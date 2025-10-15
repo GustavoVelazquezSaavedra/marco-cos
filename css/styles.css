@@ -1,0 +1,53 @@
+/* Estilos generales */
+body {
+    background-color: #f8f9fa;
+}
+
+.login-body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+/* Sidebar */
+.list-group-item {
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.list-group-item i {
+    width: 20px;
+    margin-right: 10px;
+}
+
+/* Dashboard cards */
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Botones de acción rápida */
+.btn-lg {
+    padding: 20px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.btn-lg i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
