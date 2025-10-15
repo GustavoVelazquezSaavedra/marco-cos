@@ -194,8 +194,10 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card product-card h-100">
                         <div class="position-relative">
                             <?php if (!empty($producto['imagen'])): ?>
-                            <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                                 class="card-img-top product-image" alt="<?php echo $producto['nombre']; ?>">
+                                <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
+     alt="<?php echo $producto['nombre']; ?>" 
+     style="width: 280px; height: 220px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">
+                                
                             <?php else: ?>
                             <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
                                 <i class="fas fa-image fa-3x text-muted"></i>
