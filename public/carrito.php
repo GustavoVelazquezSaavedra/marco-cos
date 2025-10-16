@@ -15,9 +15,62 @@ $db = $database->getConnection();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
+    <style>
+        .cart-item {
+            transition: all 0.3s ease;
+        }
+        .cart-item.removing {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .toast-success {
+            background: #28a745;
+            color: white;
+            border: none;
+        }
+        .toast-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+        }
+        .empty-cart-icon {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+        }
+        .product-thumb {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .btn-quantity {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cart-items-container {
+            min-height: 200px;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navbar (igual que index.php) -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
@@ -35,6 +88,9 @@ $db = $database->getConnection();
         </div>
     </nav>
 
+    <!-- Container para notificaciones Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <div class="container py-5">
         <div class="row">
             <div class="col-12">
@@ -45,14 +101,27 @@ $db = $database->getConnection();
         <div class="row">
             <div class="col-md-8">
                 <div class="card">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Productos en el Carrito</h5>
+                        <button class="btn btn-outline-danger btn-sm" id="clear-cart-btn" style="display: none;">
+                            <i class="fas fa-trash me-1"></i>Vaciar Carrito
+                        </button>
+                    </div>
                     <div class="card-body">
-                        <div id="cart-items">
-                            <!-- Los productos del carrito se cargan aquí con JavaScript -->
-                            <div class="text-center py-4" id="empty-cart-message">
-                                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                                <h5>Tu carrito está vacío</h5>
-                                <p class="text-muted">Agrega algunos productos para continuar</p>
-                                <a href="index.php" class="btn btn-primary">Ir a Comprar</a>
+                        <div class="cart-items-container" id="cart-items-container">
+                            <div id="cart-items">
+                                <!-- Los productos del carrito se cargan aquí con JavaScript -->
+                            </div>
+                            
+                            <div class="text-center py-5" id="empty-cart-message">
+                                <div class="empty-cart-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <h4 class="text-muted">Tu carrito está vacío</h4>
+                                <p class="text-muted mb-4">Agrega algunos productos para continuar</p>
+                                <a href="index.php" class="btn btn-primary">
+                                    <i class="fas fa-shopping-bag me-2"></i>Ir a Comprar
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -60,23 +129,29 @@ $db = $database->getConnection();
             </div>
             
             <div class="col-md-4">
-                <div class="card">
+                <div class="card sticky-top" style="top: 100px;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Resumen del Pedido</h5>
+                    </div>
                     <div class="card-body">
-                        <h5 class="card-title">Resumen del Pedido</h5>
                         <div id="order-summary">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Subtotal:</span>
                                 <span id="subtotal">Gs. 0</span>
                             </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Envío:</span>
+                                <span class="text-success">Gratis</span>
+                            </div>
                             <hr>
                             <div class="d-flex justify-content-between mb-3">
                                 <strong>Total:</strong>
-                                <strong id="total">Gs. 0</strong>
+                                <strong id="total" class="text-success">Gs. 0</strong>
                             </div>
-                            <button class="btn btn-primary w-100 mb-3" id="checkout-btn" disabled>
-                                <i class="fas fa-whatsapp me-2"></i>Completar Pedido por WhatsApp
+                            <button class="btn btn-success w-100 mb-3" id="checkout-btn" disabled>
+                                <i class="fab fa-whatsapp me-2"></i>Completar Pedido por WhatsApp
                             </button>
-                            <a href="index.php" class="btn btn-outline-secondary w-100">
+                            <a href="catalogo.php" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-arrow-left me-2"></i>Seguir Comprando
                             </a>
                         </div>
@@ -85,12 +160,15 @@ $db = $database->getConnection();
                 
                 <!-- Información de contacto -->
                 <div class="card mt-4">
-                    <div class="card-body">
-                        <h6 class="card-title">¿Necesitas ayuda?</h6>
-                        <p class="card-text small">
-                            <i class="fas fa-phone me-2"></i>+595 972 366-265<br>
-                            <i class="fas fa-clock me-2"></i>Lun-Vie: 8:00-18:00
+                    <div class="card-body text-center">
+                        <h6><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
+                        <p class="small mb-2">
+                            <i class="fas fa-phone me-1"></i>+595 972 366-265<br>
+                            <i class="fas fa-clock me-1"></i>Lun-Vie: 8:00-18:00
                         </p>
+                        <a href="https://wa.me/595972366265" target="_blank" class="btn btn-success btn-sm w-100">
+                            <i class="fab fa-whatsapp me-1"></i>Contactar por WhatsApp
+                        </a>
                     </div>
                 </div>
             </div>
@@ -103,19 +181,54 @@ $db = $database->getConnection();
     <script>
         let cart = JSON.parse(localStorage.getItem('marccos_cart')) || [];
         
+        // Función para mostrar notificaciones bonitas
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastHTML = `
+                <div id="${toastId}" class="toast toast-${type} align-items-center" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = new bootstrap.Toast(document.getElementById(toastId));
+            toastElement.show();
+            
+            // Remover el toast del DOM después de que se oculte
+            document.getElementById(toastId).addEventListener('hidden.bs.toast', function () {
+                this.remove();
+            });
+        }
+        
+        // Función para actualizar el carrito en tiempo real
+        function updateCartInRealTime() {
+            updateCartDisplay();
+            updateCartCount();
+            updateClearCartButton();
+        }
+        
         function updateCartDisplay() {
-            const cartItems = $('#cart-items');
-            const emptyCart = $('#empty-cart-message');
-            const checkoutBtn = $('#checkout-btn');
+            const cartItems = document.getElementById('cart-items');
+            const emptyCart = document.getElementById('empty-cart-message');
+            const checkoutBtn = document.getElementById('checkout-btn');
             
             if (cart.length === 0) {
-                emptyCart.show();
-                checkoutBtn.prop('disabled', true);
+                cartItems.innerHTML = '';
+                emptyCart.style.display = 'block';
+                checkoutBtn.disabled = true;
                 return;
             }
             
-            emptyCart.hide();
-            checkoutBtn.prop('disabled', false);
+            emptyCart.style.display = 'none';
+            checkoutBtn.disabled = false;
             
             let html = '';
             let subtotal = 0;
@@ -125,26 +238,33 @@ $db = $database->getConnection();
                 subtotal += itemTotal;
                 
                 html += `
-                    <div class="cart-item row align-items-center mb-3 pb-3 border-bottom">
-                        <div class="col-3">
-                        ${item.image ? 
-    `<img src="../uploads/products/${item.image}" class="img-thumbnail" alt="${item.name}" style="width: 250px; height: 200px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">` :
-    `<div class="img-thumbnail bg-light d-flex align-items-center justify-content-center" style="width: 250px; height: 200px; border-radius: 8px; border: 1px solid #ddd;">
-        <i class="fas fa-image text-muted"></i>
-    </div>`
-}
+                    <div class="cart-item row align-items-center mb-3 pb-3 border-bottom" id="cart-item-${index}">
+                        <div class="col-2">
+                            ${item.image ? 
+                                `<img src="../uploads/products/${item.image}" class="product-thumb" alt="${item.name}">` :
+                                `<div class="product-thumb bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>`
+                            }
                         </div>
-                        <div class="col-5">
+                        <div class="col-4">
                             <h6 class="mb-1">${item.name}</h6>
                             <p class="text-muted mb-0">Gs. ${item.price.toLocaleString()}</p>
                         </div>
-                        <div class="col-2">
-                            <input type="number" class="form-control form-control-sm quantity-input" 
-                                   value="${item.quantity}" min="1" data-index="${index}">
+                        <div class="col-4">
+                            <div class="input-group input-group-sm" style="width: 140px;">
+                                <button class="btn btn-outline-secondary btn-quantity minus-btn" type="button" data-index="${index}">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" class="form-control quantity-input" 
+                                       value="${item.quantity}" min="1" data-index="${index}">
+                                <button class="btn btn-outline-secondary btn-quantity plus-btn" type="button" data-index="${index}">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="col-2 text-end">
-                            <strong>Gs. ${itemTotal.toLocaleString()}</strong>
-                            <br>
+                            <strong class="d-block">Gs. ${itemTotal.toLocaleString()}</strong>
                             <button class="btn btn-sm btn-outline-danger mt-1 remove-item" data-index="${index}">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -153,63 +273,153 @@ $db = $database->getConnection();
                 `;
             });
             
-            cartItems.html(html);
-            $('#subtotal').text('Gs. ' + subtotal.toLocaleString());
-            $('#total').text('Gs. ' + subtotal.toLocaleString());
-            updateCartCount();
+            cartItems.innerHTML = html;
+            document.getElementById('subtotal').textContent = 'Gs. ' + subtotal.toLocaleString();
+            document.getElementById('total').textContent = 'Gs. ' + subtotal.toLocaleString();
         }
         
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            $('#cart-count').text(totalItems);
+            document.getElementById('cart-count').textContent = totalItems;
+        }
+        
+        function updateClearCartButton() {
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            if (cart.length === 0) {
+                clearCartBtn.style.display = 'none';
+            } else {
+                clearCartBtn.style.display = 'block';
+            }
         }
         
         function saveCart() {
             localStorage.setItem('marccos_cart', JSON.stringify(cart));
         }
         
-        // Eventos
-        $(document).on('change', '.quantity-input', function() {
-            const index = $(this).data('index');
-            const quantity = parseInt($(this).val());
-            
-            if (quantity > 0) {
-                cart[index].quantity = quantity;
+        function removeItemWithAnimation(index) {
+            const itemElement = document.getElementById(`cart-item-${index}`);
+            if (itemElement) {
+                itemElement.classList.add('removing');
+                
+                setTimeout(() => {
+                    cart.splice(index, 1);
+                    saveCart();
+                    updateCartInRealTime();
+                    showToast('Producto eliminado del carrito', 'danger');
+                }, 300);
+            }
+        }
+        
+        // Función para actualizar cantidad con AJAX-like behavior
+        function updateQuantity(index, newQuantity) {
+            if (newQuantity > 0) {
+                cart[index].quantity = newQuantity;
                 saveCart();
-                updateCartDisplay();
+                updateCartInRealTime();
+                showToast('Cantidad actualizada', 'success');
+            }
+        }
+        
+        // Event Listeners con delegación de eventos
+        document.addEventListener('click', function(e) {
+            // Botón menos
+            if (e.target.closest('.minus-btn')) {
+                const btn = e.target.closest('.minus-btn');
+                const index = parseInt(btn.dataset.index);
+                if (cart[index].quantity > 1) {
+                    const newQuantity = cart[index].quantity - 1;
+                    updateQuantity(index, newQuantity);
+                }
+            }
+            
+            // Botón más
+            if (e.target.closest('.plus-btn')) {
+                const btn = e.target.closest('.plus-btn');
+                const index = parseInt(btn.dataset.index);
+                const newQuantity = cart[index].quantity + 1;
+                updateQuantity(index, newQuantity);
+            }
+            
+            // Eliminar producto
+            if (e.target.closest('.remove-item')) {
+                const btn = e.target.closest('.remove-item');
+                const index = parseInt(btn.dataset.index);
+                removeItemWithAnimation(index);
+            }
+            
+            // Vaciar carrito
+            if (e.target.closest('#clear-cart-btn')) {
+                if (cart.length === 0) return;
+                
+                if (confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) {
+                    // Animación para todos los items
+                    const cartItems = document.querySelectorAll('.cart-item');
+                    cartItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.classList.add('removing');
+                        }, index * 100);
+                    });
+                    
+                    setTimeout(() => {
+                        cart = [];
+                        saveCart();
+                        updateCartInRealTime();
+                        showToast('Carrito vaciado correctamente', 'danger');
+                    }, cartItems.length * 100 + 300);
+                }
+            }
+            
+            // Completar pedido
+            if (e.target.closest('#checkout-btn')) {
+                if (cart.length === 0) return;
+                
+                // Crear mensaje para WhatsApp
+                let message = "¡Hola! Me interesan los siguientes productos:%0A%0A";
+                let total = 0;
+                
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    message += `• ${item.name} - ${item.quantity} x Gs. ${item.price.toLocaleString()}%0A`;
+                });
+                
+                message += `%0A*Total: Gs. ${total.toLocaleString()}*%0A%0A`;
+                message += "Por favor, contactame para coordinar la compra. ¡Gracias!";
+                
+                // Abrir WhatsApp
+                const phone = "595972366265";
+                window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
             }
         });
         
-        $(document).on('click', '.remove-item', function() {
-            const index = $(this).data('index');
-            cart.splice(index, 1);
-            saveCart();
-            updateCartDisplay();
+        // Evento para cambios en input de cantidad (tiempo real)
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('quantity-input')) {
+                const index = parseInt(e.target.dataset.index);
+                const quantity = parseInt(e.target.value);
+                
+                if (!isNaN(quantity) && quantity > 0) {
+                    // Actualizar en tiempo real sin esperar al change
+                    updateQuantity(index, quantity);
+                }
+            }
         });
         
-        $('#checkout-btn').click(function() {
-            if (cart.length === 0) return;
-            
-            // Crear mensaje para WhatsApp
-            let message = "¡Hola! Me interesan los siguientes productos:%0A%0A";
-            let total = 0;
-            
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                message += `• ${item.name} - ${item.quantity} x Gs. ${item.price.toLocaleString()}%0A`;
-            });
-            
-            message += `%0ATotal: Gs. ${total.toLocaleString()}%0A%0A`;
-            message += "Por favor, contactame para coordinar la compra. ¡Gracias!";
-            
-            // Abrir WhatsApp
-            const phone = "595972366265"; // Tu número sin el +
-            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+        // Evento para cuando se pierde el foco del input (validación final)
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('quantity-input')) {
+                const index = parseInt(e.target.dataset.index);
+                const quantity = parseInt(e.target.value);
+                
+                if (isNaN(quantity) || quantity < 1) {
+                    e.target.value = 1;
+                    updateQuantity(index, 1);
+                }
+            }
         });
         
         // Inicializar
-        updateCartDisplay();
+        updateCartInRealTime();
     </script>
 </body>
 </html>

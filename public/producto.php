@@ -400,7 +400,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <hr>
             <div class="text-center">
-                <small>&copy; 2024 Marco Cos. Todos los derechos reservados.</small>
+            <small>&copy; 2025 Marco Cos. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
             </div>
         </div>
     </footer>
@@ -425,36 +425,35 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         }
         
         // Agregar al carrito desde la página de detalles
-        $('.add-to-cart-detailed').click(function() {
+        // Reemplaza esta parte en todos los archivos donde esté el add-to-cart:
+
+        $('.add-to-cart').click(function() {
             const productId = $(this).data('product-id');
             const productName = $(this).data('product-name');
             const productPrice = $(this).data('product-price');
             const productImage = $(this).data('product-image');
-            const quantity = parseInt($('#quantity').val()) || 1;
             
-            // Verificar si el producto ya está en el carrito
             const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
-                existingItem.quantity += quantity;
+                existingItem.quantity += 1;
             } else {
                 cart.push({
                     id: productId,
                     name: productName,
                     price: productPrice,
                     image: productImage,
-                    quantity: quantity
+                    quantity: 1
                 });
             }
             
-            // Guardar en localStorage
             localStorage.setItem('marccos_cart', JSON.stringify(cart));
-            
-            // Actualizar contador
             updateCartCount();
             
-            // Mostrar notificación
-            alert(`¡${quantity} ${productName} agregado(s) al carrito!`);
+            // En lugar de alert, usa showToast (solo si existe la función)
+            if (typeof showToast === 'function') {
+                showToast(`¡${productName} agregado al carrito!`, 'success');
+            }
         });
         
         // Comprar ahora

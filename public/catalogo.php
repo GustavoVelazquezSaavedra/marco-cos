@@ -379,7 +379,7 @@ if (!empty($categoria_id)) {
             </div>
             <hr>
             <div class="text-center">
-                <small>&copy; 2024 Marco Cos. Todos los derechos reservados.</small>
+            <small>&copy; 2025 Marco Cos. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
             </div>
         </div>
     </footer>
@@ -397,13 +397,14 @@ if (!empty($categoria_id)) {
         }
         
         // Agregar producto al carrito
+        // Reemplaza esta parte en todos los archivos donde esté el add-to-cart:
+
         $('.add-to-cart').click(function() {
             const productId = $(this).data('product-id');
             const productName = $(this).data('product-name');
             const productPrice = $(this).data('product-price');
             const productImage = $(this).data('product-image');
             
-            // Verificar si el producto ya está en el carrito
             const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
@@ -418,14 +419,13 @@ if (!empty($categoria_id)) {
                 });
             }
             
-            // Guardar en localStorage
             localStorage.setItem('marccos_cart', JSON.stringify(cart));
-            
-            // Actualizar contador
             updateCartCount();
             
-            // Mostrar notificación
-            alert(`¡${productName} agregado al carrito!`);
+            // En lugar de alert, usa showToast (solo si existe la función)
+            if (typeof showToast === 'function') {
+                showToast(`¡${productName} agregado al carrito!`, 'success');
+            }
         });
         
         // Inicializar contador del carrito
