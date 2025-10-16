@@ -171,75 +171,161 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
     </section>
 
     <!-- Productos Destacados -->
-    <section class="py-5">
+        <!-- Productos (Destacados o Resultados de Búsqueda) -->
+        <section class="py-5">
         <div class="container">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h2 class="text-center mb-3">Productos Destacados</h2>
-                    <p class="text-center text-muted">Nuestras joyas más exclusivas</p>
-                </div>
-            </div>
-            
-            <div class="row">
-                <?php if (empty($productos_destacados)): ?>
-                <div class="col-12 text-center">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Próximamente tendremos nuevos productos destacados
+            <?php if (empty($search) && empty($categoria_id)): ?>
+                <!-- Mostrar productos destacados cuando no hay búsqueda -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="text-center mb-3">Productos Destacados</h2>
+                        <p class="text-center text-muted">Nuestras joyas más exclusivas</p>
                     </div>
                 </div>
-                <?php else: ?>
-                <?php foreach ($productos_destacados as $producto): ?>
-                <div class="col-md-3 col-sm-6">
-                    <div class="card product-card h-100">
-                        <div class="position-relative">
-                            <?php if (!empty($producto['imagen'])): ?>
-                                <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-     alt="<?php echo $producto['nombre']; ?>" 
-     style="width: 280px; height: 220px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">
-                                
-                            <?php else: ?>
-                            <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
-                                <i class="fas fa-image fa-3x text-muted"></i>
-                            </div>
-                            <?php endif; ?>
-                            <span class="category-badge badge bg-primary"><?php echo $producto['categoria_nombre']; ?></span>
+                
+                <div class="row">
+                    <?php if (empty($productos_destacados)): ?>
+                    <div class="col-12 text-center">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Próximamente tendremos nuevos productos destacados
                         </div>
-                        
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title"><?php echo $producto['nombre']; ?></h5>
-                            <p class="card-text flex-grow-1">
-                                <small class="text-muted"><?php echo substr($producto['descripcion'], 0, 80); ?>...</small>
-                            </p>
-                            <div class="mt-auto">
-                                <div class="price mb-2">Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?></div>
-                                <div class="d-grid gap-2">
-                                    <button class="btn btn-primary btn-sm add-to-cart" 
-                                            data-product-id="<?php echo $producto['id']; ?>"
-                                            data-product-name="<?php echo $producto['nombre']; ?>"
-                                            data-product-price="<?php echo $producto['precio_publico']; ?>"
-                                            data-product-image="<?php echo $producto['imagen']; ?>">
-                                        <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
-                                    </button>
-                                    <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn btn-outline-secondary btn-sm">
-                                        <i class="fas fa-eye me-1"></i>Ver Detalles
-                                    </a>
+                    </div>
+                    <?php else: ?>
+                    <?php foreach ($productos_destacados as $producto): ?>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card product-card h-100">
+                            <div class="position-relative">
+                                <?php if (!empty($producto['imagen'])): ?>
+                                <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
+                                     class="card-img-top product-image" alt="<?php echo $producto['nombre']; ?>">
+                                <?php else: ?>
+                                <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                                <?php endif; ?>
+                                <span class="category-badge badge bg-primary"><?php echo $producto['categoria_nombre']; ?></span>
+                            </div>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title"><?php echo $producto['nombre']; ?></h5>
+                                <p class="card-text flex-grow-1">
+                                    <small class="text-muted"><?php echo substr($producto['descripcion'], 0, 80); ?>...</small>
+                                </p>
+                                <div class="mt-auto">
+                                    <div class="price mb-2">Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?></div>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary btn-sm add-to-cart" 
+                                                data-product-id="<?php echo $producto['id']; ?>"
+                                                data-product-name="<?php echo $producto['nombre']; ?>"
+                                                data-product-price="<?php echo $producto['precio_publico']; ?>"
+                                                data-product-image="<?php echo $producto['imagen']; ?>">
+                                            <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
+                                        </button>
+                                        <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Ver Detalles
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            
-            <div class="row mt-4">
-                <div class="col-12 text-center">
-                    <a href="catalogo.php" class="btn btn-outline-primary">
-                        Ver Todos los Productos <i class="fas fa-arrow-right ms-2"></i>
-                    </a>
+                
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <a href="catalogo.php" class="btn btn-outline-primary">
+                            Ver Todos los Productos <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
                 </div>
-            </div>
+
+            <?php else: ?>
+                <!-- Mostrar resultados de búsqueda/filtros -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-3">
+                            <?php if (!empty($search)): ?>
+                                Resultados de búsqueda: "<?php echo $search; ?>"
+                            <?php elseif (!empty($categoria_id)): ?>
+                                <?php 
+                                $cat_nombre = '';
+                                foreach ($categorias as $cat) {
+                                    if ($cat['id'] == $categoria_id) {
+                                        $cat_nombre = $cat['nombre'];
+                                        break;
+                                    }
+                                }
+                                ?>
+                                Categoría: <?php echo $cat_nombre; ?>
+                            <?php endif; ?>
+                        </h2>
+                        <p class="text-muted"><?php echo count($productos); ?> producto(s) encontrado(s)</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <?php if (empty($productos)): ?>
+                    <div class="col-12 text-center">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-search me-2"></i>
+                            No se encontraron productos que coincidan con tu búsqueda.
+                        </div>
+                        <a href="index.php" class="btn btn-primary">Ver Todos los Productos</a>
+                    </div>
+                    <?php else: ?>
+                    <?php foreach ($productos as $producto): ?>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card product-card h-100">
+                            <div class="position-relative">
+                                <?php if (!empty($producto['imagen'])): ?>
+                                <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
+                                     class="card-img-top product-image" alt="<?php echo $producto['nombre']; ?>">
+                                <?php else: ?>
+                                <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                                <?php endif; ?>
+                                <span class="category-badge badge bg-primary"><?php echo $producto['categoria_nombre']; ?></span>
+                            </div>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title"><?php echo $producto['nombre']; ?></h5>
+                                <p class="card-text flex-grow-1">
+                                    <small class="text-muted"><?php echo substr($producto['descripcion'], 0, 80); ?>...</small>
+                                </p>
+                                <div class="mt-auto">
+                                    <div class="price mb-2">Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?></div>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary btn-sm add-to-cart" 
+                                                data-product-id="<?php echo $producto['id']; ?>"
+                                                data-product-name="<?php echo $producto['nombre']; ?>"
+                                                data-product-price="<?php echo $producto['precio_publico']; ?>"
+                                                data-product-image="<?php echo $producto['imagen']; ?>">
+                                            <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
+                                        </button>
+                                        <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Ver Detalles
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <a href="index.php" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 
