@@ -333,17 +333,17 @@ function uploadDocument($file, $folder = "documents") {
 
                     <!-- Filtros -->
                     <!-- En la sección de filtros, después de los botones Filtrar y Limpiar -->
-<div class="col-12">
-    <button type="submit" class="btn btn-primary">
-        <i class="fas fa-filter"></i> Filtrar
-    </button>
-    <a href="inventario.php" class="btn btn-secondary">Limpiar</a>
-    
-    <!-- Botón para generar PDF -->
-    <button type="button" id="generarPDF" class="btn btn-danger">
-        <i class="fas fa-file-pdf"></i> Generar PDF
-    </button>
-</div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                        <a href="inventario.php" class="btn btn-secondary">Limpiar</a>
+                        
+                        <!-- Botón para generar PDF -->
+                        <button type="button" id="generarPDF" class="btn btn-danger">
+                            <i class="fas fa-file-pdf"></i> Generar PDF
+                        </button>
+                    </div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <form method="GET" class="row g-3">
@@ -619,27 +619,27 @@ function uploadDocument($file, $folder = "documents") {
             <?php endif; ?>
         });
         // Generar PDF con los filtros actuales
-$('#generarPDF').click(function() {
-    // Obtener los valores actuales de los filtros
-    const fecha_desde = $('#fecha_desde').val();
-    const fecha_hasta = $('#fecha_hasta').val();
-    const tipo_movimiento = $('#tipo_movimiento').val();
-    const producto_id = $('#producto_id').val();
-    
-    // Construir la URL con los parámetros
-    let url = 'pdf/inventario_pdf.php?';
-    const params = [];
-    
-    if (fecha_desde) params.push('fecha_desde=' + fecha_desde);
-    if (fecha_hasta) params.push('fecha_hasta=' + fecha_hasta);
-    if (tipo_movimiento) params.push('tipo_movimiento=' + tipo_movimiento);
-    if (producto_id) params.push('producto_id=' + producto_id);
-    
-    url += params.join('&');
-    
-    // Abrir en nueva pestaña
-    window.open(url, '_blank');
-});
+        $('#generarPDF').click(function() {
+            // Obtener los valores actuales de los filtros
+            const fecha_desde = $('#fecha_desde').val();
+            const fecha_hasta = $('#fecha_hasta').val();
+            const tipo_movimiento = $('#tipo_movimiento').val();
+            const producto_id = $('#producto_id').val();
+            
+            // Construir la URL con los parámetros
+            let url = 'pdf/inventario_pdf.php?';
+            const params = [];
+            
+            if (fecha_desde) params.push('fecha_desde=' + fecha_desde);
+            if (fecha_hasta) params.push('fecha_hasta=' + fecha_hasta);
+            if (tipo_movimiento) params.push('tipo_movimiento=' + tipo_movimiento);
+            if (producto_id) params.push('producto_id=' + producto_id);
+            
+            url += params.join('&');
+            
+            // Abrir en nueva pestaña
+            window.open(url, '_blank');
+        });
     </script>
 </body>
 </html>
