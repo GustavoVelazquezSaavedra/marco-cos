@@ -368,7 +368,7 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
 
                     <div class="row">
                         <div class="col-md-8">
-                            <!-- Productos del pedido -->
+                            <!-- Productos del pedido -->                               
                             <div class="card mb-4">
                                 <div class="card-header">
                                     <h5 class="card-title mb-0">Productos del Pedido</h5>
@@ -385,28 +385,95 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <?php 
+                                                // Debug: Ver estructura real de los datos
+                                                // echo '<pre>'; print_r($productos_pedido); echo '</pre>';
+                                                ?>
                                                 <?php foreach ($productos_pedido as $producto): ?>
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex align-items-center">
-                                                            <?php if (!empty($producto['imagen'])): ?>
-                                                            <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                                                                 alt="<?php echo $producto['nombre']; ?>" class="producto-img me-3">
+                                                            <?php if (!empty($producto['image']) || !empty($producto['imagen'])): ?>
+                                                            <img src="../uploads/products/<?php echo !empty($producto['image']) ? $producto['image'] : $producto['imagen']; ?>" 
+                                                                alt="<?php echo isset($producto['name']) ? $producto['name'] : (isset($producto['nombre']) ? $producto['nombre'] : 'Producto'); ?>" 
+                                                                class="producto-img me-3">
                                                             <?php else: ?>
                                                             <div class="producto-img bg-light d-flex align-items-center justify-content-center me-3">
                                                                 <i class="fas fa-box text-muted"></i>
                                                             </div>
                                                             <?php endif; ?>
                                                             <div>
-                                                                <strong><?php echo $producto['nombre']; ?></strong>
+                                                                <strong>
+                                                                    <?php 
+                                                                    if (isset($producto['name'])) {
+                                                                        echo $producto['name'];
+                                                                    } elseif (isset($producto['nombre'])) {
+                                                                        echo $producto['nombre'];
+                                                                    } else {
+                                                                        echo 'Producto no disponible';
+                                                                    }
+                                                                    ?>
+                                                                </strong>
                                                                 <br>
-                                                                <small class="text-muted"><?php echo $producto['codigo']; ?></small>
+                                                                <small class="text-muted">
+                                                                    <?php 
+                                                                    if (isset($producto['codigo'])) {
+                                                                        echo $producto['codigo'];
+                                                                    } elseif (isset($producto['id'])) {
+                                                                        echo 'ID: ' . $producto['id'];
+                                                                    } else {
+                                                                        echo 'Sin código';
+                                                                    }
+                                                                    ?>
+                                                                </small>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td><?php echo $producto['cantidad']; ?></td>
-                                                    <td>Gs. <?php echo number_format($producto['precio'], 0, ',', '.'); ?></td>
-                                                    <td><strong>Gs. <?php echo number_format($producto['subtotal'], 0, ',', '.'); ?></strong></td>
+                                                    <td>
+                                                        <?php 
+                                                        if (isset($producto['quantity'])) {
+                                                            echo $producto['quantity'];
+                                                        } elseif (isset($producto['cantidad'])) {
+                                                            echo $producto['cantidad'];
+                                                        } else {
+                                                            echo 1;
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                    <td>
+                                                        Gs. <?php 
+                                                        $precio = 0;
+                                                        if (isset($producto['price'])) {
+                                                            $precio = $producto['price'];
+                                                        } elseif (isset($producto['precio'])) {
+                                                            $precio = $producto['precio'];
+                                                        }
+                                                        echo number_format($precio, 0, ',', '.'); 
+                                                        ?>
+                                                    </td>
+                                                    <td>
+                                                        <strong>
+                                                            Gs. <?php 
+                                                            $precio = 0;
+                                                            $cantidad = 1;
+                                                            
+                                                            if (isset($producto['price'])) {
+                                                                $precio = $producto['price'];
+                                                            } elseif (isset($producto['precio'])) {
+                                                                $precio = $producto['precio'];
+                                                            }
+                                                            
+                                                            if (isset($producto['quantity'])) {
+                                                                $cantidad = $producto['quantity'];
+                                                            } elseif (isset($producto['cantidad'])) {
+                                                                $cantidad = $producto['cantidad'];
+                                                            }
+                                                            
+                                                            $subtotal = $precio * $cantidad;
+                                                            echo number_format($subtotal, 0, ',', '.'); 
+                                                            ?>
+                                                        </strong>
+                                                    </td>
                                                 </tr>
                                                 <?php endforeach; ?>
                                             </tbody>

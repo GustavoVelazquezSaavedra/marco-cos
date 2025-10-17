@@ -175,6 +175,49 @@ $db = $database->getConnection();
         </div>
     </div>
 
+    <!-- Modal para datos del cliente -->
+    <div class="modal fade" id="clienteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user me-2"></i>Un último paso
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Para contactarte sobre tu pedido:</p>
+                    
+                    <div class="mb-3">
+                        <label for="cliente_nombre" class="form-label">¿Cómo te llamas? *</label>
+                        <input type="text" class="form-control" id="cliente_nombre" 
+                               placeholder="Tu nombre completo" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cliente_telefono" class="form-label">Tu número de WhatsApp *</label>
+                        <input type="tel" class="form-control" id="cliente_telefono" 
+                               placeholder="0972 366-265" required>
+                        <small class="text-muted">Ej: 0972366265, 0985123456</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            Te contactaremos por WhatsApp para confirmar disponibilidad y coordinar el pago.
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="modal-confirm-btn">
+                        <i class="fab fa-whatsapp me-2"></i>Enviar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
@@ -319,6 +362,138 @@ $db = $database->getConnection();
                 showToast('Cantidad actualizada', 'success');
             }
         }
+
+        // Función para formatear teléfono a formato internacional
+        function formatearTelefono(telefono) {
+            // Limpiar el teléfono (quitar espacios, guiones, etc.)
+            let telefonoLimpio = telefono.replace(/\D/g, '');
+            
+            // Si empieza con 0, removerlo
+            if (telefonoLimpio.startsWith('0')) {
+                telefonoLimpio = telefonoLimpio.substring(1);
+            }
+            
+            // Si tiene 9 dígitos, agregar 595 al inicio
+            if (telefonoLimpio.length === 9) {
+                return '595' + telefonoLimpio;
+            }
+            
+            // Si ya tiene código de país, devolver tal cual
+            return telefonoLimpio;
+        }
+
+        // Función para validar teléfono paraguayo
+        function validarTelefono(telefono) {
+            const telefonoLimpio = telefono.replace(/\D/g, '');
+            
+            // Patrones de teléfonos paraguayos
+            const patrones = [
+                /^09[1-9]\d{6}$/,      // 0972366265
+                /^9[1-9]\d{6}$/,       // 972366265
+                /^5959[1-9]\d{6}$/,    // 595972366265
+                /^09[1-9]\d{7}$/       // 09851234567
+            ];
+            
+            return patrones.some(patron => patron.test(telefonoLimpio));
+        }
+
+        // Función para guardar pedido en BD - VERSIÓN CON DATOS DEL CLIENTE
+        async function guardarPedidoEnBD(nombre, telefono) {
+            const checkoutBtn = document.getElementById('checkout-btn');
+            checkoutBtn.disabled = true;
+            checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+            
+            try {
+                // Preparar productos con la estructura correcta
+                const productosParaBD = cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.image || ''
+                }));
+                
+                const response = await fetch('../includes/save_order.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cliente_nombre: nombre,
+                        cliente_telefono: telefono,
+                        productos: productosParaBD,
+                        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+                    })
+                });
+                
+                const result = await response.json();
+                
+                console.log('Respuesta del servidor:', result); // Para debug
+                
+                if (result.success && result.pedido_id) {
+                    // Crear mensaje para WhatsApp
+                    let message = `¡Hola, me llamo:  ${nombre}!, y mi(s) pedido(os) es/son los siguientes productos:%0A%0A`;
+                    let total = 0;
+                    
+                    cart.forEach(item => {
+                        const itemTotal = item.price * item.quantity;
+                        total += itemTotal;
+                        message += ` ${item.name}%0A`;
+                        message += `   Cantidad: ${item.quantity} x Gs. ${item.price.toLocaleString()}%0A`;
+                        message += `   Subtotal: Gs. ${itemTotal.toLocaleString()}%0A%0A`;
+                    });
+                    
+                    message += `*TOTAL: Gs. ${total.toLocaleString()}*%0A%0A`;
+                    message += `*N° de Pedido: #${result.pedido_id}*%0A%0A`;
+                    message += `Por favor, confirmame:%0A`;
+                    message += `Disponibilidad de los productos%0A`;
+                    message += `Formas de pago aceptadas%0A`;
+                    message += `Costo y tiempo de envío%0A%0A`;
+                    message += `¡Quedo atento a tu respuesta!`;
+                    
+                    // Formatear teléfono para WhatsApp
+                    const telefonoWhatsapp = formatearTelefono(telefono);
+                    console.log('Teléfono formateado:', telefonoWhatsapp); // Para debug
+                    
+                    // Abrir WhatsApp
+                    window.open(`https://wa.me/595972366265?text=${message}`, '_blank');
+                    
+                    // Limpiar carrito después de enviar
+                    setTimeout(() => {
+                        cart = [];
+                        saveCart();
+                        updateCartInRealTime();
+                        showToast('¡Pedido #' + result.pedido_id + ' enviado correctamente!', 'success');
+                        
+                        // Restaurar botón
+                        checkoutBtn.disabled = false;
+                        checkoutBtn.innerHTML = '<i class="fab fa-whatsapp me-2"></i>Completar Pedido por WhatsApp';
+                    }, 2000);
+                    
+                } else {
+                    const errorMsg = result.error || 'No se pudo obtener el ID del pedido';
+                    showToast('Error: ' + errorMsg, 'danger');
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.innerHTML = '<i class="fab fa-whatsapp me-2"></i>Completar Pedido por WhatsApp';
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error de conexión. Intenta nuevamente.', 'danger');
+                checkoutBtn.disabled = false;
+                checkoutBtn.innerHTML = '<i class="fab fa-whatsapp me-2"></i>Completar Pedido por WhatsApp';
+            }
+        }
+
+        // Función para mostrar modal y capturar datos
+        function mostrarModalCliente() {
+            const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
+            modal.show();
+            
+            // Limpiar formulario
+            document.getElementById('cliente_nombre').value = '';
+            document.getElementById('cliente_telefono').value = '';
+        }
         
         // Event Listeners con delegación de eventos
         document.addEventListener('click', function(e) {
@@ -369,26 +544,40 @@ $db = $database->getConnection();
                 }
             }
             
-            // Completar pedido
+            // Completar pedido - MOSTRAR MODAL
             if (e.target.closest('#checkout-btn')) {
                 if (cart.length === 0) return;
                 
-                // Crear mensaje para WhatsApp
-                let message = "¡Hola! Me interesan los siguientes productos:%0A%0A";
-                let total = 0;
+                // Mostrar modal para datos del cliente
+                mostrarModalCliente();
+            }
+            
+            // Confirmar pedido desde el modal
+            if (e.target.closest('#modal-confirm-btn')) {
+                const nombre = document.getElementById('cliente_nombre').value.trim();
+                const telefono = document.getElementById('cliente_telefono').value.trim();
                 
-                cart.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    total += itemTotal;
-                    message += `• ${item.name} - ${item.quantity} x Gs. ${item.price.toLocaleString()}%0A`;
-                });
+                if (!nombre) {
+                    showToast('Por favor ingresa tu nombre', 'danger');
+                    return;
+                }
                 
-                message += `%0A*Total: Gs. ${total.toLocaleString()}*%0A%0A`;
-                message += "Por favor, contactame para coordinar la compra. ¡Gracias!";
+                if (!telefono) {
+                    showToast('Por favor ingresa tu número de WhatsApp', 'danger');
+                    return;
+                }
                 
-                // Abrir WhatsApp
-                const phone = "595972366265";
-                window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                if (!validarTelefono(telefono)) {
+                    showToast('Por favor ingresa un número de WhatsApp válido', 'danger');
+                    return;
+                }
+                
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('clienteModal'));
+                modal.hide();
+                
+                // Guardar pedido con datos del cliente
+                guardarPedidoEnBD(nombre, telefono);
             }
         });
         

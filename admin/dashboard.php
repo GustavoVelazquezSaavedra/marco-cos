@@ -16,7 +16,9 @@ $queries = [
     'total_productos' => "SELECT COUNT(*) as total FROM productos WHERE activo = 1",
     'total_categorias' => "SELECT COUNT(*) as total FROM categorias WHERE activo = 1",
     'stock_bajo' => "SELECT COUNT(*) as total FROM productos WHERE stock < 10 AND activo = 1",
-    'pedidos_pendientes' => "SELECT COUNT(*) as total FROM pedidos WHERE estado = 'pendiente'"
+    'pedidos_pendientes' => "SELECT COUNT(*) as total FROM pedidos WHERE estado = 'pendiente'",
+    'pedidos_procesando' => "SELECT COUNT(*) as total FROM pedidos WHERE estado = 'procesado'",
+    'pedidos_completados' => "SELECT COUNT(*) as total FROM pedidos WHERE estado = 'completado'"
 ];
 
 foreach ($queries as $key => $query) {
@@ -195,12 +197,13 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
                         </div>
                     </div>
                     
+                    <!-- NUEVAS CARDS DE PEDIDOS -->
                     <div class="col-md-3 mb-4">
-                        <div class="card text-white bg-danger">
+                        <div class="card text-white bg-warning">
                             <div class="card-body text-center">
                                 <div class="h4"><?php echo $stats['pedidos_pendientes']; ?></div>
-                                <div>Pedidos Pendientes</div>
-                                <small>Por procesar</small>
+                                <div>Pendientes</div>
+                                <small>Por contactar</small>
                             </div>
                             <div class="card-footer text-center p-2">
                                 <a href="pedidos.php?estado=pendiente" class="text-white text-decoration-none">
@@ -209,17 +212,17 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-3 mb-4">
-                        <div class="card text-white bg-warning">
+                        <div class="card text-white bg-info">
                             <div class="card-body text-center">
-                                <div class="h4"><?php echo $stats['stock_bajo']; ?></div>
-                                <div>Stock Bajo</div>
-                                <small>Necesitan atención</small>
+                                <div class="h4"><?php echo $stats['pedidos_procesando']; ?></div>
+                                <div>Procesando</div>
+                                <small>En preparación</small>
                             </div>
                             <div class="card-footer text-center p-2">
-                                <a href="productos.php" class="text-white text-decoration-none">
-                                    <i class="fas fa-box me-1"></i>Revisar Stock
+                                <a href="pedidos.php?estado=procesado" class="text-white text-decoration-none">
+                                    <i class="fas fa-cog me-1"></i>Gestionar
                                 </a>
                             </div>
                         </div>
@@ -228,13 +231,13 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
                     <div class="col-md-3 mb-4">
                         <div class="card text-white bg-success">
                             <div class="card-body text-center">
-                                <div class="h4">Gs. <?php echo number_format($stats['total_ventas'], 0, ',', '.'); ?></div>
-                                <div>Ventas Hoy</div>
-                                <small>Ingresos del día</small>
+                                <div class="h4"><?php echo $stats['pedidos_completados']; ?></div>
+                                <div>Completados</div>
+                                <small>Ventas finalizadas</small>
                             </div>
                             <div class="card-footer text-center p-2">
-                                <a href="pedidos.php" class="text-white text-decoration-none">
-                                    <i class="fas fa-chart-bar me-1"></i>Ver Reportes
+                                <a href="pedidos.php?estado=completado" class="text-white text-decoration-none">
+                                    <i class="fas fa-check me-1"></i>Ver Completados
                                 </a>
                             </div>
                         </div>
