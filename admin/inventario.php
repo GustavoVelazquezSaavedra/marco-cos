@@ -37,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'entrada') {
         }
     }
     
-    // Registrar movimiento
-    $query = "INSERT INTO inventario (producto_id, tipo, cantidad, motivo, usuario_id, documento) VALUES (?, 'entrada', ?, ?, ?, ?)";
+    // Registrar movimiento - usando el nombre correcto de la columna fecha
+    $query = "INSERT INTO inventario (producto_id, tipo, cantidad, motivo, usuario_id, documento, fecha_movimiento) VALUES (?, 'entrada', ?, ?, ?, ?, NOW())";
     $stmt = $db->prepare($query);
     
     if ($stmt->execute([$producto_id, $cantidad, $motivo, $_SESSION['user_id'], $documento])) {
@@ -79,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'salida') {
             }
         }
         
-        // Registrar movimiento
-        $query = "INSERT INTO inventario (producto_id, tipo, cantidad, motivo, usuario_id, documento) VALUES (?, 'salida', ?, ?, ?, ?)";
+        // Registrar movimiento - usando el nombre correcto de la columna fecha
+        $query = "INSERT INTO inventario (producto_id, tipo, cantidad, motivo, usuario_id, documento, fecha_movimiento) VALUES (?, 'salida', ?, ?, ?, ?, NOW())";
         $stmt = $db->prepare($query);
         
         if ($stmt->execute([$producto_id, $cantidad, $motivo, $_SESSION['user_id'], $documento])) {
@@ -99,42 +99,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'salida') {
 
 // Obtener lista de movimientos con filtros
 if ($action == 'list') {
-    $query = "SELECT i.*, p.nombre as producto_nombre, p.codigo as producto_codigo, 
-                     u.nombre as usuario_nombre, c.nombre as categoria_nombre
-              FROM inventario i 
-              LEFT JOIN productos p ON i.producto_id = p.id 
-              LEFT JOIN categorias c ON p.categoria_id = c.id
-              LEFT JOIN usuarios u ON i.usuario_id = u.id 
-              WHERE 1=1";
-    
-    $params = [];
-    
-    // Aplicar filtros
-    if (!empty($fecha_desde)) {
-        $query .= " AND DATE(i.fecha_movimiento) >= ?";
-        $params[] = $fecha_desde;
+    try {
+        // Usar el nombre correcto de la columna fecha
+        $query = "SELECT i.*, p.nombre as producto_nombre, p.codigo as producto_codigo, 
+                         u.nombre as usuario_nombre, c.nombre as categoria_nombre
+                  FROM inventario i 
+                  LEFT JOIN productos p ON i.producto_id = p.id 
+                  LEFT JOIN categorias c ON p.categoria_id = c.id
+                  LEFT JOIN usuarios u ON i.usuario_id = u.id 
+                  WHERE 1=1";
+        
+        $params = [];
+        
+        // Aplicar filtros usando la columna de fecha correcta
+        if (!empty($fecha_desde)) {
+            $query .= " AND DATE(i.fecha_movimiento) >= ?";
+            $params[] = $fecha_desde;
+        }
+        
+        if (!empty($fecha_hasta)) {
+            $query .= " AND DATE(i.fecha_movimiento) <= ?";
+            $params[] = $fecha_hasta;
+        }
+        
+        if (!empty($tipo_movimiento)) {
+            $query .= " AND i.tipo = ?";
+            $params[] = $tipo_movimiento;
+        }
+        
+        if (!empty($producto_id)) {
+            $query .= " AND i.producto_id = ?";
+            $params[] = $producto_id;
+        }
+        
+        $query .= " ORDER BY i.fecha_movimiento DESC";
+        
+        $stmt = $db->prepare($query);
+        $stmt->execute($params);
+        $movimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+    } catch (PDOException $e) {
+        $error = "Error al acceder a la base de datos: " . $e->getMessage();
+        $movimientos = [];
     }
-    
-    if (!empty($fecha_hasta)) {
-        $query .= " AND DATE(i.fecha_movimiento) <= ?";
-        $params[] = $fecha_hasta;
-    }
-    
-    if (!empty($tipo_movimiento)) {
-        $query .= " AND i.tipo = ?";
-        $params[] = $tipo_movimiento;
-    }
-    
-    if (!empty($producto_id)) {
-        $query .= " AND i.producto_id = ?";
-        $params[] = $producto_id;
-    }
-    
-    $query .= " ORDER BY i.fecha_movimiento DESC";
-    
-    $stmt = $db->prepare($query);
-    $stmt->execute($params);
-    $movimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Obtener productos para los select
@@ -325,6 +332,18 @@ function uploadDocument($file, $folder = "documents") {
                     </div>
 
                     <!-- Filtros -->
+                    <!-- En la sección de filtros, después de los botones Filtrar y Limpiar -->
+<div class="col-12">
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-filter"></i> Filtrar
+    </button>
+    <a href="inventario.php" class="btn btn-secondary">Limpiar</a>
+    
+    <!-- Botón para generar PDF -->
+    <button type="button" id="generarPDF" class="btn btn-danger">
+        <i class="fas fa-file-pdf"></i> Generar PDF
+    </button>
+</div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <form method="GET" class="row g-3">
@@ -410,7 +429,7 @@ function uploadDocument($file, $folder = "documents") {
                                                 <small class="text-muted"><?php echo $mov['producto_codigo']; ?></small>
                                             </td>
                                             <td>
-                                                <span class="badge badge-<?php echo $mov['tipo']; ?>">
+                                                <span class="badge <?php echo $mov['tipo'] == 'entrada' ? 'bg-success' : 'bg-danger'; ?>">
                                                     <?php echo ucfirst($mov['tipo']); ?>
                                                 </span>
                                             </td>
@@ -599,6 +618,28 @@ function uploadDocument($file, $folder = "documents") {
             });
             <?php endif; ?>
         });
+        // Generar PDF con los filtros actuales
+$('#generarPDF').click(function() {
+    // Obtener los valores actuales de los filtros
+    const fecha_desde = $('#fecha_desde').val();
+    const fecha_hasta = $('#fecha_hasta').val();
+    const tipo_movimiento = $('#tipo_movimiento').val();
+    const producto_id = $('#producto_id').val();
+    
+    // Construir la URL con los parámetros
+    let url = 'pdf/inventario_pdf.php?';
+    const params = [];
+    
+    if (fecha_desde) params.push('fecha_desde=' + fecha_desde);
+    if (fecha_hasta) params.push('fecha_hasta=' + fecha_hasta);
+    if (tipo_movimiento) params.push('tipo_movimiento=' + tipo_movimiento);
+    if (producto_id) params.push('producto_id=' + producto_id);
+    
+    url += params.join('&');
+    
+    // Abrir en nueva pestaña
+    window.open(url, '_blank');
+});
     </script>
 </body>
 </html>
