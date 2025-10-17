@@ -20,18 +20,31 @@ $fecha_desde = isset($_GET['fecha_desde']) ? $_GET['fecha_desde'] : '';
 $fecha_hasta = isset($_GET['fecha_hasta']) ? $_GET['fecha_hasta'] : '';
 
 // Cambiar estado del pedido
-if ($action == 'cambiar_estado' && $id) {
-    $nuevo_estado = sanitize($_POST['nuevo_estado']);
-    $notas = sanitize($_POST['notas']);
+// Cambiar estado del pedido - SOLO cuando se envía el formulario POST
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'cambiar_estado' && $id) {
+    $nuevo_estado = isset($_POST['nuevo_estado']) ? sanitize($_POST['nuevo_estado']) : '';
+    $notas = isset($_POST['notas']) ? sanitize($_POST['notas']) : '';
     
-    $query = "UPDATE pedidos SET estado = ?, notas = ? WHERE id = ?";
-    $stmt = $db->prepare($query);
-    
-    if ($stmt->execute([$nuevo_estado, $notas, $id])) {
-        $success = "Estado del pedido actualizado exitosamente";
-        $action = 'view';
-    } else {
-        $error = "Error al actualizar el estado del pedido";
+    if (!empty($nuevo_estado)) {
+        $query = "UPDATE pedidos SET estado = ?, notas = ? WHERE id = ?";
+        $stmt = $db->prepare($query);
+        
+        if ($stmt->execute([$nuevo_estado, $notas, $id])) {
+            $success = "Estado del pedido actualizado exitosamente";
+            $action = 'view';
+            
+            //  IMPORTANTE: Recargar los datos del pedido después de actualizar
+            $query = "SELECT * FROM pedidos WHERE id = ?";
+            $stmt = $db->prepare($query);
+            $stmt->execute([$id]);
+            $pedido = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($pedido) {
+                $productos_pedido = json_decode($pedido['productos'], true);
+            }
+        } else {
+            $error = "Error al actualizar el estado del pedido";
+        }
     }
 }
 

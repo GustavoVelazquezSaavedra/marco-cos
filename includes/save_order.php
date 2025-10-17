@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $input = json_decode(file_get_contents('php://input'), true);
     
-    // Obtener datos del cliente (con valores por defecto)
+    // Obtener datos del cliente
     $cliente_nombre = !empty($input['cliente_nombre']) ? sanitize($input['cliente_nombre']) : 'Cliente por Contactar';
     $cliente_telefono = !empty($input['cliente_telefono']) ? sanitize($input['cliente_telefono']) : '000000000';
     $cliente_email = '';
@@ -50,9 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute()) {
             $pedido_id = $db->lastInsertId();
             
-            // DEBUG: Registrar en logs
-            error_log("Pedido creado: ID $pedido_id, Cliente: $cliente_nombre, Tel: $cliente_telefono");
-            
             echo json_encode([
                 'success' => true, 
                 'pedido_id' => $pedido_id,
@@ -65,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
         }
     } catch (PDOException $e) {
-        error_log("Error save_order: " . $e->getMessage());
         echo json_encode([
             'success' => false, 
             'error' => 'Error de base de datos: ' . $e->getMessage()
