@@ -655,7 +655,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-md-4 mb-4">
                     <h5 class="footer-title">CONTACTO</h5>
                     <div class="footer-links">
-                        <p><i class="fas fa-phone me-2"></i>+595 972 366-265</p>
+                        <p><i class="fas fa-phone me-2"></i>+595972366265</p>
                         <p><i class="fas fa-envelope me-2"></i>info@marccos.com</p>
                     </div>
                 </div>
