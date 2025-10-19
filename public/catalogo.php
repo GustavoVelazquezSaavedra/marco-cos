@@ -74,7 +74,7 @@ if (!empty($categoria_id)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Completo - Marco Cos</title>
+    <title>Catálogo Completo - BLOOM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
@@ -125,7 +125,7 @@ if (!empty($categoria_id)) {
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-gem me-2"></i>Marco Cos
+                <i class="fas fa-gem me-2"></i>BLOOM
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -358,7 +358,7 @@ if (!empty($categoria_id)) {
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <h5><i class="fas fa-gem me-2"></i>Marco Cos</h5>
+                    <h5><i class="fas fa-gem me-2"></i>BLOOM</h5>
                     <p>Joyería y accesorios de la más alta calidad para momentos especiales.</p>
                 </div>
                 <div class="col-md-4">
@@ -379,7 +379,7 @@ if (!empty($categoria_id)) {
             </div>
             <hr>
             <div class="text-center">
-            <small>&copy; 2025 Marco Cos. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
+            <small>&copy; 2025 BLOOM. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
             </div>
         </div>
     </footer>

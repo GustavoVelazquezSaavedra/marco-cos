@@ -11,7 +11,7 @@ $db = $database->getConnection();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras - Marco Cos</title>
+    <title>Carrito de Compras - BLOOM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
@@ -74,7 +74,7 @@ $db = $database->getConnection();
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-gem me-2"></i>Marco Cos
+                <i class="fas fa-gem me-2"></i>BLOOM
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="index.php">

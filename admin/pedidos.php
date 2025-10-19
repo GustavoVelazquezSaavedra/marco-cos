@@ -113,7 +113,7 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Pedidos - Marco Cos Admin</title>
+    <title>Gestión de Pedidos - BLOOM Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="../css/styles.css" rel="stylesheet">
@@ -136,7 +136,7 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="dashboard.php">
-                <i class="fas fa-gem"></i> Marco Cos Admin
+                <i class="fas fa-gem"></i> BLOOM Admin
             </a>
             <div class="navbar-nav ms-auto">
                 <span class="navbar-text me-3">
@@ -352,7 +352,7 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
                                             <i class="fas fa-edit"></i> Estado
                                         </a>
                                         <?php if (!empty($ped['cliente_telefono'])): ?>
-                                        <a href="https://wa.me/595<?php echo substr($ped['cliente_telefono'], -9); ?>?text=Hola <?php echo urlencode($ped['cliente_nombre']); ?>, te contactamos por tu pedido #<?php echo $ped['id']; ?> en Marco Cos" 
+                                        <a href="https://wa.me/595<?php echo substr($ped['cliente_telefono'], -9); ?>?text=Hola <?php echo urlencode($ped['cliente_nombre']); ?>, te contactamos por tu pedido #<?php echo $ped['id']; ?> en BLOOM" 
                                            target="_blank" class="btn btn-sm btn-outline-success">
                                             <i class="fab fa-whatsapp"></i> WhatsApp
                                         </a>
@@ -517,7 +517,7 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
                                     
                                     <?php if (!empty($pedido['cliente_telefono'])): ?>
                                     <div class="d-grid gap-2">
-                                        <a href="https://wa.me/595<?php echo substr($pedido['cliente_telefono'], -9); ?>?text=Hola <?php echo urlencode($pedido['cliente_nombre']); ?>, te contactamos por tu pedido #<?php echo $pedido['id']; ?> en Marco Cos" 
+                                        <a href="https://wa.me/595<?php echo substr($pedido['cliente_telefono'], -9); ?>?text=Hola <?php echo urlencode($pedido['cliente_nombre']); ?>, te contactamos por tu pedido #<?php echo $pedido['id']; ?> en BLOOM" 
                                            target="_blank" class="btn btn-success">
                                             <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
                                         </a>

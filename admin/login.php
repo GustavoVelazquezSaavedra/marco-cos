@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Marco Cos Admin</title>
+    <title>Login - BLOOM Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/styles.css" rel="stylesheet">
 </head>
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-md-4">
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white text-center">
-                        <h4>Marco Cos Admin</h4>
+                        <h4>BLOOM Admin</h4>
                         <small>Sistema de Gestión</small>
                     </div>
                     <div class="card-body">

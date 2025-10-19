@@ -28,14 +28,14 @@ if ($action == 'inventario_pdf') {
     
     // Crear PDF
     $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8');
-    $pdf->SetCreator('Marco Cos');
-    $pdf->SetAuthor('Marco Cos');
+    $pdf->SetCreator('BLOOM');
+    $pdf->SetAuthor('BLOOM');
     $pdf->SetTitle('Reporte de Inventario');
     $pdf->AddPage();
     
     // Contenido del PDF
     $html = '
-    <h1>Marco Cos - Reporte de Inventario</h1>
+    <h1>BLOOM - Reporte de Inventario</h1>
     <p>Fecha: ' . date('d/m/Y H:i') . '</p>
     <table border="1" cellpadding="5">
         <thead>
@@ -90,7 +90,7 @@ if ($action == 'ticket_venta' && isset($_GET['pedido_id'])) {
         
         $html = '
         <div style="text-align: center;">
-            <h3>Marco Cos</h3>
+            <h3>BLOOM</h3>
             <p>Joyería y Accesorios</p>
             <p>Ticket de Venta #' . $pedido_id . '</p>
         </div>
@@ -128,7 +128,7 @@ if ($action == 'ticket_venta' && isset($_GET['pedido_id'])) {
         </table>
         <hr>
         <p style="text-align: center;">¡Gracias por su compra!</p>
-        <p style="text-align: center;">Marco Cos - Joyería de Calidad</p>';
+        <p style="text-align: center;">BLOOM - Joyería de Calidad</p>';
         
         $pdf->writeHTML($html, true, false, true, false, '');
         $pdf->Output('ticket_' . $pedido_id . '.pdf', 'I');
@@ -142,7 +142,7 @@ if ($action == 'ticket_venta' && isset($_GET['pedido_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes - Marco Cos Admin</title>
+    <title>Reportes - BLOOM Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>

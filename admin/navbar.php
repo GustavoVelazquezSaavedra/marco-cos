@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="dashboard.php">
-            <i class="fas fa-gem"></i> Marco Cos Admin
+            <i class="fas fa-gem"></i> BLOOM Admin
         </a>
         <div class="navbar-nav ms-auto">
             <span class="navbar-text me-3">

@@ -52,7 +52,7 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Marco Cos Admin</title>
+    <title>Dashboard - BLOOM Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="../css/styles.css" rel="stylesheet">
@@ -62,7 +62,7 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="dashboard.php">
-                <i class="fas fa-gem"></i> Marco Cos Admin
+                <i class="fas fa-gem"></i> BLOOM Admin
             </a>
             <div class="navbar-nav ms-auto">
                 <span class="navbar-text me-3">
