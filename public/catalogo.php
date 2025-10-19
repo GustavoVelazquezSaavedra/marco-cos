@@ -223,9 +223,9 @@ if (!empty($categoria_id)) {
                         <div class="card-body text-center">
                             <h6><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
                             <p class="small mb-2">
-                                <i class="fas fa-phone me-1"></i>+595 972 366-265
+                                <i class="fas fa-phone me-1"></i>+595 976 588694
                             </p>
-                            <a href="https://wa.me/595972366265" target="_blank" class="btn btn-success btn-sm w-100">
+                            <a href="https://wa.me/595976588694" target="_blank" class="btn btn-success btn-sm w-100">
                                 <i class="fab fa-whatsapp me-1"></i>WhatsApp
                             </a>
                         </div>
@@ -321,7 +321,7 @@ if (!empty($categoria_id)) {
                                     </div>
                                     <?php else: ?>
                                     <div class="d-grid">
-                                        <a href="https://wa.me/595972366265?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
+                                        <a href="https://wa.me/595976588694?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
                                            target="_blank" class="btn btn-outline-warning btn-sm">
                                             <i class="fab fa-whatsapp me-1"></i>Consultar Stock
                                         </a>

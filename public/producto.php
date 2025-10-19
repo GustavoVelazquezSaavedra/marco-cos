@@ -467,7 +467,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             const message = `¡Hola! Quiero comprar el siguiente producto:%0A%0A• ${productName}%0A• Cantidad: ${quantity}%0A• Precio unitario: Gs. ${productPrice.toLocaleString()}%0A• Total: Gs. ${(productPrice * quantity).toLocaleString()}%0A%0APor favor, contactame para coordinar la compra. ¡Gracias!`;
             
             // Abrir WhatsApp
-            const phone = "595972366265";
+            const phone = "595976588694";
             window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
         });
         

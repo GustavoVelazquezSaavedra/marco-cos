@@ -163,10 +163,10 @@ $db = $database->getConnection();
                     <div class="card-body text-center">
                         <h6><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
                         <p class="small mb-2">
-                            <i class="fas fa-phone me-1"></i>+595 972 366-265<br>
+                            <i class="fas fa-phone me-1"></i>+595 976 588694<br>
                             <i class="fas fa-clock me-1"></i>Lun-Vie: 8:00-18:00
                         </p>
-                        <a href="https://wa.me/595972366265" target="_blank" class="btn btn-success btn-sm w-100">
+                        <a href="https://wa.me/595976588694" target="_blank" class="btn btn-success btn-sm w-100">
                             <i class="fab fa-whatsapp me-1"></i>Contactar por WhatsApp
                         </a>
                     </div>
@@ -429,7 +429,7 @@ $db = $database->getConnection();
                     message += `%0ACONFIRMAR DISPONIBILIDAD`;
                     
                     // Abrir WhatsApp
-                    const whatsappUrl = `https://wa.me/595972366265?text=${message}`;
+                    const whatsappUrl = `https://wa.me/595976588694?text=${message}`;
                     window.open(whatsappUrl, '_blank');
                     
                     // Limpiar carrito después de enviar
