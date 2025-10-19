@@ -62,53 +62,331 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
     <style>
-        .hero-section {
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --accent-color: #3498db;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --border-color: #e0e0e0;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: white;
+            color: var(--text-dark);
+        }
+        
+        /* Navbar estilo FRAGARABIC */
+        .navbar-fragarabic {
+            background: white;
+            border-bottom: 2px solid var(--border-color);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .navbar-brand-fragarabic {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary-color) !important;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .nav-link-fragarabic {
+            color: var(--text-dark) !important;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin: 0 8px;
+            padding: 8px 15px !important;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link-fragarabic:hover,
+        .nav-link-fragarabic.active {
+            background: var(--primary-color);
+            color: white !important;
+        }
+        
+        .search-box-fragarabic {
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            width: 300px;
+        }
+        
+        .cart-icon-fragarabic {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            margin-left: 20px;
+        }
+        
+        /* Hero Section estilo simple */
+        .hero-simple {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 100px 0;
+            padding: 60px 0;
             text-align: center;
         }
-        .product-card {
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: none;
+        
+        .hero-title-simple {
+            font-size: 3rem;
+            font-weight: 700;
             margin-bottom: 20px;
         }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        
+        .hero-subtitle-simple {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
         }
-        .product-image {
+        
+        .hero-btn-simple {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 0 10px;
+            font-size: 1rem;
+        }
+        
+        /* Product Grid estilo MARCO COS */
+        .products-section {
+            padding: 40px 0;
+            background: white;
+        }
+        
+        .section-title-marco {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        
+        .section-subtitle-marco {
+            color: var(--text-light);
+            margin-bottom: 30px;
+            text-align: left;
+            font-size: 1rem;
+        }
+        
+        .product-card-marco {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .product-card-marco:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+        
+        .product-image-marco {
             height: 200px;
             object-fit: cover;
             width: 100%;
+            border-bottom: 1px solid var(--border-color);
         }
-        .price {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #28a745;
+        
+        .product-info-marco {
+            padding: 15px;
         }
-        .category-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+        
+        .product-title-marco {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-dark);
         }
+        
+        .product-description-marco {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .product-price-marco {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .product-meta-marco {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        
+        .btn-add-cart-marco {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .btn-add-cart-marco:hover {
+            background: #1a252f;
+        }
+        
+        /* Categories Section estilo EXPLORAR POR GÉNERO */
+        .categories-section {
+            background: var(--bg-light);
+            padding: 50px 0;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .categories-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .categories-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .categories-divider {
+            width: 50px;
+            height: 3px;
+            background: var(--secondary-color);
+            margin: 0 auto 20px;
+        }
+        
+        .category-card-explore {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .category-card-explore:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+        
+        .category-title-explore {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .category-list-explore {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .category-list-explore li {
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .category-list-explore li:last-child {
+            border-bottom: none;
+        }
+        
+        .category-list-explore a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        
+        .category-list-explore a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Footer simple */
+        .footer-simple {
+            background: var(--primary-color);
+            color: white;
+            padding: 40px 0 20px;
+            border-top: 3px solid var(--secondary-color);
+        }
+        
+        .footer-title {
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        /* Cart Badge */
         .cart-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-        }
-        .navbar-brand {
+            top: -8px;
+            right: -8px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
             font-weight: bold;
-            font-size: 1.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-brand-fragarabic {
+                font-size: 1.8rem;
+            }
+            
+            .search-box-fragarabic {
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .hero-title-simple {
+                font-size: 2.2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <!-- Navbar estilo FRAGARABIC -->
+    <nav class="navbar navbar-expand-lg navbar-fragarabic sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-gem me-2"></i>Marco Cos
+            <a class="navbar-brand navbar-brand-fragarabic" href="index.php">
+                MARCO COS
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -118,10 +396,10 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="index.php">Inicio</a>
+                        <a class="nav-link nav-link-fragarabic active" href="index.php">Inicio</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link nav-link-fragarabic dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             Categorías
                         </a>
                         <ul class="dropdown-menu">
@@ -135,210 +413,50 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="catalogo.php">Catálogo Completo</a>
+                        <a class="nav-link nav-link-fragarabic" href="catalogo.php">Catálogo</a>
                     </li>
                 </ul>
                 
                 <!-- Buscador -->
                 <form class="d-flex me-3" method="GET" action="index.php">
-                    <input class="form-control me-2" type="search" name="search" placeholder="Buscar productos..." 
+                    <input class="form-control search-box-fragarabic" type="search" name="search" placeholder="Buscar productos..." 
                            value="<?php echo $search; ?>">
-                    <button class="btn btn-outline-light" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
                 </form>
                 
                 <!-- Carrito -->
                 <div class="navbar-nav">
                     <a class="nav-link position-relative" href="carrito.php">
-                        <i class="fas fa-shopping-cart fa-lg"></i>
-                        <span class="cart-badge badge bg-danger rounded-pill" id="cart-count">0</span>
+                        <i class="fas fa-shopping-cart cart-icon-fragarabic"></i>
+                        <span class="cart-badge" id="cart-count">0</span>
                     </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-        <!-- Slider Principal -->
-        <?php
-    // Obtener slides activos
-    $querySlides = "SELECT s.*, p.id as producto_id, p.nombre as producto_nombre 
-                    FROM slider_principal s 
-                    LEFT JOIN productos p ON s.producto_id = p.id 
-                    WHERE s.activo = 1 
-                    ORDER BY s.orden ASC 
-                    LIMIT 5";
-    $stmtSlides = $db->prepare($querySlides);
-    $stmtSlides->execute();
-    $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
-    ?>
-
-    <?php if (!empty($slides)): ?>
-    <div id="mainSlider" class="carousel slide mb-0" data-bs-ride="carousel">
-        <!-- Indicadores -->
-        <div class="carousel-indicators">
-            <?php foreach ($slides as $index => $slide): ?>
-            <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="<?php echo $index; ?>" 
-                    class="<?php echo $index === 0 ? 'active' : ''; ?>" aria-current="<?php echo $index === 0 ? 'true' : 'false'; ?>" 
-                    aria-label="Slide <?php echo $index + 1; ?>"></button>
-            <?php endforeach; ?>
-        </div>
-        
-        <!-- Slides -->
-        <div class="carousel-inner">
-            <?php foreach ($slides as $index => $slide): ?>
-            <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>" style="height: 500px;">
-                <div class="carousel-image" style="
-                    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
-                                <?php if (!empty($slide['imagen'])): ?>
-                                url('../uploads/slider/<?php echo $slide['imagen']; ?>')
-                                <?php else: ?>
-                                url('https://via.placeholder.com/1200x600/667eea/764ba2?text=Marco+Cos')
-                                <?php endif; ?>;
-                    background-size: cover;
-                    background-position: center;
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                ">
-                    <div class="container">
-                        <div class="row justify-content-center text-center text-white">
-                            <div class="col-lg-8">
-                                <h1 class="display-4 fw-bold mb-3"><?php echo $slide['titulo']; ?></h1>
-                                <p class="lead mb-4"><?php echo $slide['subtitulo']; ?></p>
-                                <?php if ($slide['producto_id']): ?>
-                                <a href="producto.php?id=<?php echo $slide['producto_id']; ?>" class="btn btn-light btn-lg">
-                                    <i class="fas fa-gem me-2"></i><?php echo $slide['texto_boton']; ?>
-                                </a>
-                                <?php else: ?>
-                                <a href="catalogo.php" class="btn btn-light btn-lg">
-                                    <i class="fas fa-gem me-2"></i><?php echo $slide['texto_boton']; ?>
-                                </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        
-        <!-- Controles -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#mainSlider" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Anterior</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#mainSlider" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Siguiente</span>
-        </button>
-    </div>
-    
-    <style>
-        .carousel-item {
-            transition: transform 0.6s ease-in-out;
-        }
-        .carousel-image {
-            border-radius: 0 0 20px 20px;
-        }
-        .carousel-control-prev, .carousel-control-next {
-            width: 5%;
-        }
-        .carousel-indicators button {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin: 0 5px;
-        }
-        /* Asegurar que el slider no tenga margen inferior */
-        #mainSlider {
-            margin-bottom: 0 !important;
-        }
-    </style>
-    <?php endif; ?>
-
-    <!-- Hero Section (SIEMPRE visible debajo del slider) -->
-    <section class="hero-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Hero Section Simple -->
+    <section class="hero-simple">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-5 fw-bold mb-4">Bienvenido a Marco Cos</h1>
-                    <p class="lead mb-4">Descubre nuestra exclusiva colección de joyería y accesorios finos. Calidad, elegancia y estilo en cada pieza.</p>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="catalogo.php" class="btn btn-light btn-lg">
-                            <i class="fas fa-gem me-2"></i>Ver Catálogo
-                        </a>
-                        <a href="catalogo.php?categoria_id=1" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-ring me-2"></i>Anillos
-                        </a>
-                        <a href="catalogo.php?categoria_id=2" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-link me-2"></i>Cadenas
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <div class="hero-stats row mt-4 mt-lg-0">
-                        <div class="col-4">
-                            <div class="text-white">
-                                <h3 class="fw-bold">50+</h3>
-                                <small>Diseños Únicos</small>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="text-white">
-                                <h3 class="fw-bold">100%</h3>
-                                <small>Calidad Garantizada</small>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="text-white">
-                                <h3 class="fw-bold">24/7</h3>
-                                <small>Soporte</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <h1 class="hero-title-simple">BIENVENIDO A MARCO COS</h1>
+            <p class="hero-subtitle-simple">Descubre nuestra exclusiva colección de joyería y accesorios finos</p>
+            <div>
+                <a href="catalogo.php" class="btn hero-btn-simple">
+                    <i class="fas fa-gem me-2"></i>VER CATÁLOGO
+                </a>
+                <a href="catalogo.php?categoria_id=1" class="btn hero-btn-simple" style="background: transparent; border: 2px solid white; color: white;">
+                    <i class="fas fa-ring me-2"></i>ANILLOS
+                </a>
             </div>
         </div>
     </section>
 
-    <style>
-        .hero-section {
-            color: white;
-            padding: 80px 0;
-            text-align: left;
-        }
-        .hero-stats {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        @media (max-width: 768px) {
-            .hero-section {
-                padding: 60px 0;
-                text-align: center;
-            }
-            .hero-stats {
-                margin-top: 30px;
-            }
-        }
-    </style>
-
     <!-- Productos Destacados -->
-        <!-- Productos (Destacados o Resultados de Búsqueda) -->
-        <section class="py-5">
+    <section class="products-section">
         <div class="container">
             <?php if (empty($search) && empty($categoria_id)): ?>
                 <!-- Mostrar productos destacados cuando no hay búsqueda -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h2 class="text-center mb-3">Productos Destacados</h2>
-                        <p class="text-center text-muted">Nuestras joyas más exclusivas</p>
-                    </div>
-                </div>
+                <h2 class="section-title-marco">Productos Destacados</h2>
+                <p class="section-subtitle-marco">Nuestras joyas más exclusivas</p>
                 
                 <div class="row">
                     <?php if (empty($productos_destacados)): ?>
@@ -351,38 +469,44 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                     <?php else: ?>
                     <?php foreach ($productos_destacados as $producto): ?>
                     <div class="col-md-3 col-sm-6">
-                        <div class="card product-card h-100">
+                        <div class="product-card-marco">
                             <div class="position-relative">
                                 <?php if (!empty($producto['imagen'])): ?>
                                 <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                                     class="card-img-top product-image" alt="<?php echo $producto['nombre']; ?>">
+                                     class="product-image-marco" alt="<?php echo $producto['nombre']; ?>">
                                 <?php else: ?>
-                                <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                <div class="product-image-marco bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image fa-2x text-muted"></i>
                                 </div>
                                 <?php endif; ?>
-                                <span class="category-badge badge bg-primary"><?php echo $producto['categoria_nombre']; ?></span>
                             </div>
                             
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title"><?php echo $producto['nombre']; ?></h5>
-                                <p class="card-text flex-grow-1">
-                                    <small class="text-muted"><?php echo substr($producto['descripcion'], 0, 80); ?>...</small>
+                            <div class="product-info-marco">
+                                <h5 class="product-title-marco"><?php echo $producto['nombre']; ?></h5>
+                                <p class="product-description-marco">
+                                    <?php echo substr($producto['descripcion'], 0, 60); ?>...
                                 </p>
-                                <div class="mt-auto">
-                                    <div class="price mb-2">Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?></div>
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-primary btn-sm add-to-cart" 
-                                                data-product-id="<?php echo $producto['id']; ?>"
-                                                data-product-name="<?php echo $producto['nombre']; ?>"
-                                                data-product-price="<?php echo $producto['precio_publico']; ?>"
-                                                data-product-image="<?php echo $producto['imagen']; ?>">
-                                            <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
-                                        </button>
-                                        <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn btn-outline-secondary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Ver Detalles
-                                        </a>
-                                    </div>
+                                
+                                <div class="product-meta-marco">
+                                    <i class="fas fa-tag me-1"></i><?php echo $producto['categoria_nombre']; ?>
+                                </div>
+                                
+                                <div class="product-price-marco">
+                                    Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?>
+                                </div>
+                                
+                                <button class="btn btn-add-cart-marco add-to-cart" 
+                                        data-product-id="<?php echo $producto['id']; ?>"
+                                        data-product-name="<?php echo $producto['nombre']; ?>"
+                                        data-product-price="<?php echo $producto['precio_publico']; ?>"
+                                        data-product-image="<?php echo $producto['imagen']; ?>">
+                                    <i class="fas fa-cart-plus me-2"></i>AGREGAR AL CARRITO
+                                </button>
+                                
+                                <div class="text-center mt-2">
+                                    <a href="producto.php?id=<?php echo $producto['id']; ?>" class="text-decoration-none" style="color: var(--accent-color); font-size: 0.9rem;">
+                                        <i class="fas fa-eye me-1"></i>Ver detalles
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -393,8 +517,8 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                 
                 <div class="row mt-4">
                     <div class="col-12 text-center">
-                        <a href="catalogo.php" class="btn btn-outline-primary">
-                            Ver Todos los Productos <i class="fas fa-arrow-right ms-2"></i>
+                        <a href="catalogo.php" class="btn" style="border: 2px solid var(--primary-color); color: var(--primary-color); padding: 10px 30px; border-radius: 6px; font-weight: 600;">
+                            VER TODOS LOS PRODUCTOS <i class="fas fa-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
@@ -403,7 +527,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                 <!-- Mostrar resultados de búsqueda/filtros -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <h2 class="mb-3">
+                        <h2 class="section-title-marco">
                             <?php if (!empty($search)): ?>
                                 Resultados de búsqueda: "<?php echo $search; ?>"
                             <?php elseif (!empty($categoria_id)): ?>
@@ -419,7 +543,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                                 Categoría: <?php echo $cat_nombre; ?>
                             <?php endif; ?>
                         </h2>
-                        <p class="text-muted"><?php echo count($productos); ?> producto(s) encontrado(s)</p>
+                        <p class="section-subtitle-marco"><?php echo count($productos); ?> producto(s) encontrado(s)</p>
                     </div>
                 </div>
                 
@@ -430,43 +554,49 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                             <i class="fas fa-search me-2"></i>
                             No se encontraron productos que coincidan con tu búsqueda.
                         </div>
-                        <a href="index.php" class="btn btn-primary">Ver Todos los Productos</a>
+                        <a href="index.php" class="btn btn-add-cart-marco">VER TODOS LOS PRODUCTOS</a>
                     </div>
                     <?php else: ?>
                     <?php foreach ($productos as $producto): ?>
                     <div class="col-md-3 col-sm-6">
-                        <div class="card product-card h-100">
+                        <div class="product-card-marco">
                             <div class="position-relative">
                                 <?php if (!empty($producto['imagen'])): ?>
                                 <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                                     class="card-img-top product-image" alt="<?php echo $producto['nombre']; ?>">
+                                     class="product-image-marco" alt="<?php echo $producto['nombre']; ?>">
                                 <?php else: ?>
-                                <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                <div class="product-image-marco bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image fa-2x text-muted"></i>
                                 </div>
                                 <?php endif; ?>
-                                <span class="category-badge badge bg-primary"><?php echo $producto['categoria_nombre']; ?></span>
                             </div>
                             
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title"><?php echo $producto['nombre']; ?></h5>
-                                <p class="card-text flex-grow-1">
-                                    <small class="text-muted"><?php echo substr($producto['descripcion'], 0, 80); ?>...</small>
+                            <div class="product-info-marco">
+                                <h5 class="product-title-marco"><?php echo $producto['nombre']; ?></h5>
+                                <p class="product-description-marco">
+                                    <?php echo substr($producto['descripcion'], 0, 60); ?>...
                                 </p>
-                                <div class="mt-auto">
-                                    <div class="price mb-2">Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?></div>
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-primary btn-sm add-to-cart" 
-                                                data-product-id="<?php echo $producto['id']; ?>"
-                                                data-product-name="<?php echo $producto['nombre']; ?>"
-                                                data-product-price="<?php echo $producto['precio_publico']; ?>"
-                                                data-product-image="<?php echo $producto['imagen']; ?>">
-                                            <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
-                                        </button>
-                                        <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn btn-outline-secondary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Ver Detalles
-                                        </a>
-                                    </div>
+                                
+                                <div class="product-meta-marco">
+                                    <i class="fas fa-tag me-1"></i><?php echo $producto['categoria_nombre']; ?>
+                                </div>
+                                
+                                <div class="product-price-marco">
+                                    Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?>
+                                </div>
+                                
+                                <button class="btn btn-add-cart-marco add-to-cart" 
+                                        data-product-id="<?php echo $producto['id']; ?>"
+                                        data-product-name="<?php echo $producto['nombre']; ?>"
+                                        data-product-price="<?php echo $producto['precio_publico']; ?>"
+                                        data-product-image="<?php echo $producto['imagen']; ?>">
+                                    <i class="fas fa-cart-plus me-2"></i>AGREGAR AL CARRITO
+                                </button>
+                                
+                                <div class="text-center mt-2">
+                                    <a href="producto.php?id=<?php echo $producto['id']; ?>" class="text-decoration-none" style="color: var(--accent-color); font-size: 0.9rem;">
+                                        <i class="fas fa-eye me-1"></i>Ver detalles
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -477,8 +607,8 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                 
                 <div class="row mt-4">
                     <div class="col-12 text-center">
-                        <a href="index.php" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+                        <a href="index.php" class="btn" style="border: 2px solid var(--primary-color); color: var(--primary-color); padding: 10px 30px; border-radius: 6px; font-weight: 600;">
+                            <i class="fas fa-arrow-left me-2"></i>VOLVER AL INICIO
                         </a>
                     </div>
                 </div>
@@ -486,30 +616,27 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </section>
 
-    <!-- Categorías -->
-    <section class="py-5 bg-light">
+    <!-- Categorías estilo EXPLORAR POR GÉNERO -->
+    <section class="categories-section">
         <div class="container">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h2 class="text-center mb-3">Explora por Categoría</h2>
-                    <p class="text-center text-muted">Encuentra lo que buscas</p>
-                </div>
+            <div class="categories-header">
+                <h2 class="categories-title">Explorar por Categoría</h2>
+                <div class="categories-divider"></div>
+                <p class="text-muted">Encuentra lo que buscas en nuestras categorías</p>
             </div>
             
             <div class="row">
                 <?php foreach ($categorias as $categoria): ?>
                 <div class="col-md-3 col-sm-6 mb-4">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <i class="fas fa-gem fa-3x text-primary"></i>
-                            </div>
-                            <h5 class="card-title"><?php echo $categoria['nombre']; ?></h5>
-                            <p class="card-text text-muted"><?php echo substr($categoria['descripcion'], 0, 100); ?>...</p>
-                            <a href="?categoria_id=<?php echo $categoria['id']; ?>" class="btn btn-outline-primary">
-                                Ver Productos
-                            </a>
-                        </div>
+                    <div class="category-card-explore">
+                        <h4 class="category-title-explore"><?php echo $categoria['nombre']; ?></h4>
+                        <ul class="category-list-explore">
+                            <!-- Aquí podrías agregar subcategorías si las tienes -->
+                            <li><a href="?categoria_id=<?php echo $categoria['id']; ?>">Ver todos</a></li>
+                            <li><a href="?categoria_id=<?php echo $categoria['id']; ?>&search=oro">Oro</a></li>
+                            <li><a href="?categoria_id=<?php echo $categoria['id']; ?>&search=plata">Plata</a></li>
+                            <li><a href="?categoria_id=<?php echo $categoria['id']; ?>&search=diamante">Diamante</a></li>
+                        </ul>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -517,33 +644,33 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
+    <!-- Footer Simple -->
+    <footer class="footer-simple">
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
-                    <h5><i class="fas fa-gem me-2"></i>Marco Cos</h5>
-                    <p>Joyería y accesorios de la más alta calidad para momentos especiales.</p>
+                <div class="col-md-4 mb-4">
+                    <h5 class="footer-title">MARCO COS</h5>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Joyería y accesorios de la más alta calidad para momentos especiales.</p>
                 </div>
-                <div class="col-md-4">
-                    <h5>Contacto</h5>
-                    <p>
-                        <i class="fas fa-phone me-2"></i>+595 972 366-265<br>
-                        <i class="fas fa-envelope me-2"></i>info@marccos.com
-                    </p>
+                <div class="col-md-4 mb-4">
+                    <h5 class="footer-title">CONTACTO</h5>
+                    <div class="footer-links">
+                        <p><i class="fas fa-phone me-2"></i>+595 972 366-265</p>
+                        <p><i class="fas fa-envelope me-2"></i>info@marccos.com</p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h5>Enlaces Rápidos</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="index.php" class="text-white">Inicio</a></li>
-                        <li><a href="catalogo.php" class="text-white">Catálogo</a></li>
-                        <li><a href="carrito.php" class="text-white">Carrito</a></li>
-                    </ul>
+                <div class="col-md-4 mb-4">
+                    <h5 class="footer-title">ENLACES RÁPIDOS</h5>
+                    <div class="footer-links">
+                        <a href="index.php">Inicio</a>
+                        <a href="catalogo.php">Catálogo</a>
+                        <a href="carrito.php">Carrito</a>
+                    </div>
                 </div>
             </div>
-            <hr>
+            <hr style="border-color: rgba(255,255,255,0.2);">
             <div class="text-center">
-                <small>&copy; 2025 Marco Cos. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
+                <small style="color: rgba(255,255,255,0.7);">&copy; 2025 Marco Cos. Todos los derechos reservados.  <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
             </div>
         </div>
     </footer>
@@ -562,8 +689,6 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         }
         
         // Agregar producto al carrito
-        // Reemplaza esta parte en todos los archivos donde esté el add-to-cart:
-
         $('.add-to-cart').click(function() {
             const productId = $(this).data('product-id');
             const productName = $(this).data('product-name');
@@ -587,10 +712,22 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             localStorage.setItem('marccos_cart', JSON.stringify(cart));
             updateCartCount();
             
-            // En lugar de alert, usa showToast (solo si existe la función)
-            if (typeof showToast === 'function') {
-                showToast(`¡${productName} agregado al carrito!`, 'success');
-            }
+            // Mostrar notificación simple
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 end-0 p-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>¡Éxito!</strong> ${productName} agregado al carrito.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto-remover después de 3 segundos
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         });
         
         // Inicializar contador del carrito
