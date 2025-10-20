@@ -16,9 +16,9 @@ $db = $database->getConnection();
 // Crear PDF
 $pdf = new PDFGenerator(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-$pdf->SetCreator('Marco Cos');
-$pdf->SetAuthor('Marco Cos');
-$pdf->SetTitle('Ticket de Salida - Marco Cos');
+$pdf->SetCreator('BLOOM');
+$pdf->SetAuthor('BLOOM');
+$pdf->SetTitle('Ticket de Salida - BLOOM');
 $pdf->SetSubject('Ticket de Salida de Inventario');
 
 $pdf->AddPage();

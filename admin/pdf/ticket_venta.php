@@ -13,8 +13,10 @@ if (!isset($_SESSION['user_id'])) {
 $database = new Database();
 $db = $database->getConnection();
 
-// Obtener datos del pedido (ejemplo - adaptar según tu estructura)
+// Obtener datos del pedido
 $pedido_id = isset($_GET['pedido_id']) ? $_GET['pedido_id'] : 0;
+$pedido = null;
+$productos = array();
 
 if ($pedido_id) {
     $query = "SELECT * FROM pedidos WHERE id = ?";
@@ -27,68 +29,139 @@ if ($pedido_id) {
     }
 }
 
-// Crear PDF
-$pdf = new PDFGenerator(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+// FORZAR configuración para ticket térmico
+$pdf = new PDFGenerator('P', 'mm', array(80, 200), true, 'UTF-8', false);
 
-$pdf->SetCreator('Marco Cos');
-$pdf->SetAuthor('Marco Cos');
-$pdf->SetTitle('Ticket de Venta - Marco Cos');
-$pdf->SetSubject('Ticket de Venta al Cliente');
+// CONFIGURAR EXPLÍCITAMENTE TODO PARA BLOOM
+$pdf->SetCreator('BLOOM');
+$pdf->SetAuthor('BLOOM');
+$pdf->SetTitle('Ticket de Venta - BLOOM');
+$pdf->SetSubject('Ticket de Venta');
+$pdf->SetKeywords('ticket, venta, BLOOM');
+
+// Configuración explícita de márgenes
+$pdf->SetMargins(5, 5, 5);
+$pdf->SetHeaderMargin(0);
+$pdf->SetFooterMargin(0);
+$pdf->SetAutoPageBreak(true, 5);
 
 $pdf->AddPage();
 
-// Título del ticket
-$pdf->SetFont('helvetica', 'B', 14);
-$pdf->Cell(0, 10, 'COMPROBANTE DE VENTA', 0, 1, 'C');
-$pdf->Ln(5);
+// RESETEAR fuentes y configuraciones
+$pdf->SetFont('helvetica', '', 9);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->SetLineWidth(0.2);
 
-// Información del ticket
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(40, 6, 'N° Pedido:', 0, 0, 'L');
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->Cell(50, 6, '#' . $pedido_id, 0, 1, 'L');
+// Título del ticket - CENTRADO CORRECTAMENTE
+$pdf->SetFont('helvetica', 'B', 12);
+$pdf->Cell(0, 8, 'Ticket', 0, 1, 'C');
+$pdf->Ln(1);
 
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(40, 6, 'Fecha:', 0, 0, 'L');
-$pdf->Cell(50, 6, date('d/m/Y H:i:s'), 0, 1, 'L');
+// Línea separadora
+$pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
+$pdf->Ln(3);
+
+// Información del pedido - ALINEACIÓN CORRECTA
+$pdf->SetFont('helvetica', '', 8);
+$pdf->Cell(20, 5, 'N° Pedido:', 0, 0, 'L');
+$pdf->SetFont('helvetica', 'B', 8);
+$pdf->Cell(0, 5, '#' . $pedido_id, 0, 1, 'L');
+
+$pdf->SetFont('helvetica', '', 8);
+$pdf->Cell(20, 5, 'Fecha:', 0, 0, 'L');
+$pdf->Cell(0, 5, date('d/m/Y H:i:s'), 0, 1, 'L');
 
 if ($pedido) {
-    $pdf->Cell(40, 6, 'Cliente:', 0, 0, 'L');
-    $pdf->Cell(50, 6, $pedido['cliente_nombre'], 0, 1, 'L');
+    $pdf->SetFont('helvetica', '', 8);
+    $pdf->Cell(20, 5, 'Cliente:', 0, 0, 'L');
+    $pdf->Cell(0, 5, $pedido['cliente_nombre'], 0, 1, 'L');
     
-    $pdf->Cell(40, 6, 'Teléfono:', 0, 0, 'L');
-    $pdf->Cell(50, 6, $pedido['cliente_telefono'], 0, 1, 'L');
+    $pdf->Cell(20, 5, 'Teléfono:', 0, 0, 'L');
+    $pdf->Cell(0, 5, $pedido['cliente_telefono'], 0, 1, 'L');
 }
-$pdf->Ln(10);
 
-// Generar tabla de productos
-if ($pedido && $productos) {
-    $productos_para_pdf = array();
-    foreach ($productos as $producto) {
-        $productos_para_pdf[] = array(
-            'codigo' => $producto['id'] ?? 'N/A',
-            'nombre' => $producto['name'] ?? $producto['nombre'] ?? 'Producto',
-            'cantidad' => $producto['quantity'] ?? $producto['cantidad'] ?? 1,
-            'precio_unitario' => $producto['price'] ?? $producto['precio'] ?? 0
-        );
+$pdf->Ln(5);
+
+// Línea separadora
+$pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
+$pdf->Ln(3);
+
+// Tabla de productos - FORMATO MEJORADO
+if ($pedido && !empty($productos)) {
+    // Cabecera de la tabla
+    $pdf->SetFont('helvetica', 'B', 8);
+    $pdf->Cell(12, 6, 'Cant', 0, 0, 'L');
+    $pdf->Cell(38, 6, 'Producto', 0, 0, 'L');
+    $pdf->Cell(20, 6, 'Total', 0, 1, 'R');
+    
+    // Línea bajo cabecera
+    $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
+    $pdf->Ln(2);
+    
+    $total_general = 0;
+    $pdf->SetFont('helvetica', '', 8);
+    
+    foreach ($productos as $prod) {
+        $cantidad = $prod['quantity'] ?? $prod['cantidad'] ?? 1;
+        $precio_unitario = $prod['price'] ?? $prod['precio'] ?? 0;
+        $nombre = $prod['name'] ?? $prod['nombre'] ?? 'Producto';
+        $subtotal = $cantidad * $precio_unitario;
+        $total_general += $subtotal;
+        
+        // Acortar nombre del producto si es muy largo
+        if (strlen($nombre) > 25) {
+            $nombre = substr($nombre, 0, 25) . '...';
+        }
+        
+        $pdf->Cell(12, 5, $cantidad, 0, 0, 'L');
+        $pdf->Cell(38, 5, $nombre, 0, 0, 'L');
+        $pdf->Cell(20, 5, 'Gs. ' . number_format($subtotal, 0, ',', '.'), 0, 1, 'R');
+        
+        // Si cantidad es mayor a 1, mostrar precio unitario
+        if ($cantidad > 1) {
+            $pdf->Cell(12, 4, '', 0, 0, 'L');
+            $pdf->SetFont('helvetica', 'I', 7);
+            $pdf->Cell(38, 4, '@ Gs. ' . number_format($precio_unitario, 0, ',', '.'), 0, 1, 'L');
+            $pdf->SetFont('helvetica', '', 8);
+        }
     }
-    $pdf->generarTablaProductos($productos_para_pdf);
+    
+    $pdf->Ln(3);
+    $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
+    $pdf->Ln(3);
+    
+    // TOTAL - CON ESPACIADO CORRECTO
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->Cell(50, 7, 'TOTAL:', 0, 0, 'R');
+    $pdf->Cell(20, 7, 'Gs. ' . number_format($total_general, 0, ',', '.'), 0, 1, 'R');
 }
 
-$pdf->Ln(10);
+$pdf->Ln(8);
 
-// Información de contacto
-$pdf->SetFont('helvetica', 'B', 10);
+// Línea separadora final
+$pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
+$pdf->Ln(5);
+
+// INFORMACIÓN DE CONTACTO - BLOOM EXPLÍCITO
+$pdf->SetFont('helvetica', 'B', 9);
 $pdf->Cell(0, 6, '¡Gracias por su compra!', 0, 1, 'C');
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(0, 5, 'Marco Cos - Joyeria y Accesorios', 0, 1, 'C');
+$pdf->Ln(2);
+
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(0, 6, 'BLOOM - Joyeria y Accesorios', 0, 1, 'C');
+$pdf->SetFont('helvetica', '', 8);
 $pdf->Cell(0, 5, 'Tel: +595 972 366-265', 0, 1, 'C');
 $pdf->Cell(0, 5, 'Horario: Lun-Vie 8:00-18:00', 0, 1, 'C');
 
-$pdf->Ln(10);
-$pdf->SetFont('helvetica', 'I', 8);
+$pdf->Ln(5);
+$pdf->SetFont('helvetica', 'I', 7);
 $pdf->Cell(0, 5, 'Este documento no es válido como factura oficial', 0, 1, 'C');
 
+// ELIMINAR CUALQUIER POSIBLE HEADER/FOOTER DE MARCO COS
+$pdf->setHeaderData('', 0, '', '');
+$pdf->setPrintHeader(false);
+$pdf->setPrintFooter(false);
+
 // Salida del PDF
-$pdf->Output('ticket_venta_' . $pedido_id . '_' . date('Ymd_His') . '.pdf', 'I');
+$pdf->Output('ticket_bloom_' . $pedido_id . '.pdf', 'I');
 ?>

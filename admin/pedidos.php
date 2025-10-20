@@ -19,7 +19,6 @@ $estado = isset($_GET['estado']) ? $_GET['estado'] : '';
 $fecha_desde = isset($_GET['fecha_desde']) ? $_GET['fecha_desde'] : '';
 $fecha_hasta = isset($_GET['fecha_hasta']) ? $_GET['fecha_hasta'] : '';
 
-// Cambiar estado del pedido
 // Cambiar estado del pedido - SOLO cuando se envía el formulario POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'cambiar_estado' && $id) {
     $nuevo_estado = isset($_POST['nuevo_estado']) ? sanitize($_POST['nuevo_estado']) : '';
@@ -119,9 +118,9 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
     <link href="../css/styles.css" rel="stylesheet">
     <style>
         .badge-pendiente { background-color: #ffc107; color: #000; }
-        .badge-procesado { background-color: #17a2b8; }
-        .badge-completado { background-color: #28a745; }
-        .badge-cancelado { background-color: #dc3545; }
+        .badge-procesado { background-color: #17a2b8; color: #fff; }
+        .badge-completado { background-color: #28a745; color: #fff; }
+        .badge-cancelado { background-color: #dc3545; color: #fff; }
         .pedido-card { border-left: 4px solid; transition: transform 0.2s; }
         .pedido-card:hover { transform: translateY(-2px); }
         .pedido-pendiente { border-left-color: #ffc107; }
@@ -351,6 +350,11 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
                                         <a href="?action=cambiar_estado&id=<?php echo $ped['id']; ?>" class="btn btn-sm btn-outline-warning">
                                             <i class="fas fa-edit"></i> Estado
                                         </a>
+                                        <!-- BOTÓN PDF AGREGADO -->
+                                        <a href="../admin/pdf/ticket_venta.php?pedido_id=<?php echo $ped['id']; ?>" 
+                                           target="_blank" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
                                         <?php if (!empty($ped['cliente_telefono'])): ?>
                                         <a href="https://wa.me/595<?php echo substr($ped['cliente_telefono'], -9); ?>?text=Hola <?php echo urlencode($ped['cliente_nombre']); ?>, te contactamos por tu pedido #<?php echo $ped['id']; ?> en BLOOM" 
                                            target="_blank" class="btn btn-sm btn-outline-success">
@@ -370,6 +374,11 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2>Detalle del Pedido #<?php echo $pedido['id']; ?></h2>
                         <div class="btn-group">
+                            <!-- BOTÓN PDF AGREGADO -->
+                            <a href="../admin/pdf/ticket_venta.php?pedido_id=<?php echo $pedido['id']; ?>" 
+                               target="_blank" class="btn btn-danger">
+                                <i class="fas fa-file-pdf"></i> Ticket PDF
+                            </a>
                             <a href="?action=cambiar_estado&id=<?php echo $pedido['id']; ?>" class="btn btn-warning">
                                 <i class="fas fa-edit"></i> Cambiar Estado
                             </a>
@@ -542,8 +551,16 @@ $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
                                     </p>
                                     <p><strong>ID Pedido:</strong><br>#<?php echo $pedido['id']; ?></p>
                                     
+                                    <!-- BOTÓN PDF AGREGADO -->
+                                    <div class="d-grid gap-2 mt-3">
+                                        <a href="../admin/pdf/ticket_venta.php?pedido_id=<?php echo $pedido['id']; ?>" 
+                                           target="_blank" class="btn btn-danger">
+                                            <i class="fas fa-file-pdf"></i> Generar Ticket PDF
+                                        </a>
+                                    </div>
+                                    
                                     <?php if (!empty($pedido['notas'])): ?>
-                                    <p><strong>Notas:</strong><br><?php echo nl2br($pedido['notas']); ?></p>
+                                    <p class="mt-3"><strong>Notas:</strong><br><?php echo nl2br($pedido['notas']); ?></p>
                                     <?php endif; ?>
                                 </div>
                             </div>

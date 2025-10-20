@@ -14,6 +14,57 @@ function redirect($url) {
     header("Location: " . $url);
     exit;
 }
+// Agrega estas funciones al final de functions.php
+
+/**
+ * Obtener tipo de cambio actual
+ */
+function getTipoCambioActual() {
+    global $db;
+    $query = "SELECT * FROM tipo_cambio WHERE fecha = CURDATE() AND activo = 1 ORDER BY id DESC LIMIT 1";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Convertir guaraníes a dólares
+ */
+function gsToUsd($gs, $tipo_cambio = null) {
+    if (!$tipo_cambio) {
+        $tipo_cambio = getTipoCambioActual();
+    }
+    if (!$tipo_cambio) {
+        return 0;
+    }
+    return $gs / $tipo_cambio['venta'];
+}
+
+/**
+ * Convertir dólares a guaraníes
+ */
+function usdToGs($usd, $tipo_cambio = null) {
+    if (!$tipo_cambio) {
+        $tipo_cambio = getTipoCambioActual();
+    }
+    if (!$tipo_cambio) {
+        return 0;
+    }
+    return $usd * $tipo_cambio['venta'];
+}
+
+/**
+ * Formatear precio en ambas monedas
+ */
+function formatPrecioDual($precio_gs) {
+    $tipo_cambio = getTipoCambioActual();
+    $precio_usd = gsToUsd($precio_gs, $tipo_cambio);
+    
+    return [
+        'gs' => 'Gs. ' . number_format($precio_gs, 0, ',', '.'),
+        'usd' => '$ ' . number_format($precio_usd, 2, '.', ',')
+    ];
+}
 
 // Función para sanitizar datos
 function sanitize($data) {
