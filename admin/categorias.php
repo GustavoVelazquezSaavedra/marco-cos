@@ -218,6 +218,12 @@ if (($action == 'edit' || $action == 'view') && $id) {
                     <a href="pedidos.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-shopping-cart"></i> Pedidos
                     </a>
+                    <a href="config_tipo_cambio.php" class="list-group-item list-group-item-action">
+                        <i class="fas fa-dollar-sign"></i> Tipo de Cambio
+                    </a>
+                    <a href="slider.php" class="list-group-item list-group-item-action">
+                        <i class="fas fa-images"></i> Slider Principal
+                    </a>
                     <?php if ($_SESSION['user_role'] == 'admin'): ?>
                     <a href="usuarios.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-users"></i> Usuarios
