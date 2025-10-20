@@ -79,150 +79,596 @@ if (!empty($categoria_id)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
     <style>
-        .product-card {
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: none;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: hidden;
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --accent-color: #3498db;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --border-color: #e0e0e0;
         }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: white;
+            color: var(--text-dark);
         }
-        .product-image {
-            height: 200px;
-            object-fit: cover;
+        
+        /* Navbar estilo BLOOM */
+        .navbar-bloom {
+            background: white;
+            border-bottom: 2px solid var(--border-color);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .navbar-brand-bloom {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color) !important;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .nav-link-bloom {
+            color: var(--text-dark) !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin: 0 15px;
+            padding: 8px 0 !important;
+            position: relative;
+        }
+        
+        .nav-link-bloom:hover,
+        .nav-link-bloom.active {
+            color: var(--primary-color) !important;
+        }
+        
+        .nav-link-bloom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
             width: 100%;
+            height: 2px;
+            background: var(--primary-color);
         }
-        .price {
-            font-size: 1.25rem;
+        
+        .search-container {
+            position: relative;
+            margin-right: 20px;
+        }
+        
+        .search-box-bloom {
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            padding: 10px 45px 10px 20px;
+            font-size: 0.9rem;
+            width: 300px;
+            transition: all 0.3s;
+        }
+        
+        .search-box-bloom:focus {
+            border-color: var(--accent-color);
+            box-shadow: none;
+        }
+        
+        .search-icon-bloom {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            background: none;
+            border: none;
+        }
+        
+        .cart-icon-bloom {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            position: relative;
+        }
+        
+        .shop-icon-bloom {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-right: 20px;
+        }
+        
+        /* Cart Badge BLOOM */
+        .cart-badge-bloom {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
             font-weight: bold;
-            color: #28a745;
         }
-        .category-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+        
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+            text-align: center;
         }
-        .cart-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
+        
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Filter Sidebar */
         .filter-sidebar {
             position: sticky;
             top: 20px;
         }
-        .list-group-item.active {
-            background-color: #007bff;
-            border-color: #007bff;
+        
+        .filter-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: white;
+        }
+        
+        .filter-card .card-header {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .filter-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .filter-list li {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filter-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .filter-list a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .filter-list a:hover,
+        .filter-list a.active {
+            background: var(--bg-light);
+            color: var(--primary-color);
+        }
+        
+        .filter-list a.active {
+            font-weight: 600;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        /* Product Cards */
+        .product-card-bloom {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            background: white;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-card-bloom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .product-image-bloom {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .product-info-bloom {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        .product-title-bloom {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            min-height: 40px;
+        }
+        
+        .product-description-bloom {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            flex-grow: 1;
+            min-height: 40px;
+        }
+        
+        .product-meta-bloom {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+        
+        .product-price-bloom {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .product-actions-bloom {
+            margin-top: auto;
+        }
+        
+        .btn-add-cart-bloom {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-add-cart-bloom:hover {
+            background: #1a252f;
+        }
+        
+        .btn-details-bloom {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            display: block;
+            padding: 8px;
+        }
+        
+        .btn-details-bloom:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn-outline-primary-bloom {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary-bloom:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Category Badge */
+        .category-badge-bloom {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* Stock Badges */
+        .stock-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        /* Contact Card */
+        .contact-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: white;
+        }
+        
+        .contact-card .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* Footer BLOOM */
+        .footer-bloom {
+            background: var(--primary-color);
+            color: white;
+            padding: 40px 0 20px;
+            border-top: 3px solid var(--secondary-color);
+        }
+        
+        .footer-title-bloom {
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-links-bloom a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links-bloom a:hover {
+            color: white;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar-brand-bloom {
+                font-size: 1.6rem;
+            }
+            
+            .search-box-bloom {
+                width: 250px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .nav-link-bloom {
+                margin: 0 8px;
+                font-size: 0.9rem;
+            }
+            
+            .product-title-bloom,
+            .product-description-bloom {
+                min-height: auto;
+            }
+            
+            .filter-sidebar {
+                position: static;
+                margin-bottom: 30px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .search-container {
+                margin: 10px 0;
+                width: 100%;
+            }
+            
+            .search-box-bloom {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <!-- Navbar estilo BLOOM -->
+    <nav class="navbar navbar-expand-lg navbar-bloom sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-gem me-2"></i>BLOOM
+            <a class="navbar-brand navbar-brand-bloom" href="index.php">
+                BLOOM
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <!-- Iconos para mobile -->
+            <div class="mobile-icons d-lg-none">
+                <!-- Botón de búsqueda -->
+                <button class="mobile-search-btn" type="button" data-bs-toggle="modal" data-bs-target="#searchModal">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <!-- Icono de tienda -->
+                <a href="catalogo.php" class="text-decoration-none">
+                    <i class="fas fa-store shop-icon-bloom"></i>
+                </a>
+                
+                <!-- Carrito -->
+                <a href="carrito.php" class="text-decoration-none position-relative">
+                    <i class="fas fa-shopping-bag cart-icon-bloom"></i>
+                    <span class="cart-badge-bloom" id="cart-count">0</span>
+                </a>
+                
+                <!-- Botón hamburguesa -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
             
+            <!-- Contenido del menú -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">Inicio</a>
+                        <a class="nav-link nav-link-bloom" href="index.php">INICIO</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="catalogo.php">Catálogo Completo</a>
+                        <a class="nav-link nav-link-bloom active" href="catalogo.php">CATÁLOGO</a>
                     </li>
                 </ul>
                 
-                <!-- Buscador -->
-                <form class="d-flex me-3" method="GET" action="catalogo.php">
-                    <input class="form-control me-2" type="search" name="search" placeholder="Buscar productos..." 
-                           value="<?php echo htmlspecialchars($search); ?>">
-                    <button class="btn btn-outline-light" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-                
-                <!-- Carrito -->
-                <div class="navbar-nav">
-                    <a class="nav-link position-relative" href="carrito.php">
-                        <i class="fas fa-shopping-cart fa-lg"></i>
-                        <span class="cart-badge badge bg-danger rounded-pill" id="cart-count">0</span>
-                    </a>
+                <!-- Elementos para desktop -->
+                <div class="d-none d-lg-flex align-items-center">
+                    <!-- Icono de tienda -->
+                    <div class="navbar-nav me-3">
+                        <a class="nav-link" href="catalogo.php">
+                            <i class="fas fa-store shop-icon-bloom"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Buscador -->
+                    <div class="search-container">
+                        <form method="GET" action="catalogo.php" class="position-relative">
+                            <input class="form-control search-box-bloom" type="search" name="search" placeholder="Buscar productos..." 
+                                   value="<?php echo htmlspecialchars($search); ?>">
+                            <button class="search-icon-bloom" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Carrito -->
+                    <div class="navbar-nav">
+                        <a class="nav-link position-relative" href="carrito.php">
+                            <i class="fas fa-shopping-bag cart-icon-bloom"></i>
+                            <span class="cart-badge-bloom" id="cart-count-desktop">0</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="container py-5">
+    <!-- Modal de búsqueda para mobile -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buscar productos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="GET" action="catalogo.php">
+                        <div class="input-group">
+                            <input type="search" name="search" class="form-control" placeholder="Buscar productos..." 
+                                   value="<?php echo htmlspecialchars($search); ?>">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="page-title"><i class="fas fa-th-large me-2"></i>Catálogo Completo</h1>
+            <p class="page-subtitle">Descubre toda nuestra colección de joyas y accesorios</p>
+        </div>
+    </section>
+
+    <div class="container py-4">
         <div class="row">
             <!-- Sidebar de Filtros -->
             <div class="col-md-3">
                 <div class="filter-sidebar">
-                    <div class="card mb-4">
-                        <div class="card-header bg-primary text-white">
+                    <!-- Filtro por Categoría -->
+                    <div class="filter-card">
+                        <div class="card-header">
                             <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filtrar por Categoría</h6>
                         </div>
                         <div class="card-body p-0">
-                            <div class="list-group list-group-flush">
-                                <a href="catalogo.php" 
-                                   class="list-group-item list-group-item-action <?php echo empty($categoria_id) ? 'active' : ''; ?>">
-                                    <i class="fas fa-th-large me-2"></i>Todas las categorías
-                                </a>
+                            <ul class="filter-list">
+                                <li>
+                                    <a href="catalogo.php" class="<?php echo empty($categoria_id) ? 'active' : ''; ?>">
+                                        <i class="fas fa-th-large me-2"></i>Todas las categorías
+                                    </a>
+                                </li>
                                 <?php foreach ($categorias as $cat): ?>
-                                <a href="catalogo.php?categoria_id=<?php echo $cat['id']; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" 
-                                   class="list-group-item list-group-item-action <?php echo $categoria_id == $cat['id'] ? 'active' : ''; ?>">
-                                    <i class="fas fa-tag me-2"></i><?php echo $cat['nombre']; ?>
-                                </a>
+                                <li>
+                                    <a href="catalogo.php?categoria_id=<?php echo $cat['id']; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>" 
+                                       class="<?php echo $categoria_id == $cat['id'] ? 'active' : ''; ?>">
+                                        <i class="fas fa-tag me-2"></i><?php echo $cat['nombre']; ?>
+                                    </a>
+                                </li>
                                 <?php endforeach; ?>
-                            </div>
+                            </ul>
                         </div>
                     </div>
                     
-                    <div class="card">
-                        <div class="card-header bg-info text-white">
+                    <!-- Ordenar -->
+                    <div class="filter-card">
+                        <div class="card-header">
                             <h6 class="mb-0"><i class="fas fa-sort me-2"></i>Ordenar por</h6>
                         </div>
                         <div class="card-body p-0">
-                            <div class="list-group list-group-flush">
+                            <ul class="filter-list">
                                 <?php
                                 $base_url = "catalogo.php?"; 
                                 if (!empty($categoria_id)) $base_url .= "categoria_id=" . $categoria_id . "&";
                                 if (!empty($search)) $base_url .= "search=" . urlencode($search) . "&";
                                 ?>
-                                <a href="<?php echo $base_url; ?>orden=recientes" 
-                                   class="list-group-item list-group-item-action <?php echo $orden == 'recientes' ? 'active' : ''; ?>">
-                                    <i class="fas fa-clock me-2"></i>Más recientes
-                                </a>
-                                <a href="<?php echo $base_url; ?>orden=nombre" 
-                                   class="list-group-item list-group-item-action <?php echo $orden == 'nombre' ? 'active' : ''; ?>">
-                                    <i class="fas fa-sort-alpha-down me-2"></i>Nombre A-Z
-                                </a>
-                                <a href="<?php echo $base_url; ?>orden=precio_asc" 
-                                   class="list-group-item list-group-item-action <?php echo $orden == 'precio_asc' ? 'active' : ''; ?>">
-                                    <i class="fas fa-sort-numeric-down me-2"></i>Precio: Menor a Mayor
-                                </a>
-                                <a href="<?php echo $base_url; ?>orden=precio_desc" 
-                                   class="list-group-item list-group-item-action <?php echo $orden == 'precio_desc' ? 'active' : ''; ?>">
-                                    <i class="fas fa-sort-numeric-down-alt me-2"></i>Precio: Mayor a Menor
-                                </a>
-                            </div>
+                                <li>
+                                    <a href="<?php echo $base_url; ?>orden=recientes" 
+                                       class="<?php echo $orden == 'recientes' ? 'active' : ''; ?>">
+                                        <i class="fas fa-clock me-2"></i>Más recientes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo $base_url; ?>orden=nombre" 
+                                       class="<?php echo $orden == 'nombre' ? 'active' : ''; ?>">
+                                        <i class="fas fa-sort-alpha-down me-2"></i>Nombre A-Z
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo $base_url; ?>orden=precio_asc" 
+                                       class="<?php echo $orden == 'precio_asc' ? 'active' : ''; ?>">
+                                        <i class="fas fa-sort-numeric-down me-2"></i>Precio: Menor a Mayor
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo $base_url; ?>orden=precio_desc" 
+                                       class="<?php echo $orden == 'precio_desc' ? 'active' : ''; ?>">
+                                        <i class="fas fa-sort-numeric-down-alt me-2"></i>Precio: Mayor a Menor
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
                     <!-- Información de contacto -->
-                    <div class="card mt-4">
-                        <div class="card-body text-center">
-                            <h6><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
-                            <p class="small mb-2">
+                    <div class="contact-card mt-4">
+                        <div class="card-body">
+                            <h6 class="mb-3"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
+                            <p class="small mb-3">
                                 <i class="fas fa-phone me-1"></i>+595 976 588694
                             </p>
                             <a href="https://wa.me/595976588694" target="_blank" class="btn btn-success btn-sm w-100">
@@ -244,7 +690,7 @@ if (!empty($categoria_id)) {
                             <?php elseif (!empty($categoria_id)): ?>
                                 <i class="fas fa-tag me-2"></i><?php echo $categoria_nombre; ?>
                             <?php else: ?>
-                                <i class="fas fa-th-large me-2"></i>Catálogo Completo
+                                <i class="fas fa-th-large me-2"></i>Todos los Productos
                             <?php endif; ?>
                         </h2>
                         <p class="text-muted mb-0">
@@ -253,7 +699,7 @@ if (!empty($categoria_id)) {
                     </div>
                     
                     <?php if (!empty($search) || !empty($categoria_id)): ?>
-                    <a href="catalogo.php" class="btn btn-outline-secondary">
+                    <a href="catalogo.php" class="btn btn-outline-primary-bloom">
                         <i class="fas fa-times me-1"></i>Limpiar filtros
                     </a>
                     <?php endif; ?>
@@ -264,13 +710,13 @@ if (!empty($categoria_id)) {
                     <?php if (empty($productos)): ?>
                     <div class="col-12 text-center py-5">
                         <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted">No se encontraron productos</h4>
+                        <h4 class="text-muted mb-3">No se encontraron productos</h4>
                         <p class="text-muted mb-4">Intenta con otros términos de búsqueda o categorías</p>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <a href="catalogo.php" class="btn btn-primary">
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                            <a href="catalogo.php" class="btn btn-primary-bloom">
                                 <i class="fas fa-th-large me-1"></i>Ver Todo el Catálogo
                             </a>
-                            <a href="index.php" class="btn btn-outline-secondary">
+                            <a href="index.php" class="btn btn-outline-primary-bloom">
                                 <i class="fas fa-home me-1"></i>Volver al Inicio
                             </a>
                         </div>
@@ -278,57 +724,62 @@ if (!empty($categoria_id)) {
                     <?php else: ?>
                     <?php foreach ($productos as $producto): ?>
                     <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="card product-card h-100">
+                        <div class="product-card-bloom">
                             <div class="position-relative">
                                 <?php if (!empty($producto['imagen'])): ?>
                                 <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                                     class="card-img-top product-image" alt="<?php echo $producto['nombre']; ?>">
+                                     class="product-image-bloom" alt="<?php echo $producto['nombre']; ?>">
                                 <?php else: ?>
-                                <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                <div class="product-image-bloom bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-gem fa-2x text-muted"></i>
                                 </div>
                                 <?php endif; ?>
-                                <span class="category-badge badge bg-primary"><?php echo $producto['categoria_nombre']; ?></span>
+                                
+                                <span class="category-badge-bloom"><?php echo $producto['categoria_nombre']; ?></span>
                                 
                                 <!-- Badge de stock -->
                                 <?php if ($producto['stock'] == 0): ?>
-                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">Agotado</span>
+                                <span class="stock-badge bg-danger text-white">Agotado</span>
                                 <?php elseif ($producto['stock'] < 10): ?>
-                                <span class="badge bg-warning position-absolute top-0 end-0 m-2">Últimas unidades</span>
+                                <span class="stock-badge bg-warning text-dark">Últimas unidades</span>
                                 <?php endif; ?>
                             </div>
                             
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title"><?php echo $producto['nombre']; ?></h5>
-                                <p class="card-text flex-grow-1">
-                                    <small class="text-muted"><?php echo substr($producto['descripcion'], 0, 80); ?>...</small>
+                            <div class="product-info-bloom">
+                                <h5 class="product-title-bloom"><?php echo $producto['nombre']; ?></h5>
+                                <p class="product-description-bloom">
+                                    <?php echo substr($producto['descripcion'], 0, 80); ?>...
                                 </p>
-                                <div class="mt-auto">
-                                    <div class="price mb-2">Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?></div>
-                                    
+                                
+                                <div class="product-meta-bloom">
+                                    <i class="fas fa-tag me-1"></i><?php echo $producto['categoria_nombre']; ?>
+                                </div>
+                                
+                                <div class="product-price-bloom">
+                                    GS. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?>
+                                </div>
+                                
+                                <div class="product-actions-bloom">
                                     <?php if ($producto['stock'] > 0): ?>
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-primary btn-sm add-to-cart" 
-                                                data-product-id="<?php echo $producto['id']; ?>"
-                                                data-product-name="<?php echo $producto['nombre']; ?>"
-                                                data-product-price="<?php echo $producto['precio_publico']; ?>"
-                                                data-product-image="<?php echo $producto['imagen']; ?>">
-                                            <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
-                                        </button>
-                                        <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn btn-outline-secondary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Ver Detalles
-                                        </a>
-                                    </div>
+                                    <button class="btn btn-add-cart-bloom add-to-cart" 
+                                            data-product-id="<?php echo $producto['id']; ?>"
+                                            data-product-name="<?php echo $producto['nombre']; ?>"
+                                            data-product-price="<?php echo $producto['precio_publico']; ?>"
+                                            data-product-image="<?php echo $producto['imagen']; ?>">
+                                        <i class="fas fa-cart-plus me-2"></i>AGREGAR AL CARRITO
+                                    </button>
+                                    
+                                    <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn-details-bloom">
+                                        <i class="fas fa-eye me-1"></i>Ver detalles
+                                    </a>
                                     <?php else: ?>
-                                    <div class="d-grid">
-                                        <a href="https://wa.me/595976588694?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
-                                           target="_blank" class="btn btn-outline-warning btn-sm">
-                                            <i class="fab fa-whatsapp me-1"></i>Consultar Stock
-                                        </a>
-                                        <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn btn-outline-secondary btn-sm mt-1">
-                                            <i class="fas fa-eye me-1"></i>Ver Detalles
-                                        </a>
-                                    </div>
+                                    <a href="https://wa.me/595976588694?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
+                                       target="_blank" class="btn btn-outline-primary-bloom w-100 mb-2">
+                                        <i class="fab fa-whatsapp me-1"></i>Consultar Stock
+                                    </a>
+                                    <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn-details-bloom">
+                                        <i class="fas fa-eye me-1"></i>Ver detalles
+                                    </a>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -353,33 +804,33 @@ if (!empty($categoria_id)) {
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
+    <!-- Footer BLOOM -->
+    <footer class="footer-bloom">
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
-                    <h5><i class="fas fa-gem me-2"></i>BLOOM</h5>
-                    <p>Joyería y accesorios de la más alta calidad para momentos especiales.</p>
+                <div class="col-md-4 mb-4">
+                    <h5 class="footer-title-bloom">BLOOM</h5>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Joyería y accesorios de la más alta calidad para momentos especiales.</p>
                 </div>
-                <div class="col-md-4">
-                    <h5>Contacto</h5>
-                    <p>
-                        <i class="fas fa-phone me-2"></i>+595 972 366-265<br>
-                        <i class="fas fa-envelope me-2"></i>info@marccos.com
-                    </p>
+                <div class="col-md-4 mb-4">
+                    <h5 class="footer-title-bloom">CONTACTO</h5>
+                    <div class="footer-links-bloom">
+                        <p><i class="fas fa-phone me-2"></i>+595972366265</p>
+                        <p><i class="fas fa-envelope me-2"></i>info@bloom.com</p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h5>Enlaces Rápidos</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="index.php" class="text-white">Inicio</a></li>
-                        <li><a href="catalogo.php" class="text-white">Catálogo</a></li>
-                        <li><a href="carrito.php" class="text-white">Carrito</a></li>
-                    </ul>
+                <div class="col-md-4 mb-4">
+                    <h5 class="footer-title-bloom">ENLACES RÁPIDOS</h5>
+                    <div class="footer-links-bloom">
+                        <a href="index.php">Inicio</a>
+                        <a href="catalogo.php">Catálogo</a>
+                        <a href="carrito.php">Carrito</a>
+                    </div>
                 </div>
             </div>
-            <hr>
+            <hr style="border-color: rgba(255,255,255,0.2);">
             <div class="text-center">
-            <small>&copy; 2025 BLOOM. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
+                <small style="color: rgba(255,255,255,0.7);">&copy; 2025 BLOOM. Todos los derechos reservados, <a href="https://www.facebook.com/gustavogabriel.velazquez1/">Desarrollador</a>.</small>
             </div>
         </div>
     </footer>
@@ -389,16 +840,15 @@ if (!empty($categoria_id)) {
     
     <script>
         // Sistema de carrito
-        let cart = JSON.parse(localStorage.getItem('marccos_cart')) || [];
+        let cart = JSON.parse(localStorage.getItem('bloom_cart')) || [];
         
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             $('#cart-count').text(totalItems);
+            $('#cart-count-desktop').text(totalItems);
         }
         
         // Agregar producto al carrito
-        // Reemplaza esta parte en todos los archivos donde esté el add-to-cart:
-
         $('.add-to-cart').click(function() {
             const productId = $(this).data('product-id');
             const productName = $(this).data('product-name');
@@ -419,13 +869,25 @@ if (!empty($categoria_id)) {
                 });
             }
             
-            localStorage.setItem('marccos_cart', JSON.stringify(cart));
+            localStorage.setItem('bloom_cart', JSON.stringify(cart));
             updateCartCount();
             
-            // En lugar de alert, usa showToast (solo si existe la función)
-            if (typeof showToast === 'function') {
-                showToast(`¡${productName} agregado al carrito!`, 'success');
-            }
+            // Mostrar notificación simple
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 end-0 p-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>¡Éxito!</strong> ${productName} agregado al carrito.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto-remover después de 3 segundos
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         });
         
         // Inicializar contador del carrito

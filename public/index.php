@@ -877,7 +877,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <hr style="border-color: rgba(255,255,255,0.2);">
             <div class="text-center">
-                <small style="color: rgba(255,255,255,0.7);">&copy; 2025 BLOOM. Todos los derechos reservados.</small>
+            <small style="color: rgba(255,255,255,0.7);">&copy; 2025 BLOOM. Todos los derechos reservados, <a href="https://www.facebook.com/gustavogabriel.velazquez1/">Desarrollador</a>.</small>
             </div>
         </div>
     </footer>
