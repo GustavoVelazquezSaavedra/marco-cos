@@ -4,6 +4,25 @@ include_once('../includes/functions.php');
 
 $database = new Database();
 $db = $database->getConnection();
+
+// Obtener tipo de cambio actual
+$queryTipoCambio = "SELECT * FROM tipo_cambio WHERE fecha = CURDATE() AND activo = 1 ORDER BY id DESC LIMIT 1";
+$stmtTipoCambio = $db->prepare($queryTipoCambio);
+$stmtTipoCambio->execute();
+$tipo_cambio = $stmtTipoCambio->fetch(PDO::FETCH_ASSOC);
+
+// Si no hay tipo de cambio para hoy, usar el más reciente
+if (!$tipo_cambio) {
+    $queryTipoCambio = "SELECT * FROM tipo_cambio WHERE activo = 1 ORDER BY fecha DESC LIMIT 1";
+    $stmtTipoCambio = $db->prepare($queryTipoCambio);
+    $stmtTipoCambio->execute();
+    $tipo_cambio = $stmtTipoCambio->fetch(PDO::FETCH_ASSOC);
+}
+
+// Si aún no hay tipo de cambio, usar valores por defecto
+if (!$tipo_cambio) {
+    $tipo_cambio = ['compra' => 7000, 'venta' => 7100];
+}
 ?>
 
 <!DOCTYPE html>
@@ -179,6 +198,12 @@ $db = $database->getConnection();
             font-weight: 600;
         }
         
+        .product-price-usd {
+            color: var(--accent-color);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
         .quantity-input {
             width: 60px;
             text-align: center;
@@ -299,6 +324,27 @@ $db = $database->getConnection();
             text-align: center;
         }
         
+        /* Exchange Rate Info */
+        .exchange-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .exchange-info small {
+            opacity: 0.9;
+        }
+        
+        /* Summary USD */
+        .summary-usd {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        
         /* Modal */
         .modal-header {
             background: var(--primary-color);
@@ -342,6 +388,9 @@ $db = $database->getConnection();
                 <a class="nav-link nav-link-bloom" href="index.php">
                     <i class="fas fa-home me-1"></i>INICIO
                 </a>
+                <a class="nav-link nav-link-bloom" href="catalogo.php">
+                    <i class="fas fa-store me-1"></i>CATÁLOGO
+                </a>
                 <a class="nav-link nav-link-bloom position-relative" href="carrito.php">
                     <i class="fas fa-shopping-bag cart-icon-bloom"></i>
                     <span class="cart-badge-bloom" id="cart-count">0</span>
@@ -362,6 +411,22 @@ $db = $database->getConnection();
     </section>
 
     <div class="container py-4">
+        <!-- Información del tipo de cambio -->
+        <div class="exchange-info">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <small><i class="fas fa-sync-alt me-1"></i> Tipo de cambio actual</small>
+                    <div class="d-flex justify-content-center justify-content-md-start gap-3 mt-1">
+                        <small><strong>Compra:</strong> <?php echo number_format($tipo_cambio['compra'], 0, ',', '.'); ?> Gs.</small>
+                        <small><strong>Venta:</strong> <?php echo number_format($tipo_cambio['venta'], 0, ',', '.'); ?> Gs.</small>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                    <small><i class="fas fa-info-circle me-1"></i> Los precios en USD se calculan con tipo de cambio venta</small>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-8">
                 <div class="cart-card">
@@ -383,7 +448,7 @@ $db = $database->getConnection();
                                 </div>
                                 <h4 class="text-muted mb-3">Tu carrito está vacío</h4>
                                 <p class="text-muted mb-4">Agrega algunos productos para continuar</p>
-                                <a href="index.php" class="btn btn-primary-bloom">
+                                <a href="catalogo.php" class="btn btn-primary-bloom">
                                     <i class="fas fa-store me-2"></i>Ir a Comprar
                                 </a>
                             </div>
@@ -401,7 +466,10 @@ $db = $database->getConnection();
                         <div id="order-summary">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Subtotal:</span>
-                                <span id="subtotal">GS. 0</span>
+                                <div class="text-end">
+                                    <div id="subtotal">GS. 0</div>
+                                    <div class="summary-usd" id="subtotal-usd">USD 0.00</div>
+                                </div>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Envío:</span>
@@ -409,8 +477,14 @@ $db = $database->getConnection();
                             </div>
                             <hr>
                             <div class="d-flex justify-content-between mb-3">
-                                <strong>Total:</strong>
-                                <strong id="total" class="text-success">GS. 0</strong>
+                                <div>
+                                    <strong>Total:</strong>
+                                    <div class="summary-usd" id="total-usd-label">USD 0.00</div>
+                                </div>
+                                <div class="text-end">
+                                    <strong id="total" class="text-success">GS. 0</strong>
+                                    <div class="summary-usd" id="total-usd">USD 0.00</div>
+                                </div>
                             </div>
                             <button class="btn btn-success-bloom w-100 mb-3" id="checkout-btn" disabled>
                                 <i class="fab fa-whatsapp me-2"></i>Completar Pedido por WhatsApp
@@ -486,358 +560,400 @@ $db = $database->getConnection();
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <script>
-        let cart = JSON.parse(localStorage.getItem('bloom_cart')) || [];
+    let cart = JSON.parse(localStorage.getItem('bloom_cart')) || [];
+    const tipoCambioVenta = <?php echo $tipo_cambio['venta']; ?>;
+    
+    // Función para calcular precio en USD
+    function calcularPrecioUSD(precioGs) {
+        return precioGs / tipoCambioVenta;
+    }
+    
+    // Función para formatear precio en USD
+    function formatearPrecioUSD(precio) {
+        return 'USD ' + precio.toFixed(2);
+    }
+    
+    // Función para mostrar notificaciones bonitas
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toastId = 'toast-' + Date.now();
         
-        // Función para mostrar notificaciones bonitas
-        function showToast(message, type = 'success') {
-            const toastContainer = document.getElementById('toastContainer');
-            const toastId = 'toast-' + Date.now();
-            
-            const toastHTML = `
-                <div id="${toastId}" class="toast toast-${type} align-items-center" role="alert">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
-                            ${message}
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        const toastHTML = `
+            <div id="${toastId}" class="toast toast-${type} align-items-center" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                        ${message}
                     </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
-            `;
+            </div>
+        `;
+        
+        toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+        const toastElement = new bootstrap.Toast(document.getElementById(toastId));
+        toastElement.show();
+        
+        // Remover el toast del DOM después de que se oculte
+        document.getElementById(toastId).addEventListener('hidden.bs.toast', function () {
+            this.remove();
+        });
+    }
+    
+    // Función para actualizar el carrito en tiempo real
+    function updateCartInRealTime() {
+        updateCartDisplay();
+        updateCartCount();
+        updateClearCartButton();
+    }
+    
+    function updateCartDisplay() {
+        const cartItems = document.getElementById('cart-items');
+        const emptyCart = document.getElementById('empty-cart-message');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        
+        if (cart.length === 0) {
+            cartItems.innerHTML = '';
+            emptyCart.style.display = 'block';
+            checkoutBtn.disabled = true;
             
-            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-            const toastElement = new bootstrap.Toast(document.getElementById(toastId));
-            toastElement.show();
-            
-            // Remover el toast del DOM después de que se oculte
-            document.getElementById(toastId).addEventListener('hidden.bs.toast', function () {
-                this.remove();
-            });
+            // RESETEAR LOS PRECIOS A CERO cuando el carrito está vacío
+            document.getElementById('subtotal').textContent = 'GS. 0';
+            document.getElementById('subtotal-usd').textContent = formatearPrecioUSD(0);
+            document.getElementById('total').textContent = 'GS. 0';
+            document.getElementById('total-usd').textContent = formatearPrecioUSD(0);
+            document.getElementById('total-usd-label').textContent = formatearPrecioUSD(0);
+            return;
         }
         
-        // Función para actualizar el carrito en tiempo real
-        function updateCartInRealTime() {
-            updateCartDisplay();
-            updateCartCount();
-            updateClearCartButton();
-        }
+        emptyCart.style.display = 'none';
+        checkoutBtn.disabled = false;
         
-        function updateCartDisplay() {
-            const cartItems = document.getElementById('cart-items');
-            const emptyCart = document.getElementById('empty-cart-message');
-            const checkoutBtn = document.getElementById('checkout-btn');
+        let html = '';
+        let subtotal = 0;
+        
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            const itemTotalUSD = calcularPrecioUSD(itemTotal);
+            subtotal += itemTotal;
             
-            if (cart.length === 0) {
-                cartItems.innerHTML = '';
-                emptyCart.style.display = 'block';
-                checkoutBtn.disabled = true;
-                return;
-            }
-            
-            emptyCart.style.display = 'none';
-            checkoutBtn.disabled = false;
-            
-            let html = '';
-            let subtotal = 0;
-            
-            cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                subtotal += itemTotal;
-                
-                html += `
-                    <div class="cart-item row align-items-center" id="cart-item-${index}">
-                        <div class="col-3 col-md-2">
-                            ${item.image ? 
-                                `<img src="../uploads/products/${item.image}" class="product-thumb" alt="${item.name}">` :
-                                `<div class="product-thumb bg-light d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-gem text-muted"></i>
-                                </div>`
-                            }
-                        </div>
-                        <div class="col-5 col-md-4">
-                            <h6 class="product-title mb-1">${item.name}</h6>
-                            <p class="product-price mb-0">GS. ${item.price.toLocaleString()}</p>
-                        </div>
-                        <div class="col-4 col-md-4">
-                            <div class="input-group input-group-sm">
-                                <button class="btn btn-quantity minus-btn" type="button" data-index="${index}">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" class="form-control quantity-input" 
-                                       value="${item.quantity}" min="1" data-index="${index}">
-                                <button class="btn btn-quantity plus-btn" type="button" data-index="${index}">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-2 text-start text-md-end mt-2 mt-md-0">
-                            <strong class="product-price d-block">GS. ${itemTotal.toLocaleString()}</strong>
-                            <button class="btn btn-sm btn-danger-bloom mt-1 remove-item" data-index="${index}">
-                                <i class="fas fa-trash"></i>
+            html += `
+                <div class="cart-item row align-items-center" id="cart-item-${index}">
+                    <div class="col-3 col-md-2">
+                        ${item.image ? 
+                            `<img src="../uploads/products/${item.image}" class="product-thumb" alt="${item.name}">` :
+                            `<div class="product-thumb bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-gem text-muted"></i>
+                            </div>`
+                        }
+                    </div>
+                    <div class="col-5 col-md-4">
+                        <h6 class="product-title mb-1">${item.name}</h6>
+                        <p class="product-price mb-0">GS. ${item.price.toLocaleString()}</p>
+                        <p class="product-price-usd mb-0">${formatearPrecioUSD(calcularPrecioUSD(item.price))}</p>
+                    </div>
+                    <div class="col-4 col-md-4">
+                        <div class="input-group input-group-sm">
+                            <button class="btn btn-quantity minus-btn" type="button" data-index="${index}">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" class="form-control quantity-input" 
+                                   value="${item.quantity}" min="1" data-index="${index}">
+                            <button class="btn btn-quantity plus-btn" type="button" data-index="${index}">
+                                <i class="fas fa-plus"></i>
                             </button>
                         </div>
                     </div>
-                `;
-            });
+                    <div class="col-12 col-md-2 text-start text-md-end mt-2 mt-md-0">
+                        <strong class="product-price d-block">GS. ${itemTotal.toLocaleString()}</strong>
+                        <div class="product-price-usd">${formatearPrecioUSD(itemTotalUSD)}</div>
+                        <button class="btn btn-sm btn-danger-bloom mt-1 remove-item" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        cartItems.innerHTML = html;
+        
+        const subtotalUSD = calcularPrecioUSD(subtotal);
+        const totalUSD = calcularPrecioUSD(subtotal); // Envío gratis
+        
+        document.getElementById('subtotal').textContent = 'GS. ' + subtotal.toLocaleString();
+        document.getElementById('subtotal-usd').textContent = formatearPrecioUSD(subtotalUSD);
+        document.getElementById('total').textContent = 'GS. ' + subtotal.toLocaleString();
+        document.getElementById('total-usd').textContent = formatearPrecioUSD(totalUSD);
+        document.getElementById('total-usd-label').textContent = formatearPrecioUSD(totalUSD);
+    }
+    
+    function updateCartCount() {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('cart-count').textContent = totalItems;
+    }
+    
+    function updateClearCartButton() {
+        const clearCartBtn = document.getElementById('clear-cart-btn');
+        if (cart.length === 0) {
+            clearCartBtn.style.display = 'none';
+        } else {
+            clearCartBtn.style.display = 'block';
+        }
+    }
+    
+    function saveCart() {
+        localStorage.setItem('bloom_cart', JSON.stringify(cart));
+    }
+    
+    function removeItemWithAnimation(index) {
+        const itemElement = document.getElementById(`cart-item-${index}`);
+        if (itemElement) {
+            itemElement.classList.add('removing');
             
-            cartItems.innerHTML = html;
-            document.getElementById('subtotal').textContent = 'GS. ' + subtotal.toLocaleString();
-            document.getElementById('total').textContent = 'GS. ' + subtotal.toLocaleString();
-        }
-        
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cart-count').textContent = totalItems;
-        }
-        
-        function updateClearCartButton() {
-            const clearCartBtn = document.getElementById('clear-cart-btn');
-            if (cart.length === 0) {
-                clearCartBtn.style.display = 'none';
-            } else {
-                clearCartBtn.style.display = 'block';
-            }
-        }
-        
-        function saveCart() {
-            localStorage.setItem('bloom_cart', JSON.stringify(cart));
-        }
-        
-        function removeItemWithAnimation(index) {
-            const itemElement = document.getElementById(`cart-item-${index}`);
-            if (itemElement) {
-                itemElement.classList.add('removing');
-                
-                setTimeout(() => {
-                    cart.splice(index, 1);
-                    saveCart();
-                    updateCartInRealTime();
-                    showToast('Producto eliminado del carrito', 'danger');
-                }, 300);
-            }
-        }
-        
-        // Función para actualizar cantidad
-        function updateQuantity(index, newQuantity) {
-            if (newQuantity > 0) {
-                cart[index].quantity = newQuantity;
+            setTimeout(() => {
+                cart.splice(index, 1);
                 saveCart();
                 updateCartInRealTime();
-                showToast('Cantidad actualizada', 'success');
-            }
+                showToast('Producto eliminado del carrito', 'danger');
+            }, 300);
+        } else {
+            // Si no encuentra el elemento, actualizar igual
+            cart.splice(index, 1);
+            saveCart();
+            updateCartInRealTime();
+            showToast('Producto eliminado del carrito', 'danger');
         }
-
-        // Función para limpiar y validar teléfono
-        function formatearTelefono(telefono) {
-            return telefono.replace(/\D/g, '');
+    }
+    
+    // Función para actualizar cantidad
+    function updateQuantity(index, newQuantity) {
+        if (newQuantity > 0) {
+            cart[index].quantity = newQuantity;
+            saveCart();
+            updateCartInRealTime();
+            showToast('Cantidad actualizada', 'success');
         }
+    }
 
-        // Función para validar teléfono paraguayo
-        function validarTelefono(telefono) {
-            const telefonoLimpio = telefono.replace(/\D/g, '');
-            
-            const patrones = [
-                /^09[1-9]\d{6}$/,      // 0972366265
-                /^9[1-9]\d{6}$/,       // 972366265
-                /^5959[1-9]\d{6}$/,    // 595972366265
-                /^09[1-9]\d{7}$/       // 09851234567
-            ];
-            
-            return patrones.some(patron => patron.test(telefonoLimpio));
-        }
+    // Función para limpiar y validar teléfono
+    function formatearTelefono(telefono) {
+        return telefono.replace(/\D/g, '');
+    }
 
-        // Función para guardar pedido en BD
-        async function guardarPedidoEnBD(nombre, telefono) {
-            const checkoutBtn = document.getElementById('checkout-btn');
-            const originalText = checkoutBtn.innerHTML;
-            checkoutBtn.disabled = true;
-            checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+    // Función para validar teléfono paraguayo
+    function validarTelefono(telefono) {
+        const telefonoLimpio = telefono.replace(/\D/g, '');
+        
+        const patrones = [
+            /^09[1-9]\d{6}$/,      // 0972366265
+            /^9[1-9]\d{6}$/,       // 972366265
+            /^5959[1-9]\d{6}$/,    // 595972366265
+            /^09[1-9]\d{7}$/       // 09851234567
+        ];
+        
+        return patrones.some(patron => patron.test(telefonoLimpio));
+    }
+
+    // Función para guardar pedido en BD
+    async function guardarPedidoEnBD(nombre, telefono) {
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const originalText = checkoutBtn.innerHTML;
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+        
+        try {
+            // Convertir nombre a mayúsculas y limpiar teléfono
+            const nombreMayusculas = nombre.toUpperCase();
+            const telefonoLimpio = formatearTelefono(telefono);
             
-            try {
-                // Convertir nombre a mayúsculas y limpiar teléfono
-                const nombreMayusculas = nombre.toUpperCase();
-                const telefonoLimpio = formatearTelefono(telefono);
+            // Preparar productos
+            const productosParaBD = cart.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                image: item.image || ''
+            }));
+            
+            const response = await fetch('../includes/save_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cliente_nombre: nombreMayusculas,
+                    cliente_telefono: telefonoLimpio,
+                    productos: productosParaBD,
+                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success && result.pedido_id) {
+                // Mensaje ultra compacto para WhatsApp
+                let message = `PEDIDO num ${result.pedido_id}%0A${nombreMayusculas}%0A%0A`;
                 
-                // Preparar productos
-                const productosParaBD = cart.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                    image: item.image || ''
-                }));
-                
-                const response = await fetch('../includes/save_order.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        cliente_nombre: nombreMayusculas,
-                        cliente_telefono: telefonoLimpio,
-                        productos: productosParaBD,
-                        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-                    })
+                cart.forEach(item => {
+                    message += `${item.quantity}x ${item.name}%0A`;
                 });
                 
-                const result = await response.json();
+                message += `%0ACONFIRMAR DISPONIBILIDAD`;
                 
-                if (result.success && result.pedido_id) {
-                    // Mensaje ultra compacto para WhatsApp
-                    let message = `PEDIDO num ${result.pedido_id}%0A${nombreMayusculas}%0A%0A`;
+                // Abrir WhatsApp
+                const whatsappUrl = `https://wa.me/595976588694?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+                
+                // Limpiar carrito después de enviar
+                setTimeout(() => {
+                    cart = [];
+                    saveCart();
+                    updateCartInRealTime();
+                    showToast('¡Pedido #' + result.pedido_id + ' enviado correctamente!', 'success');
                     
-                    cart.forEach(item => {
-                        message += `${item.quantity}x ${item.name}%0A`;
-                    });
-                    
-                    message += `%0ACONFIRMAR DISPONIBILIDAD`;
-                    
-                    // Abrir WhatsApp
-                    const whatsappUrl = `https://wa.me/595976588694?text=${message}`;
-                    window.open(whatsappUrl, '_blank');
-                    
-                    // Limpiar carrito después de enviar
-                    setTimeout(() => {
-                        cart = [];
-                        saveCart();
-                        updateCartInRealTime();
-                        showToast('¡Pedido #' + result.pedido_id + ' enviado correctamente!', 'success');
-                        
-                        // Restaurar botón
-                        checkoutBtn.disabled = false;
-                        checkoutBtn.innerHTML = originalText;
-                    }, 2000);
-                    
-                } else {
-                    const errorMsg = result.error || 'No se pudo obtener el ID del pedido';
-                    showToast('Error: ' + errorMsg, 'danger');
+                    // Restaurar botón
                     checkoutBtn.disabled = false;
                     checkoutBtn.innerHTML = originalText;
-                }
+                }, 2000);
                 
-            } catch (error) {
-                showToast('Error de conexión. Intenta nuevamente.', 'danger');
+            } else {
+                const errorMsg = result.error || 'No se pudo obtener el ID del pedido';
+                showToast('Error: ' + errorMsg, 'danger');
                 checkoutBtn.disabled = false;
                 checkoutBtn.innerHTML = originalText;
             }
+            
+        } catch (error) {
+            showToast('Error de conexión. Intenta nuevamente.', 'danger');
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerHTML = originalText;
         }
+    }
 
-        // Función para mostrar modal y capturar datos
-        function mostrarModalCliente() {
-            const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
-            modal.show();
-            
-            // Limpiar formulario
-            document.getElementById('cliente_nombre').value = '';
-            document.getElementById('cliente_telefono').value = '';
-        }
+    // Función para mostrar modal y capturar datos
+    function mostrarModalCliente() {
+        const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
+        modal.show();
         
-        // Event Listeners
-        document.addEventListener('click', function(e) {
-            // Botón menos
-            if (e.target.closest('.minus-btn')) {
-                const btn = e.target.closest('.minus-btn');
-                const index = parseInt(btn.dataset.index);
-                if (cart[index].quantity > 1) {
-                    const newQuantity = cart[index].quantity - 1;
-                    updateQuantity(index, newQuantity);
-                }
-            }
-            
-            // Botón más
-            if (e.target.closest('.plus-btn')) {
-                const btn = e.target.closest('.plus-btn');
-                const index = parseInt(btn.dataset.index);
-                const newQuantity = cart[index].quantity + 1;
+        // Limpiar formulario
+        document.getElementById('cliente_nombre').value = '';
+        document.getElementById('cliente_telefono').value = '';
+    }
+    
+    // Event Listeners
+    document.addEventListener('click', function(e) {
+        // Botón menos
+        if (e.target.closest('.minus-btn')) {
+            const btn = e.target.closest('.minus-btn');
+            const index = parseInt(btn.dataset.index);
+            if (cart[index].quantity > 1) {
+                const newQuantity = cart[index].quantity - 1;
                 updateQuantity(index, newQuantity);
             }
+        }
+        
+        // Botón más
+        if (e.target.closest('.plus-btn')) {
+            const btn = e.target.closest('.plus-btn');
+            const index = parseInt(btn.dataset.index);
+            const newQuantity = cart[index].quantity + 1;
+            updateQuantity(index, newQuantity);
+        }
+        
+        // Eliminar producto
+        if (e.target.closest('.remove-item')) {
+            const btn = e.target.closest('.remove-item');
+            const index = parseInt(btn.dataset.index);
+            removeItemWithAnimation(index);
+        }
+        
+        // Vaciar carrito
+        if (e.target.closest('#clear-cart-btn')) {
+            if (cart.length === 0) return;
             
-            // Eliminar producto
-            if (e.target.closest('.remove-item')) {
-                const btn = e.target.closest('.remove-item');
-                const index = parseInt(btn.dataset.index);
-                removeItemWithAnimation(index);
-            }
-            
-            // Vaciar carrito
-            if (e.target.closest('#clear-cart-btn')) {
-                if (cart.length === 0) return;
+            if (confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) {
+                const cartItems = document.querySelectorAll('.cart-item');
                 
-                if (confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) {
-                    const cartItems = document.querySelectorAll('.cart-item');
-                    cartItems.forEach((item, index) => {
-                        setTimeout(() => {
-                            item.classList.add('removing');
-                        }, index * 100);
-                    });
-                    
+                // Animar la eliminación de cada item
+                cartItems.forEach((item, index) => {
                     setTimeout(() => {
-                        cart = [];
-                        saveCart();
-                        updateCartInRealTime();
-                        showToast('Carrito vaciado correctamente', 'danger');
-                    }, cartItems.length * 100 + 300);
-                }
+                        item.classList.add('removing');
+                    }, index * 100);
+                });
+                
+                // Limpiar después de la animación
+                setTimeout(() => {
+                    cart = [];
+                    saveCart();
+                    updateCartInRealTime();
+                    showToast('Carrito vaciado correctamente', 'danger');
+                }, cartItems.length * 100 + 300);
+                
+                // Forzar actualización inmediata como respaldo
+                setTimeout(() => {
+                    updateCartInRealTime();
+                }, cartItems.length * 100 + 500);
+            }
+        }
+        
+        // Completar pedido
+        if (e.target.closest('#checkout-btn')) {
+            if (cart.length === 0) return;
+            mostrarModalCliente();
+        }
+        
+        // Confirmar pedido desde el modal
+        if (e.target.closest('#modal-confirm-btn')) {
+            const nombre = document.getElementById('cliente_nombre').value.trim();
+            const telefono = document.getElementById('cliente_telefono').value.trim();
+            
+            if (!nombre) {
+                showToast('Por favor ingresa tu nombre', 'danger');
+                return;
             }
             
-            // Completar pedido
-            if (e.target.closest('#checkout-btn')) {
-                if (cart.length === 0) return;
-                mostrarModalCliente();
+            if (!telefono) {
+                showToast('Por favor ingresa tu número de WhatsApp', 'danger');
+                return;
             }
             
-            // Confirmar pedido desde el modal
-            if (e.target.closest('#modal-confirm-btn')) {
-                const nombre = document.getElementById('cliente_nombre').value.trim();
-                const telefono = document.getElementById('cliente_telefono').value.trim();
-                
-                if (!nombre) {
-                    showToast('Por favor ingresa tu nombre', 'danger');
-                    return;
-                }
-                
-                if (!telefono) {
-                    showToast('Por favor ingresa tu número de WhatsApp', 'danger');
-                    return;
-                }
-                
-                if (!validarTelefono(telefono)) {
-                    showToast('Por favor ingresa un número de WhatsApp válido', 'danger');
-                    return;
-                }
-                
-                const modal = bootstrap.Modal.getInstance(document.getElementById('clienteModal'));
-                modal.hide();
-                
-                guardarPedidoEnBD(nombre, telefono);
+            if (!validarTelefono(telefono)) {
+                showToast('Por favor ingresa un número de WhatsApp válido', 'danger');
+                return;
             }
-        });
-        
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('quantity-input')) {
-                const index = parseInt(e.target.dataset.index);
-                const quantity = parseInt(e.target.value);
-                
-                if (!isNaN(quantity) && quantity > 0) {
-                    updateQuantity(index, quantity);
-                }
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('clienteModal'));
+            modal.hide();
+            
+            guardarPedidoEnBD(nombre, telefono);
+        }
+    });
+    
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('quantity-input')) {
+            const index = parseInt(e.target.dataset.index);
+            const quantity = parseInt(e.target.value);
+            
+            if (!isNaN(quantity) && quantity > 0) {
+                updateQuantity(index, quantity);
             }
-        });
-        
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('quantity-input')) {
-                const index = parseInt(e.target.dataset.index);
-                const quantity = parseInt(e.target.value);
-                
-                if (isNaN(quantity) || quantity < 1) {
-                    e.target.value = 1;
-                    updateQuantity(index, 1);
-                }
+        }
+    });
+    
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('quantity-input')) {
+            const index = parseInt(e.target.dataset.index);
+            const quantity = parseInt(e.target.value);
+            
+            if (isNaN(quantity) || quantity < 1) {
+                e.target.value = 1;
+                updateQuantity(index, 1);
             }
-        });
-        
-        // Inicializar
-        updateCartInRealTime();
-    </script>
+        }
+    });
+    
+    // Inicializar
+    updateCartInRealTime();
+</script>
 </body>
 </html>

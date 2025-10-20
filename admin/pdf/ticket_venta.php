@@ -13,6 +13,9 @@ if (!isset($_SESSION['user_id'])) {
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener tipo de cambio actual
+$tipo_cambio = getTipoCambioActual();
+
 // Obtener datos del pedido
 $pedido_id = isset($_GET['pedido_id']) ? $_GET['pedido_id'] : 0;
 $pedido = null;
@@ -54,8 +57,15 @@ $pdf->SetLineWidth(0.2);
 
 // Título del ticket - CENTRADO CORRECTAMENTE
 $pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(0, 8, 'Ticket', 0, 1, 'C');
+$pdf->Cell(0, 8, 'COMPROBANTE DE VENTA', 0, 1, 'C');
 $pdf->Ln(1);
+
+// Información del tipo de cambio si está disponible
+if ($tipo_cambio) {
+    $pdf->SetFont('helvetica', 'I', 6);
+    $pdf->Cell(0, 3, 'Tipo de cambio: ' . number_format($tipo_cambio['venta'], 3) . ' Gs./USD', 0, 1, 'C');
+    $pdf->Ln(1);
+}
 
 // Línea separadora
 $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
@@ -115,13 +125,17 @@ if ($pedido && !empty($productos)) {
         
         $pdf->Cell(12, 5, $cantidad, 0, 0, 'L');
         $pdf->Cell(38, 5, $nombre, 0, 0, 'L');
-        $pdf->Cell(20, 5, 'Gs. ' . number_format($subtotal, 0, ',', '.'), 0, 1, 'R');
+        
+        // Mostrar precio en Guaraníes
+        $precios_subtotal = formatPrecioDual($subtotal);
+        $pdf->Cell(20, 5, $precios_subtotal['gs'], 0, 1, 'R');
         
         // Si cantidad es mayor a 1, mostrar precio unitario
         if ($cantidad > 1) {
             $pdf->Cell(12, 4, '', 0, 0, 'L');
             $pdf->SetFont('helvetica', 'I', 7);
-            $pdf->Cell(38, 4, '@ Gs. ' . number_format($precio_unitario, 0, ',', '.'), 0, 1, 'L');
+            $precios_unitario = formatPrecioDual($precio_unitario);
+            $pdf->Cell(38, 4, '@ ' . $precios_unitario['gs'], 0, 1, 'L');
             $pdf->SetFont('helvetica', '', 8);
         }
     }
@@ -130,10 +144,17 @@ if ($pedido && !empty($productos)) {
     $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
     $pdf->Ln(3);
     
-    // TOTAL - CON ESPACIADO CORRECTO
+    // TOTAL - CON ESPACIADO CORRECTO Y AMBAS MONEDAS
+    $precios_total = formatPrecioDual($total_general);
+    
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(50, 7, 'TOTAL:', 0, 0, 'R');
-    $pdf->Cell(20, 7, 'Gs. ' . number_format($total_general, 0, ',', '.'), 0, 1, 'R');
+    $pdf->Cell(20, 7, $precios_total['gs'], 0, 1, 'R');
+    
+    // Mostrar también en USD
+    $pdf->SetFont('helvetica', '', 8);
+    $pdf->Cell(50, 4, '', 0, 0, 'R');
+    $pdf->Cell(20, 4, $precios_total['usd'], 0, 1, 'R');
 }
 
 $pdf->Ln(8);
@@ -157,7 +178,7 @@ $pdf->Ln(5);
 $pdf->SetFont('helvetica', 'I', 7);
 $pdf->Cell(0, 5, 'Este documento no es válido como factura oficial', 0, 1, 'C');
 
-// ELIMINAR CUALQUIER POSIBLE HEADER/FOOTER DE MARCO COS
+// ELIMINAR CUALQUIER POSIBLE HEADER/FOOTER
 $pdf->setHeaderData('', 0, '', '');
 $pdf->setPrintHeader(false);
 $pdf->setPrintFooter(false);

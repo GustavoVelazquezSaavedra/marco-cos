@@ -5,6 +5,25 @@ include_once('../includes/functions.php');
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener tipo de cambio actual
+$queryTipoCambio = "SELECT * FROM tipo_cambio WHERE fecha = CURDATE() AND activo = 1 ORDER BY id DESC LIMIT 1";
+$stmtTipoCambio = $db->prepare($queryTipoCambio);
+$stmtTipoCambio->execute();
+$tipo_cambio = $stmtTipoCambio->fetch(PDO::FETCH_ASSOC);
+
+// Si no hay tipo de cambio para hoy, usar el más reciente
+if (!$tipo_cambio) {
+    $queryTipoCambio = "SELECT * FROM tipo_cambio WHERE activo = 1 ORDER BY fecha DESC LIMIT 1";
+    $stmtTipoCambio = $db->prepare($queryTipoCambio);
+    $stmtTipoCambio->execute();
+    $tipo_cambio = $stmtTipoCambio->fetch(PDO::FETCH_ASSOC);
+}
+
+// Si aún no hay tipo de cambio, usar valores por defecto
+if (!$tipo_cambio) {
+    $tipo_cambio = ['compra' => 7000, 'venta' => 7100];
+}
+
 // Obtener categorías para el menú
 $queryCategorias = "SELECT * FROM categorias WHERE activo = 1 ORDER BY nombre";
 $stmtCategorias = $db->prepare($queryCategorias);
@@ -327,6 +346,13 @@ if (!empty($categoria_id)) {
             font-size: 1.3rem;
             font-weight: 700;
             color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+        
+        .product-price-usd {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: 600;
             margin-bottom: 15px;
         }
         
@@ -418,6 +444,20 @@ if (!empty($categoria_id)) {
         .contact-card .card-body {
             padding: 20px;
             text-align: center;
+        }
+        
+        /* Exchange Rate Info */
+        .exchange-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .exchange-info small {
+            opacity: 0.9;
         }
         
         /* Footer BLOOM */
@@ -596,6 +636,22 @@ if (!empty($categoria_id)) {
     </section>
 
     <div class="container py-4">
+        <!-- Información del tipo de cambio -->
+        <div class="exchange-info">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <small><i class="fas fa-sync-alt me-1"></i> Tipo de cambio actual</small>
+                    <div class="d-flex justify-content-center justify-content-md-start gap-3 mt-1">
+                        <small><strong>Compra:</strong> <?php echo number_format($tipo_cambio['compra'], 0, ',', '.'); ?> Gs.</small>
+                        <small><strong>Venta:</strong> <?php echo number_format($tipo_cambio['venta'], 0, ',', '.'); ?> Gs.</small>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                    <small><i class="fas fa-info-circle me-1"></i> Los precios en USD se calculan con tipo de cambio venta</small>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <!-- Sidebar de Filtros -->
             <div class="col-md-3">
@@ -722,7 +778,10 @@ if (!empty($categoria_id)) {
                         </div>
                     </div>
                     <?php else: ?>
-                    <?php foreach ($productos as $producto): ?>
+                    <?php foreach ($productos as $producto): 
+                        // Calcular precio en dólares
+                        $precio_usd = $producto['precio_publico'] / $tipo_cambio['venta'];
+                    ?>
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="product-card-bloom">
                             <div class="position-relative">
@@ -757,6 +816,9 @@ if (!empty($categoria_id)) {
                                 
                                 <div class="product-price-bloom">
                                     GS. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?>
+                                </div>
+                                <div class="product-price-usd">
+                                    <i class="fas fa-dollar-sign me-1"></i>USD <?php echo number_format($precio_usd, 2, '.', ','); ?>
                                 </div>
                                 
                                 <div class="product-actions-bloom">

@@ -10,6 +10,9 @@ include_once('../includes/database.php');
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener tipo de cambio actual
+$tipo_cambio = getTipoCambioActual();
+
 // Procesar acciones
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 $id = isset($_GET['id']) ? $_GET['id'] : null;
@@ -206,6 +209,10 @@ if ($action == 'create') {
             color: #28a745;
             font-size: 0.8em;
         }
+        .price-usd {
+            color: #6c757d;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 <body>
@@ -246,6 +253,9 @@ if ($action == 'create') {
                     <a href="pedidos.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-shopping-cart"></i> Pedidos
                     </a>
+                    <a href="config_tipo_cambio.php" class="list-group-item list-group-item-action">
+                        <i class="fas fa-dollar-sign"></i> Tipo de Cambio
+                    </a>
                     <?php if ($_SESSION['user_role'] == 'admin'): ?>
                     <a href="usuarios.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-users"></i> Usuarios
@@ -278,6 +288,23 @@ if ($action == 'create') {
                             <i class="fas fa-plus"></i> Nuevo Producto
                         </a>
                     </div>
+
+                    <!-- Información del tipo de cambio -->
+                    <?php if ($tipo_cambio): ?>
+                    <div class="alert alert-info d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Tipo de Cambio Actual:</strong> 
+                            Compra: <strong class="text-success"><?php echo number_format($tipo_cambio['compra'], 3); ?> Gs.</strong> | 
+                            Venta: <strong class="text-danger"><?php echo number_format($tipo_cambio['venta'], 3); ?> Gs.</strong>
+                        </div>
+                        <small class="text-muted"><?php echo date('d/m/Y', strtotime($tipo_cambio['fecha'])); ?></small>
+                    </div>
+                    <?php else: ?>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> No hay tipo de cambio configurado para hoy.
+                        <a href="config_tipo_cambio.php" class="alert-link">Configurar ahora</a>
+                    </div>
+                    <?php endif; ?>
 
                     <!-- Filtros y Búsqueda -->
                     <div class="card mb-4">
@@ -370,17 +397,27 @@ if ($action == 'create') {
                                             </td>
                                             <td><?php echo $prod['categoria_nombre']; ?></td>
                                             <td>
-                                                <strong class="text-success">Gs. <?php echo number_format($prod['precio_publico'], 0, ',', '.'); ?></strong>
+                                                <?php 
+                                                $precios_publico = formatPrecioDual($prod['precio_publico']);
+                                                ?>
+                                                <strong class="text-success"><?php echo $precios_publico['gs']; ?></strong>
+                                                <br>
+                                                <small class="price-usd"><?php echo $precios_publico['usd']; ?></small>
                                             </td>
                                             <td>
-                                                <span class="text-primary">Gs. <?php echo number_format($prod['precio_real'], 0, ',', '.'); ?></span>
+                                                <?php 
+                                                $precios_real = formatPrecioDual($prod['precio_real']);
+                                                ?>
+                                                <span class="text-primary"><?php echo $precios_real['gs']; ?></span>
+                                                <br>
+                                                <small class="price-usd"><?php echo $precios_real['usd']; ?></small>
                                                 <?php 
                                                 $ganancia = $prod['precio_publico'] - $prod['precio_real'];
                                                 $margen = $prod['precio_real'] > 0 ? ($ganancia / $prod['precio_real']) * 100 : 0;
                                                 ?>
                                                 <br>
                                                 <small class="price-profit">
-                                                    +Gs. <?php echo number_format($ganancia, 0, ',', '.'); ?> 
+                                                    +<?php echo formatPrecioDual($ganancia)['gs']; ?> 
                                                     (<?php echo number_format($margen, 1); ?>%)
                                                 </small>
                                             </td>
@@ -476,7 +513,7 @@ if ($action == 'create') {
                                                     <label for="precio_publico" class="form-label">Precio Público *</label>
                                                     <input type="number" class="form-control" id="precio_publico" name="precio_publico" 
                                                            value="<?php echo isset($producto) ? $producto['precio_publico'] : ''; ?>" step="0.01" min="0" required>
-                                                    <small class="text-muted">Precio que ven los clientes</small>
+                                                    <small class="text-muted">Precio que ven los clientes (Guaraníes)</small>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -484,7 +521,7 @@ if ($action == 'create') {
                                                     <label for="precio_real" class="form-label">Precio Real *</label>
                                                     <input type="number" class="form-control" id="precio_real" name="precio_real" 
                                                            value="<?php echo isset($producto) ? $producto['precio_real'] : ''; ?>" step="0.01" min="0" required>
-                                                    <small class="text-muted">Costo real del producto</small>
+                                                    <small class="text-muted">Costo real del producto (Guaraníes)</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -533,13 +570,19 @@ if ($action == 'create') {
                                             <div class="card-body">
                                                 <h6 class="card-title">Calculadora de Margen</h6>
                                                 <div class="mb-2">
-                                                    <small>Precio Público: <span id="display_publico">0</span></small>
+                                                    <small>Precio Público: <span id="display_publico_gs">0</span></small>
+                                                    <br>
+                                                    <small class="text-muted"><span id="display_publico_usd">0</span></small>
                                                 </div>
                                                 <div class="mb-2">
-                                                    <small>Precio Real: <span id="display_real">0</span></small>
+                                                    <small>Precio Real: <span id="display_real_gs">0</span></small>
+                                                    <br>
+                                                    <small class="text-muted"><span id="display_real_usd">0</span></small>
                                                 </div>
                                                 <div class="mb-2">
-                                                    <small>Ganancia: <span id="display_ganancia" class="text-success">0</span></small>
+                                                    <small>Ganancia: <span id="display_ganancia_gs" class="text-success">0</span></small>
+                                                    <br>
+                                                    <small class="text-muted"><span id="display_ganancia_usd">0</span></small>
                                                 </div>
                                                 <div>
                                                     <small>Margen: <span id="display_margen" class="text-primary">0%</span></small>
@@ -568,7 +611,7 @@ if ($action == 'create') {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <script>
-        // Calculadora de margen en tiempo real
+        // Calculadora de margen en tiempo real con conversión a USD
         $(document).ready(function() {
             function calcularMargen() {
                 const precioPublico = parseFloat($('#precio_publico').val()) || 0;
@@ -576,9 +619,24 @@ if ($action == 'create') {
                 const ganancia = precioPublico - precioReal;
                 const margen = precioReal > 0 ? (ganancia / precioReal) * 100 : 0;
                 
-                $('#display_publico').text('Gs. ' + precioPublico.toLocaleString());
-                $('#display_real').text('Gs. ' + precioReal.toLocaleString());
-                $('#display_ganancia').text('Gs. ' + ganancia.toLocaleString());
+                // Obtener tipo de cambio (valor fijo por ahora, podrías obtenerlo via AJAX)
+                const tipoCambio = 7060; // Valor por defecto
+                
+                // Calcular en USD
+                const precioPublicoUSD = precioPublico / tipoCambio;
+                const precioRealUSD = precioReal / tipoCambio;
+                const gananciaUSD = ganancia / tipoCambio;
+                
+                // Mostrar en Guaraníes
+                $('#display_publico_gs').text('Gs. ' + precioPublico.toLocaleString());
+                $('#display_real_gs').text('Gs. ' + precioReal.toLocaleString());
+                $('#display_ganancia_gs').text('Gs. ' + ganancia.toLocaleString());
+                
+                // Mostrar en USD
+                $('#display_publico_usd').text('$ ' + precioPublicoUSD.toFixed(2));
+                $('#display_real_usd').text('$ ' + precioRealUSD.toFixed(2));
+                $('#display_ganancia_usd').text('$ ' + gananciaUSD.toFixed(2));
+                
                 $('#display_margen').text(margen.toFixed(1) + '%');
             }
             

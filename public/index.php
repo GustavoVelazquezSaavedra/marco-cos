@@ -5,6 +5,9 @@ include_once('../includes/functions.php');
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener tipo de cambio actual (ya está en functions.php)
+$tipo_cambio = getTipoCambioActual();
+
 // Obtener categorías para el menú
 $queryCategorias = "SELECT * FROM categorias WHERE activo = 1 ORDER BY nombre";
 $stmtCategorias = $db->prepare($queryCategorias);
@@ -285,6 +288,12 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 700;
             color: var(--secondary-color);
             margin-bottom: 15px;
+        }
+        
+        .price-usd {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 500;
         }
         
         .product-actions-bloom {
@@ -657,7 +666,6 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </section>
 
-    <!-- Resto del código se mantiene igual -->
     <!-- Productos Destacados BLOOM -->
     <section class="products-section-bloom">
         <div class="container">
@@ -700,7 +708,11 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 
                                 <div class="product-price-bloom">
-                                    GS. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?>
+                                    <?php 
+                                    $precios = formatPrecioDual($producto['precio_publico']);
+                                    ?>
+                                    <div class="fw-bold"><?php echo $precios['gs']; ?></div>
+                                    <div class="price-usd"><?php echo $precios['usd']; ?></div>
                                 </div>
                                 
                                 <div class="product-actions-bloom">
@@ -790,7 +802,11 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 
                                 <div class="product-price-bloom">
-                                    GS. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?>
+                                    <?php 
+                                    $precios = formatPrecioDual($producto['precio_publico']);
+                                    ?>
+                                    <div class="fw-bold"><?php echo $precios['gs']; ?></div>
+                                    <div class="price-usd"><?php echo $precios['usd']; ?></div>
                                 </div>
                                 
                                 <div class="product-actions-bloom">
@@ -930,7 +946,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
-            document.body.appendChild(toast);
+            document.body.appendChild(toct);
             
             // Auto-remover después de 3 segundos
             setTimeout(() => {
