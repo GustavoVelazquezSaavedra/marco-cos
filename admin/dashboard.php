@@ -98,6 +98,9 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
                     <a href="pedidos.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-shopping-cart"></i> Pedidos
                     </a>
+                    <a href="presupuestos.php" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-invoice-dollar"></i> Presupuestos
+                    </a>
                     <a href="config_tipo_cambio.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-dollar-sign"></i> Tipo de Cambio
                     </a>
@@ -272,6 +275,12 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
                                         <a href="inventario.php?action=salida" class="btn btn-outline-warning btn-lg">
                                             <i class="fas fa-arrow-up"></i><br>
                                             Salida Stock
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 text-center">
+                                        <a href="presupuestos.php?action=create" class="btn btn-outline-info btn-lg">
+                                            <i class="fas fa-file-invoice-dollar"></i><br>
+                                            Nuevo Presupuesto
                                         </a>
                                     </div>
                                     <div class="col-md-3 text-center">

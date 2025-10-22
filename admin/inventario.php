@@ -252,6 +252,9 @@ function uploadDocument($file, $folder = "documents") {
                     <a href="pedidos.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-shopping-cart"></i> Pedidos
                     </a>
+                    <a href="presupuestos.php" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-invoice-dollar"></i> Presupuestos
+                    </a>
                     <a href="config_tipo_cambio.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-dollar-sign"></i> Tipo de Cambio
                     </a>

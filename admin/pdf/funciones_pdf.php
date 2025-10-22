@@ -14,7 +14,7 @@ class PDFGenerator extends TCPDF {
         if ($pageWidth <= 100) {
             $this->SetY(3);
             $this->SetFont('helvetica', 'B', 9);
-            $this->Cell(0, 4, 'BLOOM - Joyeria y Accesorios', 0, 1, 'C');
+            $this->Cell(0, 4, 'BLOOM - Perfumes y cosmeticos', 0, 1, 'C');
             $this->SetFont('helvetica', '', 7);
             $this->Cell(0, 3, '', 0, 1, 'C');
             $this->SetY($this->GetY() + 2);
@@ -50,7 +50,7 @@ class PDFGenerator extends TCPDF {
         else {
             $this->SetY(-15);
             $this->SetFont('helvetica', 'I', 8);
-            $this->Cell(0, 10, 'Página '.$this->getAliasNumPage().'/'.$this->getAliasNbPages() . ' - BLOOM Joyeria y Accesorios', 0, 0, 'C');
+            $this->Cell(0, 10, 'Página '.$this->getAliasNumPage().'/'.$this->getAliasNbPages() . ' - BLOOM Perfumes y cosmeticos', 0, 0, 'C');
         }
     }
     

@@ -1,5 +1,5 @@
 <?php
-// admin/pdf/ticket_venta.php
+// admin/pdf/ticket_presupuesto.php
 include_once('funciones_pdf.php');
 
 // Verificar sesión
@@ -16,33 +16,38 @@ $db = $database->getConnection();
 // Obtener tipo de cambio actual
 $tipo_cambio = getTipoCambioActual();
 
-// Obtener datos del pedido
-$pedido_id = isset($_GET['pedido_id']) ? $_GET['pedido_id'] : 0;
-$pedido = null;
+// Obtener datos del presupuesto
+$presupuesto_id = isset($_GET['presupuesto_id']) ? $_GET['presupuesto_id'] : 0;
+$presupuesto = null;
 $productos = array();
 
-if ($pedido_id) {
-    $query = "SELECT * FROM pedidos WHERE id = ?";
+if ($presupuesto_id) {
+    $query = "SELECT * FROM presupuestos WHERE id = ?";
     $stmt = $db->prepare($query);
-    $stmt->execute([$pedido_id]);
-    $pedido = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute([$presupuesto_id]);
+    $presupuesto = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if ($pedido) {
-        $productos = json_decode($pedido['productos'], true);
+    if ($presupuesto) {
+        $productos = json_decode($presupuesto['productos'], true);
     }
+}
+
+// Si no se encuentra el presupuesto
+if (!$presupuesto) {
+    die('Presupuesto no encontrado');
 }
 
 // FORZAR configuración para ticket térmico
 $pdf = new PDFGenerator('P', 'mm', array(80, 200), true, 'UTF-8', false);
 
-// CONFIGURAR EXPLÍCITAMENTE TODO PARA BLOOM
+// CONFIGURACIÓN GENERAL BLOOM
 $pdf->SetCreator('BLOOM');
 $pdf->SetAuthor('BLOOM');
-$pdf->SetTitle('Ticket de Venta - BLOOM');
-$pdf->SetSubject('Ticket de Venta');
-$pdf->SetKeywords('ticket, venta, BLOOM');
+$pdf->SetTitle('Presupuesto - BLOOM');
+$pdf->SetSubject('Presupuesto');
+$pdf->SetKeywords('presupuesto, BLOOM, ticket');
 
-// Configuración explícita de márgenes
+// Márgenes y saltos
 $pdf->SetMargins(5, 5, 5);
 $pdf->SetHeaderMargin(0);
 $pdf->SetFooterMargin(0);
@@ -50,39 +55,42 @@ $pdf->SetAutoPageBreak(true, 5);
 
 $pdf->AddPage();
 
-// RESETEAR fuentes y configuraciones
+// Fuente y color base
 $pdf->SetFont('helvetica', '', 9);
 $pdf->SetTextColor(0, 0, 0);
 $pdf->SetLineWidth(0.2);
 
-// Título del ticket - CENTRADO CORRECTAMENTE
+// --- ENCABEZADO ---
 $pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(0, 8, 'COMPROBANTE DE VENTA', 0, 1, 'C');
+$pdf->Cell(0, 8, 'PRESUPUESTO BLOOM', 0, 1, 'C');
 $pdf->Ln(1);
-
-// Información del tipo de cambio si está disponible
 
 // Línea separadora
 $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
 $pdf->Ln(3);
 
-// Información del pedido - ALINEACIÓN CORRECTA
+// --- INFORMACIÓN GENERAL ---
 $pdf->SetFont('helvetica', '', 8);
-$pdf->Cell(20, 5, 'N° Pedido:', 0, 0, 'L');
+$pdf->Cell(20, 5, 'N° Presupuesto:', 0, 0, 'L');
 $pdf->SetFont('helvetica', 'B', 8);
-$pdf->Cell(0, 5, '#' . $pedido_id, 0, 1, 'L');
+$pdf->Cell(0, 5, '#' . $presupuesto_id, 0, 1, 'L');
 
 $pdf->SetFont('helvetica', '', 8);
 $pdf->Cell(20, 5, 'Fecha:', 0, 0, 'L');
 $pdf->Cell(0, 5, date('d/m/Y H:i:s'), 0, 1, 'L');
 
-if ($pedido) {
+if ($presupuesto) {
     $pdf->SetFont('helvetica', '', 8);
     $pdf->Cell(20, 5, 'Cliente:', 0, 0, 'L');
-    $pdf->Cell(0, 5, $pedido['cliente_nombre'], 0, 1, 'L');
+    $pdf->Cell(0, 5, $presupuesto['cliente_nombre'], 0, 1, 'L');
     
     $pdf->Cell(20, 5, 'Teléfono:', 0, 0, 'L');
-    $pdf->Cell(0, 5, $pedido['cliente_telefono'], 0, 1, 'L');
+    $pdf->Cell(0, 5, $presupuesto['cliente_telefono'], 0, 1, 'L');
+    
+    if (!empty($presupuesto['cliente_documento']) && $presupuesto['cliente_documento'] != '0') {
+        $pdf->Cell(20, 5, 'Documento:', 0, 0, 'L');
+        $pdf->Cell(0, 5, $presupuesto['cliente_documento'], 0, 1, 'L');
+    }
 }
 
 $pdf->Ln(5);
@@ -91,41 +99,36 @@ $pdf->Ln(5);
 $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
 $pdf->Ln(3);
 
-// Tabla de productos - FORMATO MEJORADO
-if ($pedido && !empty($productos)) {
-    // Cabecera de la tabla
+// --- TABLA DE PRODUCTOS ---
+if ($presupuesto && !empty($productos)) {
     $pdf->SetFont('helvetica', 'B', 8);
     $pdf->Cell(12, 6, 'Cant', 0, 0, 'L');
     $pdf->Cell(38, 6, 'Producto', 0, 0, 'L');
     $pdf->Cell(20, 6, 'Total', 0, 1, 'R');
-    
-    // Línea bajo cabecera
+
     $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
     $pdf->Ln(2);
-    
+
     $total_general = 0;
     $pdf->SetFont('helvetica', '', 8);
-    
+
     foreach ($productos as $prod) {
         $cantidad = $prod['quantity'] ?? $prod['cantidad'] ?? 1;
         $precio_unitario = $prod['price'] ?? $prod['precio'] ?? 0;
         $nombre = $prod['name'] ?? $prod['nombre'] ?? 'Producto';
         $subtotal = $cantidad * $precio_unitario;
         $total_general += $subtotal;
-        
-        // Acortar nombre del producto si es muy largo
+
         if (strlen($nombre) > 25) {
             $nombre = substr($nombre, 0, 25) . '...';
         }
-        
+
         $pdf->Cell(12, 5, $cantidad, 0, 0, 'L');
         $pdf->Cell(38, 5, $nombre, 0, 0, 'L');
-        
-        // Mostrar precio en Guaraníes
+
         $precios_subtotal = formatPrecioDual($subtotal);
         $pdf->Cell(20, 5, $precios_subtotal['gs'], 0, 1, 'R');
-        
-        // Si cantidad es mayor a 1, mostrar precio unitario
+
         if ($cantidad > 1) {
             $pdf->Cell(12, 4, '', 0, 0, 'L');
             $pdf->SetFont('helvetica', 'I', 7);
@@ -134,19 +137,18 @@ if ($pedido && !empty($productos)) {
             $pdf->SetFont('helvetica', '', 8);
         }
     }
-    
+
     $pdf->Ln(3);
     $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
     $pdf->Ln(3);
-    
-    // TOTAL - CON ESPACIADO CORRECTO Y AMBAS MONEDAS
+
+    // TOTAL
     $precios_total = formatPrecioDual($total_general);
-    
+
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(50, 7, 'TOTAL:', 0, 0, 'R');
     $pdf->Cell(20, 7, $precios_total['gs'], 0, 1, 'R');
-    
-    // Mostrar también en USD
+
     $pdf->SetFont('helvetica', '', 8);
     $pdf->Cell(50, 4, '', 0, 0, 'R');
     $pdf->Cell(20, 4, $precios_total['usd'], 0, 1, 'R');
@@ -154,30 +156,30 @@ if ($pedido && !empty($productos)) {
 
 $pdf->Ln(8);
 
-// Línea separadora final
+// Línea final
 $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
 $pdf->Ln(5);
 
-// INFORMACIÓN DE CONTACTO - BLOOM EXPLÍCITO
+// --- PIE DE TICKET ---
 $pdf->SetFont('helvetica', 'B', 9);
-$pdf->Cell(0, 6, '¡Gracias por su compra!', 0, 1, 'C');
+$pdf->Cell(0, 6, '¡Gracias por su consulta!', 0, 1, 'C');
 $pdf->Ln(2);
 
 $pdf->SetFont('helvetica', 'B', 10);
-$pdf->Cell(0, 6, 'BLOOM - Perfumes y cosmeticos', 0, 1, 'C');
+$pdf->Cell(0, 6, 'BLOOM - Perfumes y cosméticos', 0, 1, 'C');
 $pdf->SetFont('helvetica', '', 8);
 $pdf->Cell(0, 5, 'Tel: +595 972 366-265', 0, 1, 'C');
 $pdf->Cell(0, 5, 'Horario: Lun-Vie 8:00-18:00', 0, 1, 'C');
 
 $pdf->Ln(5);
 $pdf->SetFont('helvetica', 'I', 7);
-$pdf->Cell(0, 5, 'Este documento no es válido como factura oficial', 0, 1, 'C');
+$pdf->Cell(0, 5, 'Este presupuesto es válido por 15 días', 0, 1, 'C');
 
-// ELIMINAR CUALQUIER POSIBLE HEADER/FOOTER
+// Sin header/footer
 $pdf->setHeaderData('', 0, '', '');
 $pdf->setPrintHeader(false);
 $pdf->setPrintFooter(false);
 
-// Salida del PDF
-$pdf->Output('ticket_bloom_' . $pedido_id . '.pdf', 'I');
+// SALIDA FINAL
+$pdf->Output('presupuesto_bloom_' . $presupuesto_id . '.pdf', 'I');
 ?>
