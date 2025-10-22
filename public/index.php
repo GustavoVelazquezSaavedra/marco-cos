@@ -60,7 +60,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLOOM - Joyería y Accesorios</title>
+    <title>BLOOM - Perfumes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
@@ -649,18 +649,114 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
+        <!-- Slider Principal -->
+        <?php
+    // Obtener slides activos
+    $querySlides = "SELECT s.*, p.id as producto_id, p.nombre as producto_nombre 
+                    FROM slider_principal s 
+                    LEFT JOIN productos p ON s.producto_id = p.id 
+                    WHERE s.activo = 1 
+                    ORDER BY s.orden ASC 
+                    LIMIT 5";
+    $stmtSlides = $db->prepare($querySlides);
+    $stmtSlides->execute();
+    $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
+    ?>
 
+    <?php if (!empty($slides)): ?>
+    <div id="mainSlider" class="carousel slide mb-0" data-bs-ride="carousel">
+        <!-- Indicadores -->
+        <div class="carousel-indicators">
+            <?php foreach ($slides as $index => $slide): ?>
+            <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="<?php echo $index; ?>" 
+                    class="<?php echo $index === 0 ? 'active' : ''; ?>" aria-current="<?php echo $index === 0 ? 'true' : 'false'; ?>" 
+                    aria-label="Slide <?php echo $index + 1; ?>"></button>
+            <?php endforeach; ?>
+        </div>
+        
+        <!-- Slides -->
+        <div class="carousel-inner">
+            <?php foreach ($slides as $index => $slide): ?>
+            <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>" style="height: 500px;">
+                <div class="carousel-image" style="
+                    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                                <?php if (!empty($slide['imagen'])): ?>
+                                url('../uploads/slider/<?php echo $slide['imagen']; ?>')
+                                <?php else: ?>
+                                url('https://via.placeholder.com/1200x600/667eea/764ba2?text=Marco+Cos')
+                                <?php endif; ?>;
+                    background-size: cover;
+                    background-position: center;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                ">
+                    <div class="container">
+                        <div class="row justify-content-center text-center text-white">
+                            <div class="col-lg-8">
+                                <h1 class="display-4 fw-bold mb-3"><?php echo $slide['titulo']; ?></h1>
+                                <p class="lead mb-4"><?php echo $slide['subtitulo']; ?></p>
+                                <?php if ($slide['producto_id']): ?>
+                                <a href="producto.php?id=<?php echo $slide['producto_id']; ?>" class="btn btn-light btn-lg">
+                                    <i class="fas fa-gem me-2"></i><?php echo $slide['texto_boton']; ?>
+                                </a>
+                                <?php else: ?>
+                                <a href="catalogo.php" class="btn btn-light btn-lg">
+                                    <i class="fas fa-gem me-2"></i><?php echo $slide['texto_boton']; ?>
+                                </a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        
+        <!-- Controles -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#mainSlider" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#mainSlider" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
+    </div>
+    
+    <style>
+        .carousel-item {
+            transition: transform 0.6s ease-in-out;
+        }
+        .carousel-image {
+            border-radius: 0 0 20px 20px;
+        }
+        .carousel-control-prev, .carousel-control-next {
+            width: 5%;
+        }
+        .carousel-indicators button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+        /* Asegurar que el slider no tenga margen inferior */
+        #mainSlider {
+            margin-bottom: 0 !important;
+        }
+    </style>
+    <?php endif; ?>
     <!-- Hero Section BLOOM -->
     <section class="hero-bloom">
         <div class="container">
-            <h1 class="hero-title-bloom">BIENVENIDO A BLOOM</h1>
-            <p class="hero-subtitle-bloom">Descubre nuestra exclusiva colección de joyería y accesorios finos</p>
+            <h1 class="hero-title-bloom">BIENVENIDOS A BLOOM</h1>
+            <p class="hero-subtitle-bloom">Descubre nuestra exclusiva colección de perfumes</p>
             <div>
                 <a href="catalogo.php" class="btn hero-btn-bloom">
                     <i class="fas fa-gem me-2"></i>VER CATÁLOGO
                 </a>
                 <a href="catalogo.php?categoria_id=1" class="btn hero-btn-bloom" style="background: transparent; border: 2px solid white; color: white;">
-                    <i class="fas fa-ring me-2"></i>ANILLOS
+                    <i class="fas fa-ring me-2"></i>PERFUMES ARABES
                 </a>
             </div>
         </div>
@@ -671,8 +767,8 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         <div class="container">
             <?php if (empty($search) && empty($categoria_id)): ?>
                 <!-- Mostrar productos destacados cuando no hay búsqueda -->
-                <h2 class="section-title-bloom">Nuestras Joyas Más Exclusivas</h2>
-                <p class="section-subtitle-bloom">Descubre nuestra colección de joyas únicas y elegantes</p>
+                <h2 class="section-title-bloom">Nuestros Perfumes Más Exclusivas</h2>
+                <p class="section-subtitle-bloom">Descubre nuestra colección de Perfumes</p>
                 
                 <div class="row">
                     <?php if (empty($productos_destacados)): ?>
@@ -873,7 +969,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <h5 class="footer-title-bloom">BLOOM</h5>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Joyería y accesorios de la más alta calidad para momentos especiales.</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Perfumes de la más alta calidad para momentos especiales.</p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5 class="footer-title-bloom">CONTACTO</h5>

@@ -414,13 +414,7 @@ if (!$tipo_cambio) {
         <!-- Información del tipo de cambio -->
         <div class="exchange-info">
             <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <small><i class="fas fa-sync-alt me-1"></i> Tipo de cambio actual</small>
-                    <div class="d-flex justify-content-center justify-content-md-start gap-3 mt-1">
-                        <small><strong>Compra:</strong> <?php echo number_format($tipo_cambio['compra'], 0, ',', '.'); ?> Gs.</small>
-                        <small><strong>Venta:</strong> <?php echo number_format($tipo_cambio['venta'], 0, ',', '.'); ?> Gs.</small>
-                    </div>
-                </div>
+                
                 <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
                     <small><i class="fas fa-info-circle me-1"></i> Los precios en USD se calculan con tipo de cambio venta</small>
                 </div>

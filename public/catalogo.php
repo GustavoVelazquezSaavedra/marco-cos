@@ -631,26 +631,13 @@ if (!empty($categoria_id)) {
     <section class="page-header">
         <div class="container">
             <h1 class="page-title"><i class="fas fa-th-large me-2"></i>Catálogo Completo</h1>
-            <p class="page-subtitle">Descubre toda nuestra colección de joyas y accesorios</p>
+            <p class="page-subtitle">Descubre toda nuestra colección de perfumes</p>
         </div>
     </section>
 
     <div class="container py-4">
         <!-- Información del tipo de cambio -->
-        <div class="exchange-info">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <small><i class="fas fa-sync-alt me-1"></i> Tipo de cambio actual</small>
-                    <div class="d-flex justify-content-center justify-content-md-start gap-3 mt-1">
-                        <small><strong>Compra:</strong> <?php echo number_format($tipo_cambio['compra'], 0, ',', '.'); ?> Gs.</small>
-                        <small><strong>Venta:</strong> <?php echo number_format($tipo_cambio['venta'], 0, ',', '.'); ?> Gs.</small>
-                    </div>
-                </div>
-                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
-                    <small><i class="fas fa-info-circle me-1"></i> Los precios en USD se calculan con tipo de cambio venta</small>
-                </div>
-            </div>
-        </div>
+        
 
         <div class="row">
             <!-- Sidebar de Filtros -->
@@ -872,7 +859,7 @@ if (!empty($categoria_id)) {
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <h5 class="footer-title-bloom">BLOOM</h5>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Joyería y accesorios de la más alta calidad para momentos especiales.</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Perfumes de la más alta calidad para momentos especiales.</p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5 class="footer-title-bloom">CONTACTO</h5>
