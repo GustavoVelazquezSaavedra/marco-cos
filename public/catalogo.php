@@ -5,6 +5,35 @@ include_once('../includes/functions.php');
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener información de la empresa desde la base de datos
+$titulo_sistema = "BLOOM"; // Valor por defecto
+$subtitulo_sistema = "Perfumes"; // Valor por defecto
+$telefono_empresa = "+595976588694"; // Valor por defecto
+$email_empresa = "info@bloom.com"; // Valor por defecto
+
+// Intentar obtener de la base de datos si hay conexión
+try {
+    $query_config = "SELECT clave, valor FROM configuraciones WHERE clave IN ('titulo_sistema', 'subtitulo_sistema', 'telefono', 'email')";
+    $stmt_config = $db->prepare($query_config);
+    $stmt_config->execute();
+    $configs = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    if (isset($configs['titulo_sistema'])) {
+        $titulo_sistema = $configs['titulo_sistema'];
+    }
+    if (isset($configs['subtitulo_sistema'])) {
+        $subtitulo_sistema = $configs['subtitulo_sistema'];
+    }
+    if (isset($configs['telefono'])) {
+        $telefono_empresa = $configs['telefono'];
+    }
+    if (isset($configs['email'])) {
+        $email_empresa = $configs['email'];
+    }
+} catch (Exception $e) {
+    // Si hay error, usar valores por defecto
+}
+
 // Obtener tipo de cambio actual
 $queryTipoCambio = "SELECT * FROM tipo_cambio WHERE fecha = CURDATE() AND activo = 1 ORDER BY id DESC LIMIT 1";
 $stmtTipoCambio = $db->prepare($queryTipoCambio);
@@ -93,7 +122,7 @@ if (!empty($categoria_id)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Completo - BLOOM</title>
+    <title>Catálogo Completo - <?php echo $titulo_sistema; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
@@ -114,7 +143,7 @@ if (!empty($categoria_id)) {
             color: var(--text-dark);
         }
         
-        /* Navbar estilo BLOOM */
+        /* Navbar estilo */
         .navbar-bloom {
             background: white;
             border-bottom: 2px solid var(--border-color);
@@ -195,7 +224,7 @@ if (!empty($categoria_id)) {
             margin-right: 20px;
         }
         
-        /* Cart Badge BLOOM */
+        /* Cart Badge */
         .cart-badge-bloom {
             position: absolute;
             top: -8px;
@@ -460,7 +489,7 @@ if (!empty($categoria_id)) {
             opacity: 0.9;
         }
         
-        /* Footer BLOOM */
+        /* Footer */
         .footer-bloom {
             background: var(--primary-color);
             color: white;
@@ -530,11 +559,11 @@ if (!empty($categoria_id)) {
     </style>
 </head>
 <body>
-    <!-- Navbar estilo BLOOM -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-bloom sticky-top">
         <div class="container">
             <a class="navbar-brand navbar-brand-bloom" href="index.php">
-                BLOOM
+                <?php echo $titulo_sistema; ?>
             </a>
             
             <!-- Iconos para mobile -->
@@ -631,14 +660,11 @@ if (!empty($categoria_id)) {
     <section class="page-header">
         <div class="container">
             <h1 class="page-title"><i class="fas fa-th-large me-2"></i>Catálogo Completo</h1>
-            <p class="page-subtitle">Descubre toda nuestra colección de perfumes</p>
+            <p class="page-subtitle">Descubre toda nuestra colección de <?php echo strtolower($subtitulo_sistema); ?></p>
         </div>
     </section>
 
     <div class="container py-4">
-        <!-- Información del tipo de cambio -->
-        
-
         <div class="row">
             <!-- Sidebar de Filtros -->
             <div class="col-md-3">
@@ -712,9 +738,9 @@ if (!empty($categoria_id)) {
                         <div class="card-body">
                             <h6 class="mb-3"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
                             <p class="small mb-3">
-                                <i class="fas fa-phone me-1"></i>+595 976 588694
+                                <i class="fas fa-phone me-1"></i><?php echo $telefono_empresa; ?>
                             </p>
-                            <a href="https://wa.me/595976588694" target="_blank" class="btn btn-success btn-sm w-100">
+                            <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-success btn-sm w-100">
                                 <i class="fab fa-whatsapp me-1"></i>WhatsApp
                             </a>
                         </div>
@@ -822,7 +848,7 @@ if (!empty($categoria_id)) {
                                         <i class="fas fa-eye me-1"></i>Ver detalles
                                     </a>
                                     <?php else: ?>
-                                    <a href="https://wa.me/595976588694?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
+                                    <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
                                        target="_blank" class="btn btn-outline-primary-bloom w-100 mb-2">
                                         <i class="fab fa-whatsapp me-1"></i>Consultar Stock
                                     </a>
@@ -853,19 +879,19 @@ if (!empty($categoria_id)) {
         </div>
     </div>
 
-    <!-- Footer BLOOM -->
+    <!-- Footer -->
     <footer class="footer-bloom">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5 class="footer-title-bloom">BLOOM</h5>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Perfumes de la más alta calidad para momentos especiales.</p>
+                    <h5 class="footer-title-bloom"><?php echo $titulo_sistema; ?></h5>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales.</p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5 class="footer-title-bloom">CONTACTO</h5>
                     <div class="footer-links-bloom">
-                        <p><i class="fas fa-phone me-2"></i>+595972366265</p>
-                        <p><i class="fas fa-envelope me-2"></i>info@bloom.com</p>
+                        <p><i class="fas fa-phone me-2"></i><?php echo $telefono_empresa; ?></p>
+                        <p><i class="fas fa-envelope me-2"></i><?php echo $email_empresa; ?></p>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4">
@@ -879,7 +905,7 @@ if (!empty($categoria_id)) {
             </div>
             <hr style="border-color: rgba(255,255,255,0.2);">
             <div class="text-center">
-                <small style="color: rgba(255,255,255,0.7);">&copy; 2025 BLOOM. Todos los derechos reservados, <a href="https://www.facebook.com/gustavogabriel.velazquez1/">Desarrollador</a>.</small>
+                <small style="color: rgba(255,255,255,0.7);">&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados, <a href="https://www.facebook.com/gustavogabriel.velazquez1/">Desarrollador</a>.</small>
             </div>
         </div>
     </footer>

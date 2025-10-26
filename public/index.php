@@ -5,6 +5,35 @@ include_once('../includes/functions.php');
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener información de la empresa desde la base de datos
+$titulo_sistema = "BLOOM"; // Valor por defecto
+$subtitulo_sistema = "Perfumes"; // Valor por defecto
+$telefono_empresa = "+595972366265"; // Valor por defecto
+$email_empresa = "info@bloom.com"; // Valor por defecto
+
+// Intentar obtener de la base de datos si hay conexión
+try {
+    $query_config = "SELECT clave, valor FROM configuraciones WHERE clave IN ('titulo_sistema', 'subtitulo_sistema', 'telefono', 'email')";
+    $stmt_config = $db->prepare($query_config);
+    $stmt_config->execute();
+    $configs = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    if (isset($configs['titulo_sistema'])) {
+        $titulo_sistema = $configs['titulo_sistema'];
+    }
+    if (isset($configs['subtitulo_sistema'])) {
+        $subtitulo_sistema = $configs['subtitulo_sistema'];
+    }
+    if (isset($configs['telefono'])) {
+        $telefono_empresa = $configs['telefono'];
+    }
+    if (isset($configs['email'])) {
+        $email_empresa = $configs['email'];
+    }
+} catch (Exception $e) {
+    // Si hay error, usar valores por defecto
+}
+
 // Obtener tipo de cambio actual (ya está en functions.php)
 $tipo_cambio = getTipoCambioActual();
 
@@ -60,7 +89,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLOOM - Perfumes</title>
+    <title><?php echo $titulo_sistema; ?> - <?php echo $subtitulo_sistema; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
@@ -81,7 +110,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             color: var(--text-dark);
         }
         
-        /* Navbar estilo BLOOM */
+        /* Navbar estilo */
         .navbar-bloom {
             background: white;
             border-bottom: 2px solid var(--border-color);
@@ -177,7 +206,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             padding: 5px;
         }
         
-        /* Hero Section BLOOM */
+        /* Hero Section */
         .hero-bloom {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -208,7 +237,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             font-size: 1rem;
         }
         
-        /* Product Grid BLOOM */
+        /* Product Grid */
         .products-section-bloom {
             padding: 50px 0;
             background: white;
@@ -335,7 +364,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             color: var(--primary-color);
         }
         
-        /* Cart Badge BLOOM */
+        /* Cart Badge */
         .cart-badge-bloom {
             position: absolute;
             top: -8px;
@@ -352,7 +381,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             font-weight: bold;
         }
         
-        /* Categories Section BLOOM */
+        /* Categories Section */
         .categories-section-bloom {
             background: var(--bg-light);
             padding: 50px 0;
@@ -427,7 +456,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             color: var(--primary-color);
         }
         
-        /* Footer BLOOM */
+        /* Footer */
         .footer-bloom {
             background: var(--primary-color);
             color: white;
@@ -535,15 +564,15 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <!-- WhatsApp Float -->
-    <a href="https://wa.me/595972366265" class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- Navbar estilo BLOOM -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-bloom sticky-top">
         <div class="container">
             <a class="navbar-brand navbar-brand-bloom" href="index.php">
-                BLOOM
+                <?php echo $titulo_sistema; ?>
             </a>
             
             <!-- Iconos para mobile (fuera del menú hamburguesa) -->
@@ -649,8 +678,9 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-        <!-- Slider Principal -->
-        <?php
+
+    <!-- Slider Principal -->
+    <?php
     // Obtener slides activos
     $querySlides = "SELECT s.*, p.id as producto_id, p.nombre as producto_nombre 
                     FROM slider_principal s 
@@ -683,7 +713,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                                 <?php if (!empty($slide['imagen'])): ?>
                                 url('../uploads/slider/<?php echo $slide['imagen']; ?>')
                                 <?php else: ?>
-                                url('https://via.placeholder.com/1200x600/667eea/764ba2?text=Marco+Cos')
+                                url('https://via.placeholder.com/1200x600/667eea/764ba2?text=<?php echo urlencode($titulo_sistema); ?>')
                                 <?php endif; ?>;
                     background-size: cover;
                     background-position: center;
@@ -746,11 +776,12 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         }
     </style>
     <?php endif; ?>
-    <!-- Hero Section BLOOM -->
+
+    <!-- Hero Section -->
     <section class="hero-bloom">
         <div class="container">
-            <h1 class="hero-title-bloom">BIENVENIDOS A BLOOM</h1>
-            <p class="hero-subtitle-bloom">Descubre nuestra exclusiva colección de perfumes</p>
+            <h1 class="hero-title-bloom">BIENVENIDOS A <?php echo strtoupper($titulo_sistema); ?></h1>
+            <p class="hero-subtitle-bloom">Descubre nuestra exclusiva colección de <?php echo strtolower($subtitulo_sistema); ?></p>
             <div>
                 <a href="catalogo.php" class="btn hero-btn-bloom">
                     <i class="fas fa-gem me-2"></i>VER CATÁLOGO
@@ -762,13 +793,13 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </section>
 
-    <!-- Productos Destacados BLOOM -->
+    <!-- Productos Destacados -->
     <section class="products-section-bloom">
         <div class="container">
             <?php if (empty($search) && empty($categoria_id)): ?>
                 <!-- Mostrar productos destacados cuando no hay búsqueda -->
-                <h2 class="section-title-bloom">Nuestros Perfumes Más Exclusivas</h2>
-                <p class="section-subtitle-bloom">Descubre nuestra colección de Perfumes</p>
+                <h2 class="section-title-bloom">Nuestros <?php echo $subtitulo_sistema; ?> Más Exclusivos</h2>
+                <p class="section-subtitle-bloom">Descubre nuestra colección de <?php echo $subtitulo_sistema; ?></p>
                 
                 <div class="row">
                     <?php if (empty($productos_destacados)): ?>
@@ -936,7 +967,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </section>
 
-    <!-- Categorías BLOOM -->
+    <!-- Categorías -->
     <section class="categories-section-bloom">
         <div class="container">
             <div class="categories-header-bloom">
@@ -963,19 +994,19 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </section>
 
-    <!-- Footer BLOOM -->
+    <!-- Footer -->
     <footer class="footer-bloom">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5 class="footer-title-bloom">BLOOM</h5>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Perfumes de la más alta calidad para momentos especiales.</p>
+                    <h5 class="footer-title-bloom"><?php echo $titulo_sistema; ?></h5>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales.</p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5 class="footer-title-bloom">CONTACTO</h5>
                     <div class="footer-links-bloom">
-                        <p><i class="fas fa-phone me-2"></i>+595972366265</p>
-                        <p><i class="fas fa-envelope me-2"></i>info@bloom.com</p>
+                        <p><i class="fas fa-phone me-2"></i><?php echo $telefono_empresa; ?></p>
+                        <p><i class="fas fa-envelope me-2"></i><?php echo $email_empresa; ?></p>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4">
@@ -989,7 +1020,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <hr style="border-color: rgba(255,255,255,0.2);">
             <div class="text-center">
-            <small style="color: rgba(255,255,255,0.7);">&copy; 2025 BLOOM. Todos los derechos reservados, <a href="https://www.facebook.com/gustavogabriel.velazquez1/">Desarrollador</a>.</small>
+                <small style="color: rgba(255,255,255,0.7);">&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados, <a href="https://www.facebook.com/gustavogabriel.velazquez1/">Desarrollador</a>.</small>
             </div>
         </div>
     </footer>
@@ -1042,7 +1073,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
-            document.body.appendChild(toct);
+            document.body.appendChild(toast);
             
             // Auto-remover después de 3 segundos
             setTimeout(() => {

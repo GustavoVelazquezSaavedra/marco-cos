@@ -32,15 +32,44 @@ if ($pedido_id) {
     }
 }
 
+// Obtener información de la empresa desde la base de datos
+$titulo_sistema = "Mi Sistema"; // Valor por defecto
+$subtitulo_sistema = "Administración"; // Valor por defecto
+$telefono_empresa = "+595 972 366-265"; // Valor por defecto
+$horario_empresa = "Lun-Vie 8:00-18:00"; // Valor por defecto
+
+// Intentar obtener de la base de datos si hay conexión
+try {
+    $query_config = "SELECT clave, valor FROM configuraciones WHERE clave IN ('titulo_sistema', 'subtitulo_sistema', 'telefono', 'horario')";
+    $stmt_config = $db->prepare($query_config);
+    $stmt_config->execute();
+    $configs = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    if (isset($configs['titulo_sistema'])) {
+        $titulo_sistema = $configs['titulo_sistema'];
+    }
+    if (isset($configs['subtitulo_sistema'])) {
+        $subtitulo_sistema = $configs['subtitulo_sistema'];
+    }
+    if (isset($configs['telefono'])) {
+        $telefono_empresa = $configs['telefono'];
+    }
+    if (isset($configs['horario'])) {
+        $horario_empresa = $configs['horario'];
+    }
+} catch (Exception $e) {
+    // Si hay error, usar valores por defecto
+}
+
 // FORZAR configuración para ticket térmico
 $pdf = new PDFGenerator('P', 'mm', array(80, 200), true, 'UTF-8', false);
 
-// CONFIGURAR EXPLÍCITAMENTE TODO PARA BLOOM
-$pdf->SetCreator('BLOOM');
-$pdf->SetAuthor('BLOOM');
-$pdf->SetTitle('Ticket de Venta - BLOOM');
+// CONFIGURAR EXPLÍCITAMENTE TODO CON LOS DATOS DE LA EMPRESA
+$pdf->SetCreator($titulo_sistema);
+$pdf->SetAuthor($titulo_sistema);
+$pdf->SetTitle('Ticket de Venta - ' . $titulo_sistema);
 $pdf->SetSubject('Ticket de Venta');
-$pdf->SetKeywords('ticket, venta, BLOOM');
+$pdf->SetKeywords('ticket, venta, ' . $titulo_sistema);
 
 // Configuración explícita de márgenes
 $pdf->SetMargins(5, 5, 5);
@@ -158,16 +187,17 @@ $pdf->Ln(8);
 $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
 $pdf->Ln(5);
 
-// INFORMACIÓN DE CONTACTO - BLOOM EXPLÍCITO
+// INFORMACIÓN DE CONTACTO - USAR DATOS CONFIGURABLES
 $pdf->SetFont('helvetica', 'B', 9);
 $pdf->Cell(0, 6, '¡Gracias por su compra!', 0, 1, 'C');
 $pdf->Ln(2);
 
 $pdf->SetFont('helvetica', 'B', 10);
-$pdf->Cell(0, 6, 'BLOOM - Perfumes y cosmeticos', 0, 1, 'C');
+$pdf->Cell(0, 6, $titulo_sistema, 0, 1, 'C');
 $pdf->SetFont('helvetica', '', 8);
-$pdf->Cell(0, 5, 'Tel: +595 972 366-265', 0, 1, 'C');
-$pdf->Cell(0, 5, 'Horario: Lun-Vie 8:00-18:00', 0, 1, 'C');
+$pdf->Cell(0, 5, $subtitulo_sistema, 0, 1, 'C');
+$pdf->Cell(0, 5, 'Tel: ' . $telefono_empresa, 0, 1, 'C');
+$pdf->Cell(0, 5, 'Horario: ' . $horario_empresa, 0, 1, 'C');
 
 $pdf->Ln(5);
 $pdf->SetFont('helvetica', 'I', 7);
@@ -179,5 +209,5 @@ $pdf->setPrintHeader(false);
 $pdf->setPrintFooter(false);
 
 // Salida del PDF
-$pdf->Output('ticket_bloom_' . $pedido_id . '.pdf', 'I');
+$pdf->Output('ticket_venta_' . $pedido_id . '.pdf', 'I');
 ?>

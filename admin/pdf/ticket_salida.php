@@ -13,12 +13,33 @@ if (!isset($_SESSION['user_id'])) {
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener información de la empresa desde la base de datos
+$titulo_sistema = "Mi Sistema"; // Valor por defecto
+$subtitulo_sistema = "Administración"; // Valor por defecto
+
+// Intentar obtener de la base de datos si hay conexión
+try {
+    $query_config = "SELECT clave, valor FROM configuraciones WHERE clave IN ('titulo_sistema', 'subtitulo_sistema')";
+    $stmt_config = $db->prepare($query_config);
+    $stmt_config->execute();
+    $configs = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    if (isset($configs['titulo_sistema'])) {
+        $titulo_sistema = $configs['titulo_sistema'];
+    }
+    if (isset($configs['subtitulo_sistema'])) {
+        $subtitulo_sistema = $configs['subtitulo_sistema'];
+    }
+} catch (Exception $e) {
+    // Si hay error, usar valores por defecto
+}
+
 // Crear PDF
 $pdf = new PDFGenerator(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-$pdf->SetCreator('BLOOM');
-$pdf->SetAuthor('BLOOM');
-$pdf->SetTitle('Ticket de Salida - BLOOM');
+$pdf->SetCreator($titulo_sistema);
+$pdf->SetAuthor($titulo_sistema);
+$pdf->SetTitle('Ticket de Salida - ' . $titulo_sistema);
 $pdf->SetSubject('Ticket de Salida de Inventario');
 
 $pdf->AddPage();
@@ -26,6 +47,13 @@ $pdf->AddPage();
 // Título del ticket
 $pdf->SetFont('helvetica', 'B', 14);
 $pdf->Cell(0, 10, 'TICKET DE SALIDA DE INVENTARIO', 0, 1, 'C');
+$pdf->Ln(3);
+
+// Información de la empresa
+$pdf->SetFont('helvetica', 'B', 12);
+$pdf->Cell(0, 6, $titulo_sistema, 0, 1, 'C');
+$pdf->SetFont('helvetica', '', 10);
+$pdf->Cell(0, 6, $subtitulo_sistema, 0, 1, 'C');
 $pdf->Ln(5);
 
 // Información del ticket

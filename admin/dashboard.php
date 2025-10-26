@@ -10,6 +10,27 @@ include_once('../includes/database.php');
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener información de la empresa desde la base de datos
+$titulo_sistema = "Mi Sistema"; // Valor por defecto
+$subtitulo_sistema = "Panel de Administración"; // Valor por defecto
+
+// Intentar obtener de la base de datos si hay conexión
+try {
+    $query_config = "SELECT clave, valor FROM configuraciones WHERE clave IN ('titulo_sistema', 'subtitulo_sistema')";
+    $stmt_config = $db->prepare($query_config);
+    $stmt_config->execute();
+    $configs = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    if (isset($configs['titulo_sistema'])) {
+        $titulo_sistema = $configs['titulo_sistema'];
+    }
+    if (isset($configs['subtitulo_sistema'])) {
+        $subtitulo_sistema = $configs['subtitulo_sistema'];
+    }
+} catch (Exception $e) {
+    // Si hay error, usar valores por defecto
+}
+
 // Obtener estadísticas
 $stats = [];
 $queries = [
@@ -52,7 +73,7 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - BLOOM Admin</title>
+    <title>Dashboard - <?php echo $titulo_sistema; ?> Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="../css/styles.css" rel="stylesheet">
@@ -62,7 +83,7 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="dashboard.php">
-                <i class="fas fa-gem"></i> BLOOM Admin
+                <i class="fas fa-gem"></i> <?php echo $titulo_sistema; ?> Admin
             </a>
             <div class="navbar-nav ms-auto">
                 <span class="navbar-text me-3">
@@ -111,13 +132,14 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
                     <a href="usuarios.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-users"></i> Usuarios
                     </a>
+                    
                     <?php endif; ?>
                 </div>
             </div>
 
             <!-- Contenido principal -->
             <div class="col-md-9">
-                <h2>Dashboard</h2>
+                <h2>Dashboard - <?php echo $subtitulo_sistema; ?></h2>
                 
                 <!-- Estadísticas Principales -->
                 <div class="row">

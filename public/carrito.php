@@ -5,6 +5,31 @@ include_once('../includes/functions.php');
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener información de la empresa desde la base de datos
+$titulo_sistema = "BLOOM"; // Valor por defecto
+$telefono_empresa = "+595976588694"; // Valor por defecto
+$horario_empresa = "Lun-Vie: 8:00-18:00"; // Valor por defecto
+
+// Intentar obtener de la base de datos si hay conexión
+try {
+    $query_config = "SELECT clave, valor FROM configuraciones WHERE clave IN ('titulo_sistema', 'telefono', 'horario')";
+    $stmt_config = $db->prepare($query_config);
+    $stmt_config->execute();
+    $configs = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    if (isset($configs['titulo_sistema'])) {
+        $titulo_sistema = $configs['titulo_sistema'];
+    }
+    if (isset($configs['telefono'])) {
+        $telefono_empresa = $configs['telefono'];
+    }
+    if (isset($configs['horario'])) {
+        $horario_empresa = $configs['horario'];
+    }
+} catch (Exception $e) {
+    // Si hay error, usar valores por defecto
+}
+
 // Obtener tipo de cambio actual
 $queryTipoCambio = "SELECT * FROM tipo_cambio WHERE fecha = CURDATE() AND activo = 1 ORDER BY id DESC LIMIT 1";
 $stmtTipoCambio = $db->prepare($queryTipoCambio);
@@ -30,7 +55,7 @@ if (!$tipo_cambio) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras - BLOOM</title>
+    <title>Carrito de Compras - <?php echo $titulo_sistema; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
@@ -51,7 +76,7 @@ if (!$tipo_cambio) {
             color: var(--text-dark);
         }
         
-        /* Navbar estilo BLOOM */
+        /* Navbar estilo */
         .navbar-bloom {
             background: white;
             border-bottom: 2px solid var(--border-color);
@@ -87,7 +112,7 @@ if (!$tipo_cambio) {
             position: relative;
         }
         
-        /* Cart Badge BLOOM */
+        /* Cart Badge */
         .cart-badge-bloom {
             position: absolute;
             top: -8px;
@@ -382,7 +407,7 @@ if (!$tipo_cambio) {
     <nav class="navbar navbar-expand-lg navbar-bloom sticky-top">
         <div class="container">
             <a class="navbar-brand navbar-brand-bloom" href="index.php">
-                BLOOM
+                <?php echo $titulo_sistema; ?>
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link nav-link-bloom" href="index.php">
@@ -495,10 +520,10 @@ if (!$tipo_cambio) {
                     <div class="card-body">
                         <h6 class="mb-3"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
                         <p class="small mb-3">
-                            <i class="fas fa-phone me-1"></i>+595 976 588694<br>
-                            <i class="fas fa-clock me-1"></i>Lun-Vie: 8:00-18:00
+                            <i class="fas fa-phone me-1"></i><?php echo $telefono_empresa; ?><br>
+                            <i class="fas fa-clock me-1"></i><?php echo $horario_empresa; ?>
                         </p>
-                        <a href="https://wa.me/595976588694" target="_blank" class="btn btn-success-bloom btn-sm w-100">
+                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-success-bloom btn-sm w-100">
                             <i class="fab fa-whatsapp me-1"></i>Contactar por WhatsApp
                         </a>
                     </div>
@@ -529,7 +554,7 @@ if (!$tipo_cambio) {
                     <div class="mb-3">
                         <label for="cliente_telefono" class="form-label">Tu número de WhatsApp *</label>
                         <input type="tel" class="form-control" id="cliente_telefono" 
-                               placeholder="0972 366-265" required>
+                               placeholder="<?php echo $telefono_empresa; ?>" required>
                         <small class="text-muted">Ej: 0972366265, 0985123456</small>
                     </div>
                     
@@ -556,6 +581,7 @@ if (!$tipo_cambio) {
     <script>
     let cart = JSON.parse(localStorage.getItem('bloom_cart')) || [];
     const tipoCambioVenta = <?php echo $tipo_cambio['venta']; ?>;
+    const telefonoEmpresa = '<?php echo str_replace('+', '', $telefono_empresa); ?>';
     
     // Función para calcular precio en USD
     function calcularPrecioUSD(precioGs) {
@@ -794,8 +820,8 @@ if (!$tipo_cambio) {
                 
                 message += `%0ACONFIRMAR DISPONIBILIDAD`;
                 
-                // Abrir WhatsApp
-                const whatsappUrl = `https://wa.me/595976588694?text=${message}`;
+                // Abrir WhatsApp con el teléfono de la empresa
+                const whatsappUrl = `https://wa.me/${telefonoEmpresa}?text=${message}`;
                 window.open(whatsappUrl, '_blank');
                 
                 // Limpiar carrito después de enviar

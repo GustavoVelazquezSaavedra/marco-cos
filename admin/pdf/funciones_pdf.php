@@ -4,6 +4,9 @@ include_once('../../includes/tcpdf/tcpdf.php');
 include_once('../../includes/database.php');
 include_once('../../includes/functions.php');
 
+// Incluir el archivo de configuración de títulos
+include_once('../../config/config_sistema.php');
+
 class PDFGenerator extends TCPDF {
     
     // Header personalizado adaptativo
@@ -14,9 +17,9 @@ class PDFGenerator extends TCPDF {
         if ($pageWidth <= 100) {
             $this->SetY(3);
             $this->SetFont('helvetica', 'B', 9);
-            $this->Cell(0, 4, 'BLOOM - Perfumes y cosmeticos', 0, 1, 'C');
+            $this->Cell(0, 4, $GLOBALS['titulo_sistema'], 0, 1, 'C');
             $this->SetFont('helvetica', '', 7);
-            $this->Cell(0, 3, '', 0, 1, 'C');
+            $this->Cell(0, 3, $GLOBALS['subtitulo_sistema'], 0, 1, 'C');
             $this->SetY($this->GetY() + 2);
         } 
         // Para formatos A4/Oficio - HEADER COMPLETO
@@ -24,11 +27,11 @@ class PDFGenerator extends TCPDF {
             $this->SetY(10);
             
             $this->SetFont('helvetica', 'B', 16);
-            $this->Cell(0, 8, 'BLOOM', 0, 1, 'C');
+            $this->Cell(0, 8, $GLOBALS['titulo_sistema'], 0, 1, 'C');
             $this->SetFont('helvetica', '', 12);
-            $this->Cell(0, 6, '', 0, 1, 'C');
+            $this->Cell(0, 6, $GLOBALS['subtitulo_sistema'], 0, 1, 'C');
             $this->SetFont('helvetica', '', 9);
-            $this->Cell(0, 5, '', 0, 1, 'C');
+            $this->Cell(0, 5, obtenerConfiguracion('direccion', 'Tu dirección aquí'), 0, 1, 'C');
             
             // Línea separadora
             $this->Line(10, $this->GetY() + 2, $pageWidth-10, $this->GetY() + 2);
@@ -50,7 +53,7 @@ class PDFGenerator extends TCPDF {
         else {
             $this->SetY(-15);
             $this->SetFont('helvetica', 'I', 8);
-            $this->Cell(0, 10, 'Página '.$this->getAliasNumPage().'/'.$this->getAliasNbPages() . ' - BLOOM Perfumes y cosmeticos', 0, 0, 'C');
+            $this->Cell(0, 10, 'Página '.$this->getAliasNumPage().'/'.$this->getAliasNbPages() . ' - ' . $GLOBALS['titulo_sistema'] . ' ' . $GLOBALS['subtitulo_sistema'], 0, 0, 'C');
         }
     }
     

@@ -5,6 +5,35 @@ include_once('../includes/functions.php');
 $database = new Database();
 $db = $database->getConnection();
 
+// Obtener información de la empresa desde la base de datos
+$titulo_sistema = "BLOOM"; // Valor por defecto
+$subtitulo_sistema = "Perfumes"; // Valor por defecto
+$telefono_empresa = "+595972366265"; // Valor por defecto
+$email_empresa = "info@bloom.com"; // Valor por defecto
+
+// Intentar obtener de la base de datos si hay conexión
+try {
+    $query_config = "SELECT clave, valor FROM configuraciones WHERE clave IN ('titulo_sistema', 'subtitulo_sistema', 'telefono', 'email')";
+    $stmt_config = $db->prepare($query_config);
+    $stmt_config->execute();
+    $configs = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    if (isset($configs['titulo_sistema'])) {
+        $titulo_sistema = $configs['titulo_sistema'];
+    }
+    if (isset($configs['subtitulo_sistema'])) {
+        $subtitulo_sistema = $configs['subtitulo_sistema'];
+    }
+    if (isset($configs['telefono'])) {
+        $telefono_empresa = $configs['telefono'];
+    }
+    if (isset($configs['email'])) {
+        $email_empresa = $configs['email'];
+    }
+} catch (Exception $e) {
+    // Si hay error, usar valores por defecto
+}
+
 // Verificar que se proporcionó un ID de producto
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: index.php");
@@ -51,7 +80,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $producto['nombre']; ?> - BLOOM</title>
+    <title><?php echo $producto['nombre']; ?> - <?php echo $titulo_sistema; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/styles.css" rel="stylesheet">
@@ -113,7 +142,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-gem me-2"></i>BLOOM
+                <i class="fas fa-gem me-2"></i><?php echo $titulo_sistema; ?>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -298,7 +327,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             Este producto está temporalmente agotado. Contáctanos para más información.
                         </div>
-                        <a href="https://wa.me/595972366265?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
+                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
                            target="_blank" class="btn btn-success w-100">
                             <i class="fab fa-whatsapp me-2"></i>Consultar por WhatsApp
                         </a>
@@ -379,14 +408,14 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <h5><i class="fas fa-gem me-2"></i>BLOOM</h5>
-                    <p>Joyería y accesorios de la más alta calidad para momentos especiales.</p>
+                    <h5><i class="fas fa-gem me-2"></i><?php echo $titulo_sistema; ?></h5>
+                    <p><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales.</p>
                 </div>
                 <div class="col-md-4">
                     <h5>Contacto</h5>
                     <p>
-                        <i class="fas fa-phone me-2"></i>+595 972 366-265<br>
-                        <i class="fas fa-envelope me-2"></i>info@marccos.com
+                        <i class="fas fa-phone me-2"></i><?php echo $telefono_empresa; ?><br>
+                        <i class="fas fa-envelope me-2"></i><?php echo $email_empresa; ?>
                     </p>
                 </div>
                 <div class="col-md-4">
@@ -400,7 +429,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <hr>
             <div class="text-center">
-            <small>&copy; 2025 BLOOM. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
+                <small>&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
             </div>
         </div>
     </footer>
@@ -410,7 +439,8 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
     
     <script>
         // Sistema de carrito
-        let cart = JSON.parse(localStorage.getItem('marccos_cart')) || [];
+        let cart = JSON.parse(localStorage.getItem('bloom_cart')) || [];
+        const telefonoEmpresa = '<?php echo str_replace('+', '', $telefono_empresa); ?>';
         
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -425,35 +455,46 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         }
         
         // Agregar al carrito desde la página de detalles
-        // Reemplaza esta parte en todos los archivos donde esté el add-to-cart:
-
-        $('.add-to-cart').click(function() {
+        $('.add-to-cart-detailed').click(function() {
             const productId = $(this).data('product-id');
             const productName = $(this).data('product-name');
             const productPrice = $(this).data('product-price');
             const productImage = $(this).data('product-image');
+            const quantity = parseInt($('#quantity').val()) || 1;
             
             const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
-                existingItem.quantity += 1;
+                existingItem.quantity += quantity;
             } else {
                 cart.push({
                     id: productId,
                     name: productName,
                     price: productPrice,
                     image: productImage,
-                    quantity: 1
+                    quantity: quantity
                 });
             }
             
-            localStorage.setItem('marccos_cart', JSON.stringify(cart));
+            localStorage.setItem('bloom_cart', JSON.stringify(cart));
             updateCartCount();
             
-            // En lugar de alert, usa showToast (solo si existe la función)
-            if (typeof showToast === 'function') {
-                showToast(`¡${productName} agregado al carrito!`, 'success');
-            }
+            // Mostrar notificación
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 end-0 p-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>¡Éxito!</strong> ${productName} agregado al carrito.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto-remover después de 3 segundos
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         });
         
         // Comprar ahora
@@ -466,9 +507,8 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             // Crear mensaje para WhatsApp
             const message = `¡Hola! Quiero comprar el siguiente producto:%0A%0A• ${productName}%0A• Cantidad: ${quantity}%0A• Precio unitario: Gs. ${productPrice.toLocaleString()}%0A• Total: Gs. ${(productPrice * quantity).toLocaleString()}%0A%0APor favor, contactame para coordinar la compra. ¡Gracias!`;
             
-            // Abrir WhatsApp
-            const phone = "595976588694";
-            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+            // Abrir WhatsApp con el teléfono de la empresa
+            window.open(`https://wa.me/${telefonoEmpresa}?text=${message}`, '_blank');
         });
         
         // Inicializar contador del carrito
