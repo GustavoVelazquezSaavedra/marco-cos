@@ -13,27 +13,6 @@ if (!isset($_SESSION['user_id'])) {
 $database = new Database();
 $db = $database->getConnection();
 
-// Obtener información de la empresa desde la base de datos
-$titulo_sistema = "Mi Sistema"; // Valor por defecto
-$subtitulo_sistema = "Administración"; // Valor por defecto
-
-// Intentar obtener de la base de datos si hay conexión
-try {
-    $query_config = "SELECT clave, valor FROM configuraciones WHERE clave IN ('titulo_sistema', 'subtitulo_sistema')";
-    $stmt_config = $db->prepare($query_config);
-    $stmt_config->execute();
-    $configs = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
-    
-    if (isset($configs['titulo_sistema'])) {
-        $titulo_sistema = $configs['titulo_sistema'];
-    }
-    if (isset($configs['subtitulo_sistema'])) {
-        $subtitulo_sistema = $configs['subtitulo_sistema'];
-    }
-} catch (Exception $e) {
-    // Si hay error, usar valores por defecto
-}
-
 // Obtener parámetros de filtro
 $fecha_desde = isset($_GET['fecha_desde']) ? $_GET['fecha_desde'] : '';
 $fecha_hasta = isset($_GET['fecha_hasta']) ? $_GET['fecha_hasta'] : '';
@@ -91,9 +70,9 @@ $productos = $stmtProductos->fetchAll(PDO::FETCH_ASSOC);
 // Crear PDF en formato Landscape para mejor visualización
 $pdf = new PDFGenerator('L', 'mm', 'A4', true, 'UTF-8', false);
 
-$pdf->SetCreator($titulo_sistema);
-$pdf->SetAuthor($titulo_sistema);
-$pdf->SetTitle('Reporte de Movimientos de Inventario - ' . $titulo_sistema);
+$pdf->SetCreator('BLOOM');
+$pdf->SetAuthor('BLOOM');
+$pdf->SetTitle('Reporte de Movimientos de Inventario - BLOOM');
 $pdf->SetSubject('Reporte de Movimientos de Inventario');
 
 // Configurar márgenes
@@ -105,13 +84,6 @@ $pdf->AddPage();
 // Título del reporte
 $pdf->SetFont('helvetica', 'B', 16);
 $pdf->Cell(0, 10, 'REPORTE DE MOVIMIENTOS DE INVENTARIO', 0, 1, 'C');
-$pdf->Ln(3);
-
-// Información de la empresa
-$pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(0, 6, $titulo_sistema, 0, 1, 'C');
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(0, 6, $subtitulo_sistema, 0, 1, 'C');
 $pdf->Ln(3);
 
 // Información del reporte
@@ -192,7 +164,7 @@ $pdf->Cell(30, 6, count($productosSinStock), 0, 1, 'L');
 // Pie de página con información adicional
 $pdf->Ln(10);
 $pdf->SetFont('helvetica', 'I', 8);
-$pdf->Cell(0, 6, 'Reporte generado automáticamente por el Sistema de Gestión ' . $titulo_sistema, 0, 1, 'C');
+$pdf->Cell(0, 6, 'Reporte generado automáticamente por el Sistema de Gestión BLOOM', 0, 1, 'C');
 
 // Salida del PDF
 $pdf->Output('movimientos_inventario_' . date('Ymd_His') . '.pdf', 'I');
