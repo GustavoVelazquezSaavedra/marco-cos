@@ -247,11 +247,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                     <!-- Precio -->
                     <div class="mb-4">
                         <div class="price">Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?></div>
-                        <?php if ($producto['precio_real'] < $producto['precio_publico']): ?>
-                        <div class="original-price">
-                            Precio real: Gs. <?php echo number_format($producto['precio_real'], 0, ',', '.'); ?>
-                        </div>
-                        <?php endif; ?>
+                        
                     </div>
                     
                     <!-- Stock -->
