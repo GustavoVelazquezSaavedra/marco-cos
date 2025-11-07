@@ -197,6 +197,7 @@ $pdf->Cell(0, 6, $titulo_sistema, 0, 1, 'C');
 $pdf->SetFont('helvetica', '', 8);
 $pdf->Cell(0, 5, $subtitulo_sistema, 0, 1, 'C');
 $pdf->Cell(0, 5, 'Tel: ' . $telefono_empresa, 0, 1, 'C');
+$pdf->Cell(0, 5, 'Tel: +595981934464', 0, 1, 'C');
 $pdf->Cell(0, 5, 'Horario: ' . $horario_empresa, 0, 1, 'C');
 
 $pdf->Ln(5);

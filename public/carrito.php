@@ -521,6 +521,7 @@ if (!$tipo_cambio) {
                         <h6 class="mb-3"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
                         <p class="small mb-3">
                             <i class="fas fa-phone me-1"></i><?php echo $telefono_empresa; ?><br>
+                            <i class="fas fa-phone me-1"></i>+595981934464<br>
                             <i class="fas fa-clock me-1"></i><?php echo $horario_empresa; ?>
                         </p>
                         <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-success-bloom btn-sm w-100">

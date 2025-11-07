@@ -42,11 +42,15 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $producto_id = sanitize($_GET['id']);
 
-// Obtener información del producto
-$queryProducto = "SELECT p.*, c.nombre as categoria_nombre 
+// Obtener información del producto con múltiples categorías
+$queryProducto = "SELECT p.*, 
+                         GROUP_CONCAT(c.nombre SEPARATOR ', ') as categorias_nombres,
+                         GROUP_CONCAT(c.id SEPARATOR ',') as categorias_ids
                   FROM productos p 
-                  LEFT JOIN categorias c ON p.categoria_id = c.id 
-                  WHERE p.id = ? AND p.activo = 1";
+                  LEFT JOIN producto_categorias pc ON p.id = pc.producto_id 
+                  LEFT JOIN categorias c ON pc.categoria_id = c.id 
+                  WHERE p.id = ? AND p.activo = 1
+                  GROUP BY p.id";
 $stmtProducto = $db->prepare($queryProducto);
 $stmtProducto->execute([$producto_id]);
 $producto = $stmtProducto->fetch(PDO::FETCH_ASSOC);
@@ -58,14 +62,26 @@ if (!$producto) {
 }
 
 // Obtener productos relacionados (misma categoría)
-$queryRelacionados = "SELECT p.*, c.nombre as categoria_nombre 
+$queryRelacionados = "SELECT p.*, 
+                             GROUP_CONCAT(c.nombre SEPARATOR ', ') as categorias_nombres
                       FROM productos p 
-                      LEFT JOIN categorias c ON p.categoria_id = c.id 
-                      WHERE p.categoria_id = ? AND p.id != ? AND p.activo = 1 
+                      LEFT JOIN producto_categorias pc ON p.id = pc.producto_id 
+                      LEFT JOIN categorias c ON pc.categoria_id = c.id 
+                      WHERE p.id IN (
+                          SELECT DISTINCT p2.id 
+                          FROM productos p2 
+                          LEFT JOIN producto_categorias pc2 ON p2.id = pc2.producto_id 
+                          WHERE pc2.categoria_id IN (
+                              SELECT categoria_id 
+                              FROM producto_categorias 
+                              WHERE producto_id = ?
+                          ) AND p2.id != ? AND p2.activo = 1
+                      )
+                      GROUP BY p.id 
                       ORDER BY p.fecha_creacion DESC 
                       LIMIT 4";
 $stmtRelacionados = $db->prepare($queryRelacionados);
-$stmtRelacionados->execute([$producto['categoria_id'], $producto_id]);
+$stmtRelacionados->execute([$producto_id, $producto_id]);
 $productos_relacionados = $stmtRelacionados->fetchAll(PDO::FETCH_ASSOC);
 
 // Obtener categorías para el menú
@@ -135,6 +151,18 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             color: #28a745;
             margin-right: 10px;
         }
+        .categorias-badge {
+            margin: 2px;
+            font-size: 0.75em;
+        }
+        .breadcrumb-category {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -190,9 +218,16 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="index.php">Inicio</a></li>
                 <li class="breadcrumb-item"><a href="catalogo.php">Catálogo</a></li>
-                <li class="breadcrumb-item"><a href="catalogo.php?categoria_id=<?php echo $producto['categoria_id']; ?>">
-                    <?php echo $producto['categoria_nombre']; ?>
-                </a></li>
+                <?php if (!empty($producto['categorias_nombres'])): ?>
+                <li class="breadcrumb-item">
+                    <span class="breadcrumb-category" title="<?php echo $producto['categorias_nombres']; ?>">
+                        <?php 
+                        $categorias_array = explode(', ', $producto['categorias_nombres']);
+                        echo count($categorias_array) > 1 ? 'Múltiples categorías' : $categorias_array[0];
+                        ?>
+                    </span>
+                </li>
+                <?php endif; ?>
                 <li class="breadcrumb-item active"><?php echo $producto['nombre']; ?></li>
             </ol>
         </div>
@@ -235,9 +270,17 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             <!-- Información del Producto -->
             <div class="col-md-6">
                 <div class="product-details">
-                    <!-- Categoría y código -->
+                    <!-- Categorías -->
                     <div class="mb-3">
-                        <span class="badge bg-primary"><?php echo $producto['categoria_nombre']; ?></span>
+                        <?php if (!empty($producto['categorias_nombres'])): ?>
+                            <?php 
+                            $categorias_array = explode(', ', $producto['categorias_nombres']);
+                            foreach ($categorias_array as $categoria): ?>
+                                <span class="badge bg-primary categorias-badge"><?php echo $categoria; ?></span>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <span class="badge bg-secondary categorias-badge">Sin categorías</span>
+                        <?php endif; ?>
                         <span class="text-muted ms-2">Código: <?php echo $producto['codigo']; ?></span>
                     </div>
                     
@@ -276,8 +319,13 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                         <h5 class="mb-3">Características</h5>
                         <ul class="product-features">
                             <li>
-                                <i class="fas fa-tag feature-icon"></i>
-                                <strong>Categoría:</strong> <?php echo $producto['categoria_nombre']; ?>
+                                <i class="fas fa-tags feature-icon"></i>
+                                <strong>Categorías:</strong> 
+                                <?php if (!empty($producto['categorias_nombres'])): ?>
+                                    <?php echo $producto['categorias_nombres']; ?>
+                                <?php else: ?>
+                                    Sin categorías
+                                <?php endif; ?>
                             </li>
                             <li>
                                 <i class="fas fa-barcode feature-icon"></i>
@@ -331,22 +379,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     
                     <!-- Envío y garantía -->
-                    <div class="mt-4 pt-4 border-top">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <i class="fas fa-shipping-fast text-primary fa-2x mb-2"></i>
-                                <div class="small">Envío Gratis</div>
-                            </div>
-                            <div class="col-4">
-                                <i class="fas fa-shield-alt text-success fa-2x mb-2"></i>
-                                <div class="small">Garantía</div>
-                            </div>
-                            <div class="col-4">
-                                <i class="fas fa-undo text-info fa-2x mb-2"></i>
-                                <div class="small">Devoluciones</div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -375,6 +408,21 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                             
                             <div class="card-body d-flex flex-column">
                                 <h6 class="card-title"><?php echo $relacionado['nombre']; ?></h6>
+                                
+                                <!-- Categorías del producto relacionado -->
+                                <?php if (!empty($relacionado['categorias_nombres'])): ?>
+                                <div class="mb-2">
+                                    <?php 
+                                    $categorias_rel_array = explode(', ', $relacionado['categorias_nombres']);
+                                    foreach (array_slice($categorias_rel_array, 0, 2) as $categoria_rel): ?>
+                                        <span class="badge bg-secondary categorias-badge"><?php echo $categoria_rel; ?></span>
+                                    <?php endforeach; ?>
+                                    <?php if (count($categorias_rel_array) > 2): ?>
+                                        <span class="badge bg-light text-dark categorias-badge">+<?php echo count($categorias_rel_array) - 2; ?> más</span>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+                                
                                 <p class="card-text flex-grow-1">
                                     <small class="text-muted"><?php echo substr($relacionado['descripcion'], 0, 60); ?>...</small>
                                 </p>
@@ -411,6 +459,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                     <h5>Contacto</h5>
                     <p>
                         <i class="fas fa-phone me-2"></i><?php echo $telefono_empresa; ?><br>
+                        <i class="fas fa-phone me-2"></i>+595981934464<br>
                         <i class="fas fa-envelope me-2"></i><?php echo $email_empresa; ?>
                     </p>
                 </div>

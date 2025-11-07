@@ -43,11 +43,15 @@ $stmtCategorias = $db->prepare($queryCategorias);
 $stmtCategorias->execute();
 $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
 
-// Obtener productos destacados (los más recientes)
-$queryProductos = "SELECT p.*, c.nombre as categoria_nombre 
+// Obtener productos destacados (los más recientes) con múltiples categorías
+$queryProductos = "SELECT p.*, 
+                          GROUP_CONCAT(c.nombre SEPARATOR ', ') as categorias_nombres,
+                          GROUP_CONCAT(c.id SEPARATOR ',') as categorias_ids
                    FROM productos p 
-                   LEFT JOIN categorias c ON p.categoria_id = c.id 
+                   LEFT JOIN producto_categorias pc ON p.id = pc.producto_id 
+                   LEFT JOIN categorias c ON pc.categoria_id = c.id 
                    WHERE p.activo = 1 
+                   GROUP BY p.id
                    ORDER BY p.fecha_creacion DESC 
                    LIMIT 8";
 $stmtProductos = $db->prepare($queryProductos);
@@ -58,27 +62,31 @@ $productos_destacados = $stmtProductos->fetchAll(PDO::FETCH_ASSOC);
 $search = isset($_GET['search']) ? sanitize($_GET['search']) : '';
 $categoria_id = isset($_GET['categoria_id']) ? $_GET['categoria_id'] : '';
 
-// Obtener productos con filtros
-$queryProductosFiltro = "SELECT p.*, c.nombre as categoria_nombre 
+// Obtener productos con filtros y múltiples categorías - CONSULTA CORREGIDA
+$queryProductosFiltro = "SELECT p.*, 
+                                GROUP_CONCAT(c.nombre SEPARATOR ', ') as categorias_nombres,
+                                GROUP_CONCAT(c.id SEPARATOR ',') as categorias_ids
                          FROM productos p 
-                         LEFT JOIN categorias c ON p.categoria_id = c.id 
+                         LEFT JOIN producto_categorias pc ON p.id = pc.producto_id 
+                         LEFT JOIN categorias c ON pc.categoria_id = c.id 
                          WHERE p.activo = 1";
 $params = [];
 
 if (!empty($search)) {
-    $queryProductosFiltro .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.codigo LIKE ?)";
+    $queryProductosFiltro .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.codigo LIKE ? OR c.nombre LIKE ?)";
     $searchTerm = "%$search%";
+    $params[] = $searchTerm;
     $params[] = $searchTerm;
     $params[] = $searchTerm;
     $params[] = $searchTerm;
 }
 
 if (!empty($categoria_id)) {
-    $queryProductosFiltro .= " AND p.categoria_id = ?";
+    $queryProductosFiltro .= " AND p.id IN (SELECT producto_id FROM producto_categorias WHERE categoria_id = ?)";
     $params[] = $categoria_id;
 }
 
-$queryProductosFiltro .= " ORDER BY p.fecha_creacion DESC";
+$queryProductosFiltro .= " GROUP BY p.id ORDER BY p.fecha_creacion DESC";
 $stmtProductosFiltro = $db->prepare($queryProductosFiltro);
 $stmtProductosFiltro->execute($params);
 $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
@@ -189,6 +197,19 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             color: var(--primary-color);
             font-size: 1.4rem;
             margin-right: 20px;
+        }
+        
+        /* Categorías badges */
+        .categorias-badge {
+            margin: 2px;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        
+        .categorias-container {
+            min-height: 40px;
+            margin-bottom: 8px;
         }
         
         /* Mobile Header Icons */
@@ -548,6 +569,11 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
             .mobile-icons {
                 gap: 10px;
             }
+            
+            .categorias-badge {
+                font-size: 0.65rem;
+                padding: 3px 6px;
+            }
         }
         
         @media (max-width: 576px) {
@@ -830,8 +856,20 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                                     <?php echo substr($producto['descripcion'], 0, 80); ?>...
                                 </p>
                                 
-                                <div class="product-meta-bloom">
-                                    <i class="fas fa-tag me-1"></i><?php echo $producto['categoria_nombre']; ?>
+                                <!-- Categorías del producto -->
+                                <div class="categorias-container">
+                                    <?php if (!empty($producto['categorias_nombres'])): ?>
+                                        <?php 
+                                        $categorias_array = explode(', ', $producto['categorias_nombres']);
+                                        foreach (array_slice($categorias_array, 0, 2) as $categoria): ?>
+                                            <span class="badge bg-primary categorias-badge"><?php echo $categoria; ?></span>
+                                        <?php endforeach; ?>
+                                        <?php if (count($categorias_array) > 2): ?>
+                                            <span class="badge bg-secondary categorias-badge">+<?php echo count($categorias_array) - 2; ?> más</span>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary categorias-badge">Sin categorías</span>
+                                    <?php endif; ?>
                                 </div>
                                 
                                 <div class="product-price-bloom">
@@ -924,8 +962,20 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                                     <?php echo substr($producto['descripcion'], 0, 80); ?>...
                                 </p>
                                 
-                                <div class="product-meta-bloom">
-                                    <i class="fas fa-tag me-1"></i><?php echo $producto['categoria_nombre']; ?>
+                                <!-- Categorías del producto -->
+                                <div class="categorias-container">
+                                    <?php if (!empty($producto['categorias_nombres'])): ?>
+                                        <?php 
+                                        $categorias_array = explode(', ', $producto['categorias_nombres']);
+                                        foreach (array_slice($categorias_array, 0, 2) as $categoria): ?>
+                                            <span class="badge bg-primary categorias-badge"><?php echo $categoria; ?></span>
+                                        <?php endforeach; ?>
+                                        <?php if (count($categorias_array) > 2): ?>
+                                            <span class="badge bg-secondary categorias-badge">+<?php echo count($categorias_array) - 2; ?> más</span>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary categorias-badge">Sin categorías</span>
+                                    <?php endif; ?>
                                 </div>
                                 
                                 <div class="product-price-bloom">
@@ -1006,6 +1056,7 @@ $productos = $stmtProductosFiltro->fetchAll(PDO::FETCH_ASSOC);
                     <h5 class="footer-title-bloom">CONTACTO</h5>
                     <div class="footer-links-bloom">
                         <p><i class="fas fa-phone me-2"></i><?php echo $telefono_empresa; ?></p>
+                        <p><i class="fas fa-phone me-2"></i>+595981934464</p>
                         <p><i class="fas fa-envelope me-2"></i><?php echo $email_empresa; ?></p>
                     </div>
                 </div>

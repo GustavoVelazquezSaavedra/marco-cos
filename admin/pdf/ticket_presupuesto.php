@@ -14,9 +14,9 @@ $database = new Database();
 $db = $database->getConnection();
 
 // Obtener información de la empresa desde la base de datos
-$titulo_sistema = "Mi Sistema"; // Valor por defecto
-$subtitulo_sistema = "Administración"; // Valor por defecto
-$telefono_empresa = "+595 972 366-265"; // Valor por defecto
+$titulo_sistema = "BLOOM"; // Valor por defecto
+$subtitulo_sistema = "Perfumes y cosmeticos"; // Valor por defecto
+$telefono_empresa = "+595976588694"; // Valor por defecto
 $horario_empresa = "Lun-Vie 8:00-18:00"; // Valor por defecto
 
 // Intentar obtener de la base de datos si hay conexión
@@ -51,7 +51,13 @@ $presupuesto = null;
 $productos = array();
 
 if ($presupuesto_id) {
-    $query = "SELECT * FROM presupuestos WHERE id = ?";
+    // Obtener presupuesto con las nuevas columnas
+    $query = "SELECT *, 
+                     COALESCE(moneda, 'gs') as moneda,
+                     COALESCE(aplicar_iva, 'no') as aplicar_iva,
+                     COALESCE(tipo_descuento, '') as tipo_descuento,
+                     COALESCE(descuento_general, 0) as descuento_general
+              FROM presupuestos WHERE id = ?";
     $stmt = $db->prepare($query);
     $stmt->execute([$presupuesto_id]);
     $presupuesto = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -106,7 +112,7 @@ $pdf->Cell(0, 5, '#' . $presupuesto_id, 0, 1, 'L');
 
 $pdf->SetFont('helvetica', '', 8);
 $pdf->Cell(20, 5, 'Fecha:', 0, 0, 'L');
-$pdf->Cell(0, 5, date('d/m/Y H:i:s'), 0, 1, 'L');
+$pdf->Cell(0, 5, date('d/m/Y H:i:s', strtotime($presupuesto['fecha_creacion'])), 0, 1, 'L');
 
 if ($presupuesto) {
     $pdf->SetFont('helvetica', '', 8);
@@ -122,7 +128,23 @@ if ($presupuesto) {
     }
 }
 
-$pdf->Ln(5);
+// Mostrar configuración del presupuesto
+$pdf->Ln(2);
+$pdf->SetFont('helvetica', '', 7);
+$pdf->Cell(0, 4, 'Moneda: ' . strtoupper($presupuesto['moneda']), 0, 1, 'L');
+$pdf->Cell(0, 4, 'IVA: ' . ($presupuesto['aplicar_iva'] == 'si' ? 'SÍ (10%)' : 'NO'), 0, 1, 'L');
+
+if (!empty($presupuesto['tipo_descuento'])) {
+    $descuento_text = 'Descuento: ' . strtoupper($presupuesto['tipo_descuento']);
+    if ($presupuesto['tipo_descuento'] == 'porcentaje') {
+        $descuento_text .= ' (' . $presupuesto['descuento_general'] . '%)';
+    } else {
+        $descuento_text .= ' (' . ($presupuesto['moneda'] == 'usd' ? '$' : 'Gs.') . ' ' . number_format($presupuesto['descuento_general'], $presupuesto['moneda'] == 'usd' ? 2 : 0, ',', '.') . ')';
+    }
+    $pdf->Cell(0, 4, $descuento_text, 0, 1, 'L');
+}
+
+$pdf->Ln(3);
 
 // Línea separadora
 $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
@@ -138,7 +160,7 @@ if ($presupuesto && !empty($productos)) {
     $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
     $pdf->Ln(2);
 
-    $total_general = 0;
+    $subtotal_general = 0;
     $pdf->SetFont('helvetica', '', 8);
 
     foreach ($productos as $prod) {
@@ -146,7 +168,7 @@ if ($presupuesto && !empty($productos)) {
         $precio_unitario = $prod['price'] ?? $prod['precio'] ?? 0;
         $nombre = $prod['name'] ?? $prod['nombre'] ?? 'Producto';
         $subtotal = $cantidad * $precio_unitario;
-        $total_general += $subtotal;
+        $subtotal_general += $subtotal;
 
         if (strlen($nombre) > 25) {
             $nombre = substr($nombre, 0, 25) . '...';
@@ -155,14 +177,21 @@ if ($presupuesto && !empty($productos)) {
         $pdf->Cell(12, 5, $cantidad, 0, 0, 'L');
         $pdf->Cell(38, 5, $nombre, 0, 0, 'L');
 
-        $precios_subtotal = formatPrecioDual($subtotal);
-        $pdf->Cell(20, 5, $precios_subtotal['gs'], 0, 1, 'R');
+        // Mostrar precio según moneda
+        if ($presupuesto['moneda'] == 'usd') {
+            $pdf->Cell(20, 5, '$ ' . number_format($subtotal, 2, '.', ','), 0, 1, 'R');
+        } else {
+            $pdf->Cell(20, 5, 'Gs. ' . number_format($subtotal, 0, ',', '.'), 0, 1, 'R');
+        }
 
         if ($cantidad > 1) {
             $pdf->Cell(12, 4, '', 0, 0, 'L');
             $pdf->SetFont('helvetica', 'I', 7);
-            $precios_unitario = formatPrecioDual($precio_unitario);
-            $pdf->Cell(38, 4, '@ ' . $precios_unitario['gs'], 0, 1, 'L');
+            if ($presupuesto['moneda'] == 'usd') {
+                $pdf->Cell(38, 4, '@ $ ' . number_format($precio_unitario, 2, '.', ','), 0, 1, 'L');
+            } else {
+                $pdf->Cell(38, 4, '@ Gs. ' . number_format($precio_unitario, 0, ',', '.'), 0, 1, 'L');
+            }
             $pdf->SetFont('helvetica', '', 8);
         }
     }
@@ -171,16 +200,85 @@ if ($presupuesto && !empty($productos)) {
     $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
     $pdf->Ln(3);
 
-    // TOTAL
-    $precios_total = formatPrecioDual($total_general);
+    // --- CÁLCULO DE TOTALES ---
+    $subtotal = $subtotal_general;
+    $iva = 0;
+    $descuento = 0;
+    $total = $subtotal;
 
+    // Calcular IVA
+    if ($presupuesto['aplicar_iva'] == 'si') {
+        $iva = $subtotal * 0.10;
+        $total += $iva;
+    }
+
+    // Calcular descuento
+    if (!empty($presupuesto['tipo_descuento'])) {
+        if ($presupuesto['tipo_descuento'] == 'porcentaje') {
+            $descuento = $subtotal * ($presupuesto['descuento_general'] / 100);
+        } else {
+            $descuento = $presupuesto['descuento_general'];
+        }
+        $total -= $descuento;
+    }
+
+    // Mostrar desglose
+    $pdf->SetFont('helvetica', '', 8);
+    
+    // Subtotal
+    $pdf->Cell(50, 5, 'Subtotal:', 0, 0, 'R');
+    if ($presupuesto['moneda'] == 'usd') {
+        $pdf->Cell(20, 5, '$ ' . number_format($subtotal, 2, '.', ','), 0, 1, 'R');
+    } else {
+        $pdf->Cell(20, 5, 'Gs. ' . number_format($subtotal, 0, ',', '.'), 0, 1, 'R');
+    }
+
+    // IVA
+    if ($presupuesto['aplicar_iva'] == 'si') {
+        $pdf->Cell(50, 5, 'IVA 10%:', 0, 0, 'R');
+        if ($presupuesto['moneda'] == 'usd') {
+            $pdf->Cell(20, 5, '$ ' . number_format($iva, 2, '.', ','), 0, 1, 'R');
+        } else {
+            $pdf->Cell(20, 5, 'Gs. ' . number_format($iva, 0, ',', '.'), 0, 1, 'R');
+        }
+    }
+
+    // Descuento
+    if (!empty($presupuesto['tipo_descuento'])) {
+        $pdf->SetTextColor(255, 0, 0); // Rojo para descuento
+        $pdf->Cell(50, 5, 'Descuento:', 0, 0, 'R');
+        if ($presupuesto['moneda'] == 'usd') {
+            $pdf->Cell(20, 5, '- $ ' . number_format($descuento, 2, '.', ','), 0, 1, 'R');
+        } else {
+            $pdf->Cell(20, 5, '- Gs. ' . number_format($descuento, 0, ',', '.'), 0, 1, 'R');
+        }
+        $pdf->SetTextColor(0, 0, 0); // Volver a negro
+    }
+
+    $pdf->Ln(2);
+    $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
+    $pdf->Ln(2);
+
+    // TOTAL FINAL
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(50, 7, 'TOTAL:', 0, 0, 'R');
-    $pdf->Cell(20, 7, $precios_total['gs'], 0, 1, 'R');
-
-    $pdf->SetFont('helvetica', '', 8);
-    $pdf->Cell(50, 4, '', 0, 0, 'R');
-    $pdf->Cell(20, 4, $precios_total['usd'], 0, 1, 'R');
+    if ($presupuesto['moneda'] == 'usd') {
+        $pdf->Cell(20, 7, '$ ' . number_format($total, 2, '.', ','), 0, 1, 'R');
+        
+        // Mostrar conversión a guaraníes
+        $pdf->SetFont('helvetica', '', 7);
+        $pdf->Cell(50, 4, '', 0, 0, 'R');
+        $total_gs = $total * $tipo_cambio['venta'];
+        $pdf->Cell(20, 4, 'Gs. ' . number_format($total_gs, 0, ',', '.'), 0, 1, 'R');
+    } else {
+        $pdf->Cell(20, 7, 'Gs. ' . number_format($total, 0, ',', '.'), 0, 1, 'R');
+        
+        // Mostrar conversión a dólares
+        $pdf->SetFont('helvetica', '', 7);
+        $pdf->Cell(50, 4, '', 0, 0, 'R');
+        $total_usd = $total / $tipo_cambio['venta'];
+        $pdf->Cell(20, 4, '$ ' . number_format($total_usd, 2, '.', ','), 0, 1, 'R');
+    }
 }
 
 $pdf->Ln(8);

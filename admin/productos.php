@@ -24,7 +24,7 @@ $estado = isset($_GET['estado']) ? $_GET['estado'] : '';
 
 // Crear nuevo producto
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'create') {
-    $categoria_id = sanitize($_POST['categoria_id']);
+    $categorias_ids = isset($_POST['categorias_ids']) ? $_POST['categorias_ids'] : [];
     $nombre = sanitize($_POST['nombre']);
     $descripcion = sanitize($_POST['descripcion']);
     $codigo = sanitize($_POST['codigo']);
@@ -50,21 +50,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'create') {
     if ($checkCodigo->rowCount() > 0) {
         $error = "El código del producto ya existe";
     } else {
-        $query = "INSERT INTO productos (categoria_id, nombre, descripcion, codigo, precio_publico, precio_real, stock, imagen) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $db->prepare($query);
-        
-        if ($stmt->execute([$categoria_id, $nombre, $descripcion, $codigo, $precio_publico, $precio_real, $stock, $imagen])) {
+        try {
+            $db->beginTransaction();
+            
+            // Insertar producto principal
+            $query = "INSERT INTO productos (nombre, descripcion, codigo, precio_publico, precio_real, stock, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $db->prepare($query);
+            $stmt->execute([$nombre, $descripcion, $codigo, $precio_publico, $precio_real, $stock, $imagen]);
+            $producto_id = $db->lastInsertId();
+            
+            // Insertar categorías del producto
+            if (!empty($categorias_ids)) {
+                foreach ($categorias_ids as $cat_id) {
+                    $query_cat = "INSERT INTO producto_categorias (producto_id, categoria_id) VALUES (?, ?)";
+                    $stmt_cat = $db->prepare($query_cat);
+                    $stmt_cat->execute([$producto_id, $cat_id]);
+                }
+            }
+            
+            $db->commit();
             $success = "Producto creado exitosamente";
-            $action = 'list'; // Volver a la lista
-        } else {
-            $error = "Error al crear el producto";
+            $action = 'list';
+            
+        } catch (Exception $e) {
+            $db->rollBack();
+            $error = "Error al crear el producto: " . $e->getMessage();
         }
     }
 }
 
 // Editar producto
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'edit') {
-    $categoria_id = sanitize($_POST['categoria_id']);
+    $categorias_ids = isset($_POST['categorias_ids']) ? $_POST['categorias_ids'] : [];
     $nombre = sanitize($_POST['nombre']);
     $descripcion = sanitize($_POST['descripcion']);
     $codigo = sanitize($_POST['codigo']);
@@ -79,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'edit') {
         $uploadResult = uploadImage($_FILES['imagen'], 'products');
         if ($uploadResult['success']) {
             $imagen = $uploadResult['filename'];
-            // Opcional: eliminar la imagen anterior
         }
     }
     
@@ -90,14 +106,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'edit') {
     if ($checkCodigo->rowCount() > 0) {
         $error = "El código del producto ya existe";
     } else {
-        $query = "UPDATE productos SET categoria_id = ?, nombre = ?, descripcion = ?, codigo = ?, precio_publico = ?, precio_real = ?, stock = ?, imagen = ?, activo = ? WHERE id = ?";
-        $stmt = $db->prepare($query);
-        
-        if ($stmt->execute([$categoria_id, $nombre, $descripcion, $codigo, $precio_publico, $precio_real, $stock, $imagen, $activo, $id])) {
+        try {
+            $db->beginTransaction();
+            
+            // Actualizar producto principal
+            $query = "UPDATE productos SET nombre = ?, descripcion = ?, codigo = ?, precio_publico = ?, precio_real = ?, stock = ?, imagen = ?, activo = ? WHERE id = ?";
+            $stmt = $db->prepare($query);
+            $stmt->execute([$nombre, $descripcion, $codigo, $precio_publico, $precio_real, $stock, $imagen, $activo, $id]);
+            
+            // Actualizar categorías del producto
+            // Primero eliminar las categorías existentes
+            $deleteCats = $db->prepare("DELETE FROM producto_categorias WHERE producto_id = ?");
+            $deleteCats->execute([$id]);
+            
+            // Luego insertar las nuevas categorías
+            if (!empty($categorias_ids)) {
+                foreach ($categorias_ids as $cat_id) {
+                    $query_cat = "INSERT INTO producto_categorias (producto_id, categoria_id) VALUES (?, ?)";
+                    $stmt_cat = $db->prepare($query_cat);
+                    $stmt_cat->execute([$id, $cat_id]);
+                }
+            }
+            
+            $db->commit();
             $success = "Producto actualizado exitosamente";
             $action = 'list';
-        } else {
-            $error = "Error al actualizar el producto";
+            
+        } catch (Exception $e) {
+            $db->rollBack();
+            $error = "Error al actualizar el producto: " . $e->getMessage();
         }
     }
 }
@@ -122,37 +159,86 @@ if ($action == 'activate' && $id) {
 
 // Obtener lista de productos con filtros
 if ($action == 'list') {
-    $query = "SELECT p.*, c.nombre as categoria_nombre 
-              FROM productos p 
-              LEFT JOIN categorias c ON p.categoria_id = c.id 
-              WHERE 1=1";
-    
-    $params = [];
-    
-    // Aplicar filtros
-    if (!empty($search)) {
-        $query .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.codigo LIKE ?)";
-        $searchTerm = "%$search%";
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
+    try {
+        $query = "SELECT p.*, 
+                         GROUP_CONCAT(c.nombre SEPARATOR ', ') as categorias_nombres,
+                         GROUP_CONCAT(c.id SEPARATOR ',') as categorias_ids
+                  FROM productos p 
+                  LEFT JOIN producto_categorias pc ON p.id = pc.producto_id 
+                  LEFT JOIN categorias c ON pc.categoria_id = c.id 
+                  WHERE 1=1";
+        
+        $params = [];
+        
+        // Aplicar filtros
+        if (!empty($search)) {
+            $query .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.codigo LIKE ?)";
+            $searchTerm = "%$search%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+        
+        if (!empty($categoria_id)) {
+            $query .= " AND p.id IN (SELECT producto_id FROM producto_categorias WHERE categoria_id = ?)";
+            $params[] = $categoria_id;
+        }
+        
+        if ($estado !== '') {
+            $query .= " AND p.activo = ?";
+            $params[] = $estado;
+        }
+        
+        $query .= " GROUP BY p.id ORDER BY p.fecha_creacion DESC";
+        
+        $stmt = $db->prepare($query);
+        $stmt->execute($params);
+        $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+    } catch (Exception $e) {
+        // Si falla la consulta con JOIN, usar consulta simple
+        $query = "SELECT p.* FROM productos p WHERE 1=1";
+        $params = [];
+        
+        if (!empty($search)) {
+            $query .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.codigo LIKE ?)";
+            $searchTerm = "%$search%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+        
+        if ($estado !== '') {
+            $query .= " AND p.activo = ?";
+            $params[] = $estado;
+        }
+        
+        $query .= " ORDER BY p.fecha_creacion DESC";
+        
+        $stmt = $db->prepare($query);
+        $stmt->execute($params);
+        $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Para cada producto, obtener sus categorías
+        foreach ($productos as &$prod) {
+            try {
+                $queryCats = "SELECT c.id, c.nombre 
+                              FROM categorias c 
+                              INNER JOIN producto_categorias pc ON c.id = pc.categoria_id 
+                              WHERE pc.producto_id = ?";
+                $stmtCats = $db->prepare($queryCats);
+                $stmtCats->execute([$prod['id']]);
+                $categorias_prod = $stmtCats->fetchAll(PDO::FETCH_ASSOC);
+                
+                $prod['categorias_nombres'] = implode(', ', array_column($categorias_prod, 'nombre'));
+                $prod['categorias_ids'] = implode(',', array_column($categorias_prod, 'id'));
+            } catch (Exception $e) {
+                $prod['categorias_nombres'] = '';
+                $prod['categorias_ids'] = '';
+            }
+        }
+        unset($prod);
     }
-    
-    if (!empty($categoria_id)) {
-        $query .= " AND p.categoria_id = ?";
-        $params[] = $categoria_id;
-    }
-    
-    if ($estado !== '') {
-        $query .= " AND p.activo = ?";
-        $params[] = $estado;
-    }
-    
-    $query .= " ORDER BY p.fecha_creacion DESC";
-    
-    $stmt = $db->prepare($query);
-    $stmt->execute($params);
-    $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Obtener categorías para los filtros y formularios
@@ -163,6 +249,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
 
 // Obtener datos de producto para editar
 if (($action == 'edit' || $action == 'view') && $id) {
+    // Obtener datos del producto
     $query = "SELECT * FROM productos WHERE id = ?";
     $stmt = $db->prepare($query);
     $stmt->execute([$id]);
@@ -171,6 +258,16 @@ if (($action == 'edit' || $action == 'view') && $id) {
     if (!$producto) {
         $error = "Producto no encontrado";
         $action = 'list';
+    } else {
+        // Obtener categorías del producto
+        try {
+            $queryCats = "SELECT categoria_id FROM producto_categorias WHERE producto_id = ?";
+            $stmtCats = $db->prepare($queryCats);
+            $stmtCats->execute([$id]);
+            $categorias_producto = $stmtCats->fetchAll(PDO::FETCH_COLUMN, 0);
+        } catch (Exception $e) {
+            $categorias_producto = [];
+        }
     }
 }
 
@@ -190,6 +287,7 @@ if ($action == 'create') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="../css/styles.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
         .product-image {
             width: 60px;
@@ -212,6 +310,23 @@ if ($action == 'create') {
         .price-usd {
             color: #6c757d;
             font-size: 0.8em;
+        }
+        .categorias-badge {
+            margin: 2px;
+            font-size: 0.75em;
+        }
+        .select2-container--default .select2-selection--multiple {
+            min-height: 38px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+            padding: 2px 8px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white;
+            margin-right: 4px;
         }
     </style>
 </head>
@@ -365,7 +480,7 @@ if ($action == 'create') {
                                             <th>Imagen</th>
                                             <th>Código</th>
                                             <th>Nombre</th>
-                                            <th>Categoría</th>
+                                            <th>Categorías</th>
                                             <th>Precio Público</th>
                                             <th>Precio Real</th>
                                             <th>Stock</th>
@@ -401,7 +516,17 @@ if ($action == 'create') {
                                                 <div class="fw-bold"><?php echo $prod['nombre']; ?></div>
                                                 <small class="text-muted"><?php echo substr($prod['descripcion'], 0, 50); ?>...</small>
                                             </td>
-                                            <td><?php echo $prod['categoria_nombre']; ?></td>
+                                            <td>
+                                                <?php if (!empty($prod['categorias_nombres'])): ?>
+                                                    <?php 
+                                                    $categorias_array = explode(', ', $prod['categorias_nombres']);
+                                                    foreach ($categorias_array as $categoria): ?>
+                                                        <span class="badge bg-primary categorias-badge"><?php echo $categoria; ?></span>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <span class="badge bg-secondary categorias-badge">Sin categorías</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td>
                                                 <?php 
                                                 $precios_publico = formatPrecioDual($prod['precio_publico']);
@@ -500,21 +625,21 @@ if ($action == 'create') {
                                         </div>
                                         
                                         <div class="row">
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label for="categoria_id" class="form-label">Categoría *</label>
-                                                    <select class="form-control" id="categoria_id" name="categoria_id" required>
-                                                        <option value="">Seleccionar categoría</option>
+                                                    <label for="categorias_ids" class="form-label">Categorías</label>
+                                                    <select class="form-control" id="categorias_ids" name="categorias_ids[]" multiple="multiple" style="width: 100%;">
                                                         <?php foreach ($categorias as $cat): ?>
                                                         <option value="<?php echo $cat['id']; ?>" 
-                                                                <?php echo (isset($producto) && $producto['categoria_id'] == $cat['id']) ? 'selected' : ''; ?>>
+                                                                <?php echo (isset($categorias_producto) && in_array($cat['id'], $categorias_producto)) ? 'selected' : ''; ?>>
                                                             <?php echo $cat['nombre']; ?>
                                                         </option>
                                                         <?php endforeach; ?>
                                                     </select>
+                                                    <small class="text-muted">Selecciona una o más categorías</small>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 <div class="mb-3">
                                                     <label for="precio_publico" class="form-label">Precio Público *</label>
                                                     <input type="number" class="form-control" id="precio_publico" name="precio_publico" 
@@ -522,7 +647,7 @@ if ($action == 'create') {
                                                     <small class="text-muted">Precio que ven los clientes (Guaraníes)</small>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 <div class="mb-3">
                                                     <label for="precio_real" class="form-label">Precio Real *</label>
                                                     <input type="number" class="form-control" id="precio_real" name="precio_real" 
@@ -615,10 +740,20 @@ if ($action == 'create') {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/i18n/es.min.js"></script>
     
     <script>
-        // Calculadora de margen en tiempo real con conversión a USD
+        // Inicializar Select2 para selección múltiple de categorías
         $(document).ready(function() {
+            $('#categorias_ids').select2({
+                language: 'es',
+                placeholder: 'Selecciona una o más categorías',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Calculadora de margen en tiempo real con conversión a USD
             function calcularMargen() {
                 const precioPublico = parseFloat($('#precio_publico').val()) || 0;
                 const precioReal = parseFloat($('#precio_real').val()) || 0;
