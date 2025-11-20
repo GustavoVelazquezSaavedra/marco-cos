@@ -99,62 +99,299 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
     <title><?php echo $producto['nombre']; ?> - <?php echo $titulo_sistema; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="css/styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #0a0a0a;
+            --secondary: #8b7d5a;
+            --accent: #b8a86d;
+            --light: #f8f9fa;
+            --dark: #1a1a1a;
+            --success: #9caf88;
+            --text-light: #e8e6e3;
+            --text-muted: #a5a5a5;
+            --gold-light: #d4c19c;
+            --gold-dark: #8b7d5a;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--primary);
+            color: var(--text-light);
+            padding-top: 76px;
+            overflow-x: hidden;
+        }
+        
+        .title-font {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Navbar estilo */
+        .navbar {
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            z-index: 1030;
+        }
+        
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98) !important;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--accent) !important;
+        }
+        
+        .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            position: relative;
+            margin: 0 5px;
+            padding: 8px 15px !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(184, 168, 109, 0.1);
+            color: var(--accent) !important;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15px;
+            right: 15px;
+            height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            transform: scaleX(1);
+        }
+        
+        /* Dropdown styles */
+        .dropdown-menu {
+            background: var(--dark) !important;
+            border: 1px solid rgba(139, 125, 90, 0.2) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .dropdown-item {
+            color: var(--text-light) !important;
+            padding: 10px 15px !important;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(184, 168, 109, 0.1) !important;
+            color: var(--accent) !important;
+        }
+        
+        /* Cart Badge */
+        .cart-badge-bloom {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, rgba(10,10,10,0.9), rgba(26,26,26,0.8)), 
+                        url('https://images.unsplash.com/photo-1547887537-6158d64c35b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-light);
+            padding: 80px 0;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            color: var(--text-light);
+        }
+        
+        /* Card Style */
+        .bloom-card {
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            border: 1px solid rgba(139, 125, 90, 0.1);
+            position: relative;
+        }
+        
+        .bloom-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .bloom-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
+            border-color: rgba(184, 168, 109, 0.3);
+        }
+        
+        .bloom-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        /* Buttons */
+        .btn-bloom {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(184, 168, 109, 0.3);
+        }
+        
+        .btn-bloom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.4);
+            color: var(--primary);
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+        }
+        
+        .btn-outline-bloom {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-bloom:hover {
+            background: var(--accent);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.3);
+        }
+        
+        /* Product Gallery */
         .product-image {
             width: 100%;
             max-height: 500px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 125, 90, 0.2);
         }
+        
         .product-gallery {
-            margin-top: 10px;
+            margin-top: 15px;
         }
+        
         .gallery-thumb {
             width: 80px;
             height: 80px;
             object-fit: cover;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
+        
         .gallery-thumb:hover,
         .gallery-thumb.active {
-            border-color: #007bff;
+            border-color: var(--accent);
+            transform: scale(1.05);
         }
-        .price {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #28a745;
+        
+        /* Product Details */
+        .product-price-bloom {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 1rem;
         }
-        .original-price {
-            font-size: 1.2rem;
-            text-decoration: line-through;
-            color: #6c757d;
+        
+        .price-usd {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
+        
         .stock-badge {
             font-size: 0.9rem;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
         }
+        
         .product-features {
             list-style: none;
             padding: 0;
         }
+        
         .product-features li {
-            padding: 5px 0;
-            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
         }
+        
         .product-features li:last-child {
             border-bottom: none;
         }
+        
         .feature-icon {
-            color: #28a745;
+            color: var(--accent);
             margin-right: 10px;
+            width: 20px;
         }
+        
+        /* Categorías badges */
         .categorias-badge {
             margin: 2px;
-            font-size: 0.75em;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(184, 168, 109, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(184, 168, 109, 0.3);
         }
+        
         .breadcrumb-category {
             max-width: 200px;
             overflow: hidden;
@@ -163,28 +400,213 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             display: inline-block;
             vertical-align: middle;
         }
+        
+        /* Breadcrumb */
+        .breadcrumb-bloom {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+        }
+        
+        .breadcrumb-bloom .breadcrumb-item a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .breadcrumb-bloom .breadcrumb-item a:hover {
+            color: var(--text-light);
+        }
+        
+        .breadcrumb-bloom .breadcrumb-item.active {
+            color: var(--text-muted);
+        }
+        
+        /* Quantity Input */
+        .quantity-input {
+            width: 80px;
+            text-align: center;
+            border: 1px solid rgba(139, 125, 90, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        
+        .quantity-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.25rem rgba(184, 168, 109, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Related Products */
+        .related-product-card {
+            border: 1px solid rgba(139, 125, 90, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .related-product-card:hover {
+            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
+            transform: translateY(-5px);
+            border-color: rgba(184, 168, 109, 0.3);
+        }
+        
+        .related-product-image {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+        }
+        
+        /* WhatsApp Float */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+        
+        /* Footer */
+        .footer-bloom {
+            background: var(--dark);
+            color: var(--text-light);
+            padding: 60px 0 20px;
+            border-top: 3px solid var(--accent);
+        }
+        
+        .footer-title-bloom {
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+        
+        .footer-links-bloom a {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links-bloom a:hover {
+            color: var(--accent);
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        
+        .toast-success {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 2.2rem;
+            }
+            
+            .product-price-bloom {
+                font-size: 2rem;
+            }
+            
+            .gallery-thumb {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .btn-bloom, .btn-outline-bloom {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .product-price-bloom {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- WhatsApp Float -->
+    <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-gem me-2"></i><?php echo $titulo_sistema; ?>
+                <i class="fas fa-spa me-2"></i><?php echo $titulo_sistema; ?>
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <!-- Iconos para mobile -->
+            <div class="mobile-icons d-lg-none">
+                <a href="catalogo.php" class="text-decoration-none">
+                    <i class="fas fa-store" style="color: var(--accent); font-size: 1.2rem;"></i>
+                </a>
+                
+                <a href="carrito.php" class="text-decoration-none position-relative ms-3">
+                    <i class="fas fa-shopping-bag" style="color: var(--accent); font-size: 1.2rem;"></i>
+                    <span class="cart-badge-bloom" id="cart-count">0</span>
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
             
+            <!-- Contenido del menú -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">Inicio</a>
+                        <a class="nav-link" href="index.php">INICIO</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Categorías
+                            CATEGORÍAS
                         </a>
                         <ul class="dropdown-menu">
                             <?php foreach ($categorias as $cat): ?>
@@ -197,23 +619,37 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="catalogo.php">Catálogo Completo</a>
+                        <a class="nav-link" href="catalogo.php">CATÁLOGO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="carrito.php">CARRITO</a>
                     </li>
                 </ul>
                 
-                <!-- Carrito -->
-                <div class="navbar-nav">
-                    <a class="nav-link position-relative" href="carrito.php">
-                        <i class="fas fa-shopping-cart fa-lg"></i>
-                        <span class="cart-badge badge bg-danger rounded-pill" id="cart-count">0</span>
-                    </a>
+                <!-- Elementos para desktop -->
+                <div class="d-none d-lg-flex align-items-center">
+                    <div class="navbar-nav me-3">
+                        <a class="nav-link" href="catalogo.php">
+                            <i class="fas fa-store" style="color: var(--accent); font-size: 1.2rem;"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="navbar-nav">
+                        <a class="nav-link position-relative" href="carrito.php">
+                            <i class="fas fa-shopping-bag" style="color: var(--accent); font-size: 1.2rem;"></i>
+                            <span class="cart-badge-bloom" id="cart-count-desktop">0</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Container para notificaciones Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="bg-light py-3">
+    <nav class="breadcrumb-bloom py-3">
         <div class="container">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="index.php">Inicio</a></li>
@@ -237,177 +673,182 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
     <div class="container py-5">
         <div class="row">
             <!-- Galería de Imágenes -->
-            <div class="col-md-6">
-                <div class="product-gallery-main">
-                    <?php if (!empty($producto['imagen'])): ?>
-                    <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                         alt="<?php echo $producto['nombre']; ?>" 
-                         class="product-image" 
-                         id="main-product-image">
-                    <?php else: ?>
-                    <div class="product-image bg-light d-flex align-items-center justify-content-center">
-                        <i class="fas fa-image fa-5x text-muted"></i>
-                    </div>
-                    <?php endif; ?>
-                </div>
-                
-                <!-- Mini galería (si hay más imágenes) -->
-                <div class="product-gallery">
-                    <div class="row g-2">
+            <div class="col-md-6 mb-5">
+                <div class="bloom-card p-4">
+                    <div class="product-gallery-main">
                         <?php if (!empty($producto['imagen'])): ?>
-                        <div class="col-3">
-                            <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                                 alt="<?php echo $producto['nombre']; ?>" 
-                                 class="gallery-thumb active"
-                                 onclick="changeMainImage(this.src)">
+                        <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
+                             alt="<?php echo $producto['nombre']; ?>" 
+                             class="product-image" 
+                             id="main-product-image">
+                        <?php else: ?>
+                        <div class="product-image bg-dark d-flex align-items-center justify-content-center">
+                            <i class="fas fa-spa fa-5x text-accent"></i>
                         </div>
                         <?php endif; ?>
-                        <!-- Aquí puedes agregar más imágenes si tienes una galería -->
+                    </div>
+                    
+                    <!-- Mini galería -->
+                    <div class="product-gallery">
+                        <div class="row g-2 justify-content-center">
+                            <?php if (!empty($producto['imagen'])): ?>
+                            <div class="col-auto">
+                                <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
+                                     alt="<?php echo $producto['nombre']; ?>" 
+                                     class="gallery-thumb active"
+                                     onclick="changeMainImage(this.src)">
+                            </div>
+                            <?php endif; ?>
+                            <!-- Aquí puedes agregar más imágenes si tienes una galería -->
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Información del Producto -->
             <div class="col-md-6">
-                <div class="product-details">
-                    <!-- Categorías -->
-                    <div class="mb-3">
-                        <?php if (!empty($producto['categorias_nombres'])): ?>
-                            <?php 
-                            $categorias_array = explode(', ', $producto['categorias_nombres']);
-                            foreach ($categorias_array as $categoria): ?>
-                                <span class="badge bg-primary categorias-badge"><?php echo $categoria; ?></span>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <span class="badge bg-secondary categorias-badge">Sin categorías</span>
-                        <?php endif; ?>
-                        <span class="text-muted ms-2">Código: <?php echo $producto['codigo']; ?></span>
-                    </div>
-                    
-                    <!-- Nombre del producto -->
-                    <h1 class="h2 mb-3"><?php echo $producto['nombre']; ?></h1>
-                    
-                    <!-- Precio -->
-                    <div class="mb-4">
-                        <div class="price">Gs. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?></div>
+                <div class="bloom-card p-4 h-100">
+                    <div class="product-details">
+                        <!-- Categorías -->
+                        <div class="mb-4">
+                            <?php if (!empty($producto['categorias_nombres'])): ?>
+                                <?php 
+                                $categorias_array = explode(', ', $producto['categorias_nombres']);
+                                foreach ($categorias_array as $categoria): ?>
+                                    <span class="badge categorias-badge"><?php echo $categoria; ?></span>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <span class="badge bg-secondary categorias-badge">Sin categorías</span>
+                            <?php endif; ?>
+                            <span class="text-muted ms-2">Código: <?php echo $producto['codigo']; ?></span>
+                        </div>
                         
-                    </div>
-                    
-                    <!-- Stock -->
-                    <div class="mb-4">
-                        <?php if ($producto['stock'] > 0): ?>
-                        <span class="badge bg-success stock-badge">
-                            <i class="fas fa-check me-1"></i>
-                            <?php echo $producto['stock']; ?> disponibles en stock
-                        </span>
-                        <?php else: ?>
-                        <span class="badge bg-danger stock-badge">
-                            <i class="fas fa-times me-1"></i>
-                            Agotado
-                        </span>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <!-- Descripción -->
-                    <div class="mb-4">
-                        <h5 class="mb-3">Descripción</h5>
-                        <p class="text-muted"><?php echo nl2br($producto['descripcion']); ?></p>
-                    </div>
-                    
-                    <!-- Características -->
-                    <div class="mb-4">
-                        <h5 class="mb-3">Características</h5>
-                        <ul class="product-features">
-                            <li>
-                                <i class="fas fa-tags feature-icon"></i>
-                                <strong>Categorías:</strong> 
-                                <?php if (!empty($producto['categorias_nombres'])): ?>
-                                    <?php echo $producto['categorias_nombres']; ?>
-                                <?php else: ?>
-                                    Sin categorías
-                                <?php endif; ?>
-                            </li>
-                            <li>
-                                <i class="fas fa-barcode feature-icon"></i>
-                                <strong>Código:</strong> <?php echo $producto['codigo']; ?>
-                            </li>
-                            <li>
-                                <i class="fas fa-box feature-icon"></i>
-                                <strong>Stock:</strong> <?php echo $producto['stock']; ?> unidades
-                            </li>
-                            <li>
-                                <i class="fas fa-calendar feature-icon"></i>
-                                <strong>Agregado:</strong> <?php echo date('d/m/Y', strtotime($producto['fecha_creacion'])); ?>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Acciones -->
-                    <div class="product-actions">
-                        <?php if ($producto['stock'] > 0): ?>
-                        <div class="row g-3 align-items-center mb-3">
-                            <div class="col-auto">
-                                <label for="quantity" class="form-label"><strong>Cantidad:</strong></label>
-                            </div>
-                            <div class="col-auto">
-                                <input type="number" id="quantity" class="form-control" value="1" min="1" max="<?php echo $producto['stock']; ?>" style="width: 80px;">
+                        <!-- Nombre del producto -->
+                        <h1 class="h2 title-font mb-4"><?php echo $producto['nombre']; ?></h1>
+                        
+                        <!-- Precio -->
+                        <div class="mb-4">
+                            <div class="product-price-bloom">
+                                <?php 
+                                $precios = formatPrecioDual($producto['precio_publico']);
+                                ?>
+                                <div class="fw-bold"><?php echo $precios['gs']; ?></div>
+                                <div class="price-usd"><?php echo $precios['usd']; ?></div>
                             </div>
                         </div>
                         
-                        <div class="d-grid gap-2 d-md-flex">
-                            <button class="btn btn-primary btn-lg flex-fill add-to-cart-detailed" 
-                                    data-product-id="<?php echo $producto['id']; ?>"
-                                    data-product-name="<?php echo $producto['nombre']; ?>"
-                                    data-product-price="<?php echo $producto['precio_publico']; ?>"
-                                    data-product-image="<?php echo $producto['imagen']; ?>">
-                                <i class="fas fa-cart-plus me-2"></i>Agregar al Carrito
-                            </button>
-                            <button class="btn btn-outline-success btn-lg flex-fill buy-now">
-                                <i class="fas fa-bolt me-2"></i>Comprar Ahora
-                            </button>
+                        <!-- Stock -->
+                        <div class="mb-4">
+                            <?php if ($producto['stock'] > 0): ?>
+                            <span class="badge stock-badge" style="background: linear-gradient(135deg, var(--success), #7a9a63);">
+                                <i class="fas fa-check me-1"></i>
+                                <?php echo $producto['stock']; ?> disponibles en stock
+                            </span>
+                            <?php else: ?>
+                            <span class="badge stock-badge bg-danger">
+                                <i class="fas fa-times me-1"></i>
+                                Agotado
+                            </span>
+                            <?php endif; ?>
                         </div>
-                        <?php else: ?>
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Este producto está temporalmente agotado. Contáctanos para más información.
+                        
+                        <!-- Descripción -->
+                        <div class="mb-4">
+                            <h5 class="mb-3" style="color: var(--accent);">Descripción</h5>
+                            <p class="text-muted"><?php echo nl2br($producto['descripcion']); ?></p>
                         </div>
-                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
-                           target="_blank" class="btn btn-success w-100">
-                            <i class="fab fa-whatsapp me-2"></i>Consultar por WhatsApp
-                        </a>
-                        <?php endif; ?>
+                        
+                        <!-- Características -->
+                        <div class="mb-4">
+                            <h5 class="mb-3" style="color: var(--accent);">Características</h5>
+                            <ul class="product-features">
+                                <li>
+                                    <i class="fas fa-tags feature-icon"></i>
+                                    <strong>Categorías:</strong> 
+                                    <?php if (!empty($producto['categorias_nombres'])): ?>
+                                        <?php echo $producto['categorias_nombres']; ?>
+                                    <?php else: ?>
+                                        Sin categorías
+                                    <?php endif; ?>
+                                </li>
+                                <li>
+                                    <i class="fas fa-barcode feature-icon"></i>
+                                    <strong>Código:</strong> <?php echo $producto['codigo']; ?>
+                                </li>
+                                <li>
+                                    <i class="fas fa-box feature-icon"></i>
+                                    <strong>Stock:</strong> <?php echo $producto['stock']; ?> unidades
+                                </li>
+                                <li>
+                                    <i class="fas fa-calendar feature-icon"></i>
+                                    <strong>Agregado:</strong> <?php echo date('d/m/Y', strtotime($producto['fecha_creacion'])); ?>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Acciones -->
+                        <div class="product-actions">
+                            <?php if ($producto['stock'] > 0): ?>
+                            <div class="row g-3 align-items-center mb-4">
+                                <div class="col-auto">
+                                    <label for="quantity" class="form-label"><strong>Cantidad:</strong></label>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="number" id="quantity" class="form-control quantity-input" 
+                                           value="1" min="1" max="<?php echo $producto['stock']; ?>">
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-3 d-md-flex">
+                                <button class="btn btn-bloom btn-lg flex-fill add-to-cart-detailed" 
+                                        data-product-id="<?php echo $producto['id']; ?>"
+                                        data-product-name="<?php echo $producto['nombre']; ?>"
+                                        data-product-price="<?php echo $producto['precio_publico']; ?>"
+                                        data-product-image="<?php echo $producto['imagen']; ?>">
+                                    <i class="fas fa-cart-plus me-2"></i>Agregar al Carrito
+                                </button>
+                                <button class="btn btn-outline-bloom btn-lg flex-fill buy-now">
+                                    <i class="fas fa-bolt me-2"></i>Comprar Ahora
+                                </button>
+                            </div>
+                            <?php else: ?>
+                            <div class="alert bloom-card mb-4" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.3);">
+                                <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
+                                Este producto está temporalmente agotado. Contáctanos para más información.
+                            </div>
+                            <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
+                               target="_blank" class="btn btn-bloom w-100" style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
+                                <i class="fab fa-whatsapp me-2"></i>Consultar por WhatsApp
+                            </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                    
-                    <!-- Envío y garantía -->
-                    
                 </div>
             </div>
         </div>
 
         <!-- Productos Relacionados -->
         <?php if (!empty($productos_relacionados)): ?>
-        <div class="row mt-5 pt-5 border-top">
+        <div class="row mt-5 pt-5 border-top" style="border-color: rgba(139, 125, 90, 0.1) !important;">
             <div class="col-12">
-                <h3 class="mb-4">Productos Relacionados</h3>
+                <h3 class="title-font mb-4" style="color: var(--accent);">Productos Relacionados</h3>
                 <div class="row">
                     <?php foreach ($productos_relacionados as $relacionado): ?>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="card product-card h-100">
+                    <div class="col-md-3 col-sm-6 mb-4">
+                        <div class="related-product-card bloom-card">
                             <div class="position-relative">
                                 <?php if (!empty($relacionado['imagen'])): ?>
                                 <img src="../uploads/products/<?php echo $relacionado['imagen']; ?>" 
-                                     class="card-img-top product-image" alt="<?php echo $relacionado['nombre']; ?>"
-                                     style="height: 200px;">
+                                     class="related-product-image" alt="<?php echo $relacionado['nombre']; ?>">
                                 <?php else: ?>
-                                <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center"
-                                     style="height: 200px;">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                <div class="related-product-image bg-dark d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-spa fa-3x text-accent"></i>
                                 </div>
                                 <?php endif; ?>
                             </div>
                             
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title"><?php echo $relacionado['nombre']; ?></h6>
+                            <div class="p-3 d-flex flex-column flex-grow-1">
+                                <h6 class="product-title-bloom mb-2"><?php echo $relacionado['nombre']; ?></h6>
                                 
                                 <!-- Categorías del producto relacionado -->
                                 <?php if (!empty($relacionado['categorias_nombres'])): ?>
@@ -415,24 +856,28 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                                     <?php 
                                     $categorias_rel_array = explode(', ', $relacionado['categorias_nombres']);
                                     foreach (array_slice($categorias_rel_array, 0, 2) as $categoria_rel): ?>
-                                        <span class="badge bg-secondary categorias-badge"><?php echo $categoria_rel; ?></span>
+                                        <span class="badge categorias-badge"><?php echo $categoria_rel; ?></span>
                                     <?php endforeach; ?>
                                     <?php if (count($categorias_rel_array) > 2): ?>
-                                        <span class="badge bg-light text-dark categorias-badge">+<?php echo count($categorias_rel_array) - 2; ?> más</span>
+                                        <span class="badge bg-secondary categorias-badge">+<?php echo count($categorias_rel_array) - 2; ?> más</span>
                                     <?php endif; ?>
                                 </div>
                                 <?php endif; ?>
                                 
-                                <p class="card-text flex-grow-1">
-                                    <small class="text-muted"><?php echo substr($relacionado['descripcion'], 0, 60); ?>...</small>
+                                <p class="product-description-bloom flex-grow-1">
+                                    <?php echo substr($relacionado['descripcion'], 0, 80); ?>...
                                 </p>
                                 <div class="mt-auto">
-                                    <div class="price mb-2" style="font-size: 1rem;">
-                                        Gs. <?php echo number_format($relacionado['precio_publico'], 0, ',', '.'); ?>
+                                    <div class="product-price-bloom mb-2" style="font-size: 1.1rem;">
+                                        <?php 
+                                        $precios_rel = formatPrecioDual($relacionado['precio_publico']);
+                                        ?>
+                                        <div class="fw-bold"><?php echo $precios_rel['gs']; ?></div>
+                                        <div class="price-usd"><?php echo $precios_rel['usd']; ?></div>
                                     </div>
-                                    <div class="d-grid gap-2">
+                                    <div class="d-grid">
                                         <a href="producto.php?id=<?php echo $relacionado['id']; ?>" 
-                                           class="btn btn-outline-primary btn-sm">
+                                           class="btn btn-outline-bloom btn-sm">
                                             <i class="fas fa-eye me-1"></i>Ver Detalles
                                         </a>
                                     </div>
@@ -448,33 +893,68 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
+    <footer class="footer-bloom">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5><i class="fas fa-gem me-2"></i><?php echo $titulo_sistema; ?></h5>
-                    <p><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales.</p>
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <i class="fas fa-spa fs-2 me-2" style="color: var(--accent);"></i>
+                        <h3 class="title-font h4 mb-0"><?php echo $titulo_sistema; ?></h3>
+                    </div>
+                    <p class="mb-4"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales. Descubre la esencia de la elegancia en cada fragancia.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h5>Contacto</h5>
-                    <p>
-                        <i class="fas fa-phone me-2"></i><?php echo $telefono_empresa; ?><br>
-                        <i class="fas fa-phone me-2"></i>+595981934464<br>
-                        <i class="fas fa-envelope me-2"></i><?php echo $email_empresa; ?>
-                    </p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Enlaces Rápidos</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="index.php" class="text-white">Inicio</a></li>
-                        <li><a href="catalogo.php" class="text-white">Catálogo</a></li>
-                        <li><a href="carrito.php" class="text-white">Carrito</a></li>
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-title-bloom">Enlaces</h5>
+                    <ul class="list-unstyled footer-links-bloom">
+                        <li><a href="index.php">Inicio</a></li>
+                        <li><a href="catalogo.php">Catálogo</a></li>
+                        <li><a href="carrito.php">Carrito</a></li>
                     </ul>
                 </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-title-bloom">Contacto</h5>
+                    <ul class="list-unstyled footer-links-bloom">
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-phone me-2 mt-1" style="color: var(--accent);"></i>
+                            <span><?php echo $telefono_empresa; ?></span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-phone me-2 mt-1" style="color: var(--accent);"></i>
+                            <span>+595981934464</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-envelope me-2 mt-1" style="color: var(--accent);"></i>
+                            <span><?php echo $email_empresa; ?></span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-map-marker-alt me-2 mt-1" style="color: var(--accent);"></i>
+                            <span>CDE - Paraguay</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h5 class="footer-title-bloom">Newsletter</h5>
+                    <p class="mb-3">Suscríbete para recibir novedades y ofertas exclusivas.</p>
+                    <div class="d-flex">
+                        <input type="email" class="form-control me-2" placeholder="Tu correo" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139,125,90,0.3); color: white;">
+                        <button class="btn btn-bloom">Enviar</button>
+                    </div>
+                </div>
             </div>
-            <hr>
+            <hr class="my-5" style="border-color: rgba(255,255,255,0.1);">
             <div class="text-center">
-                <small>&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1">Desarrollador</a></small>
+                <p>&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1/" style="color: var(--accent);">Desarrollador</a></p>
             </div>
         </div>
     </footer>
@@ -490,6 +970,34 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             $('#cart-count').text(totalItems);
+            $('#cart-count-desktop').text(totalItems);
+        }
+        
+        // Función para mostrar notificaciones bonitas
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastHTML = `
+                <div id="${toastId}" class="toast toast-${type} align-items-center" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = new bootstrap.Toast(document.getElementById(toastId));
+            toastElement.show();
+            
+            // Remover el toast del DOM después de que se oculte
+            document.getElementById(toastId).addEventListener('hidden.bs.toast', function () {
+                this.remove();
+            });
         }
         
         // Cambiar imagen principal en la galería
@@ -524,22 +1032,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             localStorage.setItem('bloom_cart', JSON.stringify(cart));
             updateCartCount();
             
-            // Mostrar notificación
-            const toast = document.createElement('div');
-            toast.className = 'position-fixed top-0 end-0 p-3';
-            toast.style.zIndex = '9999';
-            toast.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>¡Éxito!</strong> ${productName} agregado al carrito.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            document.body.appendChild(toast);
-            
-            // Auto-remover después de 3 segundos
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
+            showToast(`${productName} agregado al carrito`, 'success');
         });
         
         // Comprar ahora
@@ -554,6 +1047,16 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             
             // Abrir WhatsApp con el teléfono de la empresa
             window.open(`https://wa.me/${telefonoEmpresa}?text=${message}`, '_blank');
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
         });
         
         // Inicializar contador del carrito

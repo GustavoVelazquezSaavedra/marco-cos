@@ -28,9 +28,11 @@ if (isset($_GET['ajax_search']) && $_GET['ajax_search'] == 'productos') {
     
     $query = "SELECT p.*, c.nombre as categoria_nombre 
               FROM productos p 
-              LEFT JOIN categorias c ON p.categoria_id = c.id 
+              LEFT JOIN producto_categorias pc ON p.id = pc.producto_id 
+              LEFT JOIN categorias c ON pc.categoria_id = c.id 
               WHERE p.activo = 1 AND p.stock > 0 
-              AND (p.nombre LIKE ? OR p.codigo LIKE ? OR p.precio_publico LIKE ? OR c.nombre LIKE ?)
+              AND (p.nombre LIKE ? OR p.codigo LIKE ? OR p.descripcion LIKE ? OR c.nombre LIKE ?)
+              GROUP BY p.id
               ORDER BY p.nombre 
               LIMIT 20";
     
@@ -309,62 +311,75 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         .descuento-badge { background-color: #6f42c1; }
         .moneda-badge { background-color: #fd7e14; }
         
-        /* Estilos compactos para productos */
-        .producto-item-compact {
-            border-left: 3px solid #007bff;
-            transition: all 0.2s ease;
-            font-size: 0.85rem;
-            padding: 8px 12px;
-            margin-bottom: 6px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        
-        .producto-item-compact:hover {
-            background-color: #e9ecef !important;
-            transform: translateX(2px);
-        }
-        
-        .producto-item-compact .small {
-            font-size: 0.75rem;
-        }
-        
-        .producto-item-compact strong {
-            font-size: 0.85rem;
-        }
-        
+        /* Estilos compactos para tabla de productos */
         .compact-table {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
+            margin-bottom: 0;
         }
         
         .compact-table th {
-            padding: 4px 8px;
+            padding: 8px 6px;
             background-color: #f8f9fa;
             font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 0.8rem;
         }
         
         .compact-table td {
-            padding: 4px 8px;
+            padding: 6px;
             vertical-align: middle;
+            border-bottom: 1px solid #eee;
         }
         
-        /* Estilos para la lista compacta en móviles */
-        @media (max-width: 768px) {
-            .producto-item-compact .col-3,
-            .producto-item-compact .col-5,
-            .producto-item-compact .col-3,
-            .producto-item-compact .col-1 {
-                padding: 0.25rem;
-            }
-            
-            .producto-item-compact {
-                padding: 0.5rem !important;
-                font-size: 0.8rem;
-            }
-            
-            .producto-item-compact .small {
-                font-size: 0.7rem;
-            }
+        .compact-table .btn-sm {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.75rem;
+        }
+        
+        .producto-row:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .table-responsive {
+            border-radius: 0.375rem;
+            border: 1px solid #dee2e6;
+        }
+        
+        .cantidad-input {
+            width: 70px;
+            text-align: center;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.85rem;
+        }
+        
+        .subtotal-col {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .acciones-col {
+            width: 80px;
+            text-align: center;
+        }
+        
+        .codigo-col {
+            width: 100px;
+            font-weight: 600;
+        }
+        
+        .cantidad-col {
+            width: 80px;
+            text-align: center;
+        }
+        
+        .precio-col {
+            width: 120px;
+            text-align: right;
+        }
+        
+        .subtotal-col {
+            width: 120px;
+            text-align: right;
         }
     </style>
 </head>
@@ -641,7 +656,7 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                         <div class="mb-3">
                                             <label for="producto_selector" class="form-label">Buscar Producto</label>
                                             <select class="form-control" id="producto_selector" style="width: 100%;">
-                                                <option value="">Buscar producto por código, nombre, precio o categoría...</option>
+                                                <option value="">Buscar producto por código, nombre, precio, categoría o descripción...</option>
                                             </select>
                                         </div>
                                         
@@ -723,33 +738,51 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                     </div>
                                 </div>
 
-                                <!-- Lista de productos del presupuesto - VERSIÓN COMPACTA -->
+                                <!-- Lista de productos del presupuesto - VERSIÓN TABLA COMPACTA -->
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h5 class="card-title mb-0">Productos del Presupuesto</h5>
                                         <span class="badge bg-primary" id="contador-productos">0 productos</span>
                                     </div>
                                     <div class="card-body">
-                                        <div id="lista-productos" class="mb-4">
-                                            <p class="text-muted text-center py-3">No hay productos agregados</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped compact-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="codigo-col">Código</th>
+                                                        <th class="cantidad-col">Cant</th>
+                                                        <th>Producto</th>
+                                                        <th class="precio-col">P.Unit</th>
+                                                        <th class="subtotal-col">Subtotal</th>
+                                                        <th class="acciones-col">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="lista-productos">
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted py-3">
+                                                            No hay productos agregados
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                         
                                         <!-- Totales -->
-                                        <div class="row">
+                                        <div class="row mt-4">
                                             <div class="col-md-6">
                                                 <div class="card bg-light">
-                                                    <div class="card-body">
-                                                        <h6 class="card-title">Subtotal</h6>
-                                                        <h5 class="text-primary" id="subtotal-display">Gs. 0</h5>
+                                                    <div class="card-body p-3">
+                                                        <h6 class="card-title mb-2">Subtotal</h6>
+                                                        <h5 class="text-primary mb-0" id="subtotal-display">Gs. 0</h5>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="card bg-light">
-                                                    <div class="card-body">
-                                                        <h6 class="card-title">Total</h6>
-                                                        <h4 class="text-success" id="total-display">Gs. 0</h4>
-                                                        <small id="total-usd-display" class="text-muted">$ 0.00</small>
+                                                <div class="card bg-success text-white">
+                                                    <div class="card-body p-3">
+                                                        <h6 class="card-title mb-2">Total</h6>
+                                                        <h4 class="mb-1" id="total-display">Gs. 0</h4>
+                                                        <small id="total-usd-display" class="opacity-75">$ 0.00</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -802,7 +835,7 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
 
                     <div class="row">
                         <div class="col-md-8">
-                            <!-- Productos del presupuesto - VERSIÓN COMPACTA -->
+                            <!-- Productos del presupuesto - VERSIÓN TABLA COMPACTA -->
                             <div class="card mb-4">
                                 <div class="card-header">
                                     <h5 class="card-title mb-0">Productos del Presupuesto</h5>
@@ -812,32 +845,32 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                         <table class="table table-striped compact-table mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th width="15%">Código</th>
-                                                    <th width="10%">Cantidad</th>
-                                                    <th width="45%">Producto</th>
-                                                    <th width="15%">P.Unit</th>
-                                                    <th width="15%">Subtotal</th>
+                                                    <th class="codigo-col">Código</th>
+                                                    <th class="cantidad-col">Cant</th>
+                                                    <th>Producto</th>
+                                                    <th class="precio-col">P.Unit</th>
+                                                    <th class="subtotal-col">Subtotal</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php foreach ($productos_presupuesto as $producto): ?>
                                                 <tr>
                                                     <td><strong class="text-primary"><?php echo $producto['codigo'] ?? 'Sin código'; ?></strong></td>
-                                                    <td><?php echo $producto['quantity']; ?></td>
+                                                    <td class="text-center"><?php echo $producto['quantity']; ?></td>
                                                     <td>
                                                         <strong><?php echo $producto['name']; ?></strong>
                                                         <?php if (isset($producto['categoria'])): ?>
                                                         <br><small class="text-muted"><?php echo $producto['categoria']; ?></small>
                                                         <?php endif; ?>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-end">
                                                         <?php if ($presupuesto['moneda'] == 'usd'): ?>
                                                             $ <?php echo number_format($producto['price'], 2, '.', ','); ?>
                                                         <?php else: ?>
                                                             Gs. <?php echo number_format($producto['price'], 0, ',', '.'); ?>
                                                         <?php endif; ?>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-end">
                                                         <strong class="text-success">
                                                             <?php if ($presupuesto['moneda'] == 'usd'): ?>
                                                                 $ <?php echo number_format($producto['price'] * $producto['quantity'], 2, '.', ','); ?>
@@ -1104,7 +1137,7 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
     $(document).ready(function() {
         $('#producto_selector').select2({
             language: 'es',
-            placeholder: 'Buscar producto por código, nombre, precio o categoría...',
+            placeholder: 'Buscar producto por código, nombre, precio, categoría o descripción...',
             minimumInputLength: 2,
             ajax: {
                 url: 'presupuestos.php?ajax_search=productos',
@@ -1228,13 +1261,13 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         cantidadInput.value = 1;
     }
 
-    // Función para actualizar la lista de productos en la interfaz - VERSIÓN COMPACTA
+    // Función para actualizar la lista de productos en la interfaz - VERSIÓN TABLA COMPACTA
     function actualizarListaProductos() {
         const lista = document.getElementById('lista-productos');
         const contador = document.getElementById('contador-productos');
         
         if (productosPresupuesto.length === 0) {
-            lista.innerHTML = '<p class="text-muted text-center py-3">No hay productos agregados</p>';
+            lista.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No hay productos agregados</td></tr>';
             contador.textContent = '0 productos';
             return;
         }
@@ -1262,39 +1295,29 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
             });
             
             html += `
-                <div class="producto-item-compact">
-                    <div class="row align-items-center">
-                        <!-- Código y Cantidad -->
-                        <div class="col-3">
-                            <div class="small text-muted">Código</div>
-                            <strong class="text-primary">${producto.codigo}</strong>
-                            <div class="small text-muted mt-1">Cantidad</div>
-                            <strong>${producto.quantity}</strong>
-                        </div>
-                        
-                        <!-- Producto y Categoría -->
-                        <div class="col-5">
-                            <div class="small text-muted">Producto</div>
-                            <strong>${producto.name}</strong>
-                            ${producto.categoria ? '<div class="small text-muted">' + producto.categoria + '</div>' : ''}
-                        </div>
-                        
-                        <!-- Precios -->
-                        <div class="col-3">
-                            <div class="small text-muted">P.Unit</div>
-                            <div class="small">${monedaActual === 'usd' ? '$' : 'Gs.'} ${precioFormateado}</div>
-                            <div class="small text-muted mt-1">Subtotal</div>
-                            <strong class="text-success">${monedaActual === 'usd' ? '$' : 'Gs.'} ${subtotalFormateado}</strong>
-                        </div>
-                        
-                        <!-- Botón Eliminar -->
-                        <div class="col-1 text-center">
-                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(${index})" title="Eliminar producto">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <tr class="producto-row">
+                    <td class="codigo-col">
+                        <strong class="text-primary">${producto.codigo}</strong>
+                    </td>
+                    <td class="cantidad-col">
+                        <strong>${producto.quantity}</strong>
+                    </td>
+                    <td>
+                        <div class="fw-bold">${producto.name}</div>
+                        ${producto.categoria ? '<small class="text-muted">' + producto.categoria + '</small>' : ''}
+                    </td>
+                    <td class="precio-col">
+                        ${monedaActual === 'usd' ? '$' : 'Gs.'} ${precioFormateado}
+                    </td>
+                    <td class="subtotal-col">
+                        <strong class="text-success">${monedaActual === 'usd' ? '$' : 'Gs.'} ${subtotalFormateado}</strong>
+                    </td>
+                    <td class="acciones-col">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(${index})" title="Eliminar producto">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </td>
+                </tr>
             `;
         });
         

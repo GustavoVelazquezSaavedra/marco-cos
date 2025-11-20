@@ -48,6 +48,12 @@ if (!$tipo_cambio) {
 if (!$tipo_cambio) {
     $tipo_cambio = ['compra' => 7000, 'venta' => 7100];
 }
+
+// Obtener categorías para el menú
+$queryCategorias = "SELECT * FROM categorias WHERE activo = 1 ORDER BY nombre";
+$stmtCategorias = $db->prepare($queryCategorias);
+$stmtCategorias->execute();
+$categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -58,58 +64,85 @@ if (!$tipo_cambio) {
     <title>Carrito de Compras - <?php echo $titulo_sistema; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="css/styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #e74c3c;
-            --accent-color: #3498db;
-            --text-dark: #2c3e50;
-            --text-light: #7f8c8d;
-            --bg-light: #f8f9fa;
-            --border-color: #e0e0e0;
+            --primary: #0a0a0a;
+            --secondary: #8b7d5a;
+            --accent: #b8a86d;
+            --light: #f8f9fa;
+            --dark: #1a1a1a;
+            --success: #9caf88;
+            --text-light: #e8e6e3;
+            --text-muted: #a5a5a5;
+            --gold-light: #d4c19c;
+            --gold-dark: #8b7d5a;
         }
         
         body {
-            font-family: 'Arial', sans-serif;
-            background: white;
-            color: var(--text-dark);
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--primary);
+            color: var(--text-light);
+            padding-top: 76px;
+            overflow-x: hidden;
+        }
+        
+        .title-font {
+            font-family: 'Playfair Display', serif;
         }
         
         /* Navbar estilo */
-        .navbar-bloom {
-            background: white;
-            border-bottom: 2px solid var(--border-color);
-            padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        .navbar {
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            z-index: 1030;
         }
         
-        .navbar-brand-bloom {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary-color) !important;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98) !important;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
         
-        .nav-link-bloom {
-            color: var(--text-dark) !important;
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin: 0 15px;
-            padding: 8px 0 !important;
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--accent) !important;
+        }
+        
+        .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
             position: relative;
+            margin: 0 5px;
+            padding: 8px 15px !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
         
-        .nav-link-bloom:hover,
-        .nav-link-bloom.active {
-            color: var(--primary-color) !important;
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(184, 168, 109, 0.1);
+            color: var(--accent) !important;
         }
         
-        .cart-icon-bloom {
-            color: var(--primary-color);
-            font-size: 1.4rem;
-            position: relative;
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15px;
+            right: 15px;
+            height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            transform: scaleX(1);
         }
         
         /* Cart Badge */
@@ -117,8 +150,8 @@ if (!$tipo_cambio) {
             position: absolute;
             top: -8px;
             right: -8px;
-            background: var(--secondary-color);
-            color: white;
+            background: var(--accent);
+            color: var(--primary);
             border-radius: 50%;
             width: 20px;
             height: 20px;
@@ -131,65 +164,119 @@ if (!$tipo_cambio) {
         
         /* Page Header */
         .page-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 0;
+            background: linear-gradient(135deg, rgba(10,10,10,0.9), rgba(26,26,26,0.8)), 
+                        url('https://images.unsplash.com/photo-1547887537-6158d64c35b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-light);
+            padding: 80px 0;
             margin-bottom: 40px;
             text-align: center;
         }
         
         .page-title {
-            font-size: 2.5rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--text-light);
         }
         
         .page-subtitle {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             opacity: 0.9;
+            color: var(--text-light);
         }
         
-        /* Cart Cards */
-        .cart-card {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+        /* Card Style */
+        .bloom-card {
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
-            margin-bottom: 20px;
-            background: white;
+            border: 1px solid rgba(139, 125, 90, 0.1);
+            position: relative;
+        }
+        
+        .bloom-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .bloom-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
+            border-color: rgba(184, 168, 109, 0.3);
+        }
+        
+        .bloom-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        /* Buttons */
+        .btn-bloom {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(184, 168, 109, 0.3);
+        }
+        
+        .btn-bloom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.4);
+            color: var(--primary);
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+        }
+        
+        .btn-outline-bloom {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
             transition: all 0.3s ease;
         }
         
-        .cart-card:hover {
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        .btn-outline-bloom:hover {
+            background: var(--accent);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.3);
         }
         
-        .cart-card .card-header {
-            background: var(--bg-light);
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 20px;
-            font-weight: 600;
-        }
-        
-        .summary-card {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            overflow: hidden;
-            background: white;
-        }
-        
-        .summary-card .card-header {
-            background: var(--primary-color);
+        .btn-danger-bloom {
+            background: #dc3545;
             color: white;
             border: none;
-            padding: 15px 20px;
+            border-radius: 6px;
+            padding: 8px 15px;
             font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger-bloom:hover {
+            background: #c82333;
+            transform: translateY(-1px);
         }
         
         /* Cart Items */
         .cart-item {
             transition: all 0.3s ease;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
         }
         
         .cart-item:last-child {
@@ -209,22 +296,22 @@ if (!$tipo_cambio) {
             height: 80px;
             object-fit: cover;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(139, 125, 90, 0.2);
         }
         
         .product-title {
             font-weight: 600;
-            color: var(--text-dark);
+            color: var(--text-light);
             margin-bottom: 5px;
         }
         
         .product-price {
-            color: var(--secondary-color);
+            color: var(--accent);
             font-weight: 600;
         }
         
         .product-price-usd {
-            color: var(--accent-color);
+            color: var(--text-muted);
             font-size: 0.85rem;
             font-weight: 500;
         }
@@ -232,9 +319,11 @@ if (!$tipo_cambio) {
         .quantity-input {
             width: 60px;
             text-align: center;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(139, 125, 90, 0.3);
             border-radius: 6px;
             padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
         }
         
         .btn-quantity {
@@ -243,71 +332,21 @@ if (!$tipo_cambio) {
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid var(--border-color);
-            background: white;
+            border: 1px solid rgba(139, 125, 90, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            transition: all 0.3s ease;
         }
         
         .btn-quantity:hover {
-            background: var(--bg-light);
-        }
-        
-        /* Buttons */
-        .btn-primary-bloom {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 12px 20px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary-bloom:hover {
-            background: #1a252f;
-        }
-        
-        .btn-success-bloom {
-            background: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 12px 20px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .btn-success-bloom:hover {
-            background: #c0392b;
-        }
-        
-        .btn-outline-primary-bloom {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            background: transparent;
-            border-radius: 6px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .btn-outline-primary-bloom:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-        
-        .btn-danger-bloom {
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-weight: 600;
+            background: rgba(184, 168, 109, 0.2);
+            border-color: var(--accent);
         }
         
         /* Empty Cart */
         .empty-cart-icon {
             font-size: 4rem;
-            color: var(--text-light);
+            color: var(--text-muted);
             margin-bottom: 1rem;
         }
         
@@ -324,8 +363,8 @@ if (!$tipo_cambio) {
         }
         
         .toast-success {
-            background: var(--secondary-color);
-            color: white;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
             border: none;
             border-radius: 8px;
         }
@@ -339,9 +378,9 @@ if (!$tipo_cambio) {
         
         /* Contact Card */
         .contact-card {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: white;
+            border: 1px solid rgba(139, 125, 90, 0.1);
+            border-radius: 12px;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
         }
         
         .contact-card .card-body {
@@ -351,12 +390,12 @@ if (!$tipo_cambio) {
         
         /* Exchange Rate Info */
         .exchange-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(184, 168, 109, 0.2), rgba(139, 125, 90, 0.1));
+            color: var(--text-light);
+            padding: 20px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            text-align: center;
+            border: 1px solid rgba(139, 125, 90, 0.2);
         }
         
         .exchange-info small {
@@ -366,29 +405,52 @@ if (!$tipo_cambio) {
         /* Summary USD */
         .summary-usd {
             font-size: 0.9rem;
-            color: var(--accent-color);
+            color: var(--text-muted);
             font-weight: 500;
         }
         
         /* Modal */
+        .modal-content {
+            background: var(--dark);
+            border: 1px solid rgba(139, 125, 90, 0.2);
+            border-radius: 16px;
+            color: var(--text-light);
+        }
+        
         .modal-header {
-            background: var(--primary-color);
-            color: white;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
             border: none;
+            padding: 20px;
         }
         
         .modal-header .btn-close {
-            filter: invert(1);
+            filter: brightness(0) invert(1);
+        }
+        
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(139, 125, 90, 0.3);
+            border-radius: 8px;
+            color: var(--text-light);
+            padding: 10px 15px;
+        }
+        
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.25rem rgba(184, 168, 109, 0.25);
+            color: var(--text-light);
         }
         
         /* Responsive */
         @media (max-width: 768px) {
-            .navbar-brand-bloom {
-                font-size: 1.6rem;
+            .navbar-brand {
+                font-size: 1.5rem;
             }
             
             .page-title {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
             
             .product-thumb {
@@ -397,29 +459,90 @@ if (!$tipo_cambio) {
             }
             
             .cart-item {
-                padding: 10px 0;
+                padding: 15px 0;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .btn-bloom, .btn-outline-bloom {
+                padding: 10px 20px;
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
 <body>
+    <!-- WhatsApp Float -->
+    <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="whatsapp-float" target="_blank" style="position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); z-index: 1000; transition: all 0.3s;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-bloom sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar">
         <div class="container">
-            <a class="navbar-brand navbar-brand-bloom" href="index.php">
-                <?php echo $titulo_sistema; ?>
+            <a class="navbar-brand" href="index.php">
+                <i class="fas fa-spa me-2"></i><?php echo $titulo_sistema; ?>
             </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link nav-link-bloom" href="index.php">
-                    <i class="fas fa-home me-1"></i>INICIO
+            
+            <!-- Iconos para mobile -->
+            <div class="mobile-icons d-lg-none">
+                <a href="catalogo.php" class="text-decoration-none">
+                    <i class="fas fa-store" style="color: var(--accent); font-size: 1.2rem;"></i>
                 </a>
-                <a class="nav-link nav-link-bloom" href="catalogo.php">
-                    <i class="fas fa-store me-1"></i>CATÁLOGO
-                </a>
-                <a class="nav-link nav-link-bloom position-relative" href="carrito.php">
-                    <i class="fas fa-shopping-bag cart-icon-bloom"></i>
+                
+                <a href="carrito.php" class="text-decoration-none position-relative ms-3">
+                    <i class="fas fa-shopping-bag" style="color: var(--accent); font-size: 1.2rem;"></i>
                     <span class="cart-badge-bloom" id="cart-count">0</span>
                 </a>
+            </div>
+            
+            <!-- Contenido del menú -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">INICIO</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            CATEGORÍAS
+                        </a>
+                        <ul class="dropdown-menu">
+                            <?php foreach ($categorias as $cat): ?>
+                            <li>
+                                <a class="dropdown-item" href="catalogo.php?categoria_id=<?php echo $cat['id']; ?>">
+                                    <?php echo $cat['nombre']; ?>
+                                </a>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="catalogo.php">CATÁLOGO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="carrito.php">CARRITO</a>
+                    </li>
+                </ul>
+                
+                <!-- Elementos para desktop -->
+                <div class="d-none d-lg-flex align-items-center">
+                    <div class="navbar-nav me-3">
+                        <a class="nav-link" href="catalogo.php">
+                            <i class="fas fa-store" style="color: var(--accent); font-size: 1.2rem;"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="navbar-nav">
+                        <a class="nav-link position-relative" href="carrito.php">
+                            <i class="fas fa-shopping-bag" style="color: var(--accent); font-size: 1.2rem;"></i>
+                            <span class="cart-badge-bloom" id="cart-count-desktop">0</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -437,9 +560,11 @@ if (!$tipo_cambio) {
 
     <div class="container py-4">
         <!-- Información del tipo de cambio -->
-        <div class="exchange-info">
+        <div class="exchange-info bloom-card">
             <div class="row align-items-center">
-                
+                <div class="col-md-6 text-center text-md-start">
+                    <strong><i class="fas fa-dollar-sign me-1"></i> Tipo de cambio: GS. <?php echo number_format($tipo_cambio['venta'], 0, ',', '.'); ?> por USD</strong>
+                </div>
                 <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
                     <small><i class="fas fa-info-circle me-1"></i> Los precios en USD se calculan con tipo de cambio venta</small>
                 </div>
@@ -448,12 +573,14 @@ if (!$tipo_cambio) {
 
         <div class="row">
             <div class="col-md-8">
-                <div class="cart-card">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Productos en el Carrito</h5>
-                        <button class="btn btn-danger-bloom btn-sm" id="clear-cart-btn" style="display: none;">
-                            <i class="fas fa-trash me-1"></i>Vaciar Carrito
-                        </button>
+                <div class="bloom-card">
+                    <div class="card-header" style="background: linear-gradient(135deg, var(--accent), var(--secondary)); color: var(--primary); border: none; padding: 15px 20px; font-weight: 600;">
+                        <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-shopping-cart me-2"></i>Productos en el Carrito</span>
+                            <button class="btn btn-danger-bloom btn-sm" id="clear-cart-btn" style="display: none;">
+                                <i class="fas fa-trash me-1"></i>Vaciar Carrito
+                            </button>
+                        </h5>
                     </div>
                     <div class="card-body">
                         <div class="cart-items-container" id="cart-items-container">
@@ -467,7 +594,7 @@ if (!$tipo_cambio) {
                                 </div>
                                 <h4 class="text-muted mb-3">Tu carrito está vacío</h4>
                                 <p class="text-muted mb-4">Agrega algunos productos para continuar</p>
-                                <a href="catalogo.php" class="btn btn-primary-bloom">
+                                <a href="catalogo.php" class="btn btn-bloom">
                                     <i class="fas fa-store me-2"></i>Ir a Comprar
                                 </a>
                             </div>
@@ -477,8 +604,8 @@ if (!$tipo_cambio) {
             </div>
             
             <div class="col-md-4">
-                <div class="summary-card sticky-top" style="top: 100px;">
-                    <div class="card-header">
+                <div class="bloom-card sticky-top" style="top: 100px;">
+                    <div class="card-header" style="background: linear-gradient(135deg, var(--accent), var(--secondary)); color: var(--primary); border: none; padding: 15px 20px; font-weight: 600;">
                         <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Resumen del Pedido</h5>
                     </div>
                     <div class="card-body">
@@ -494,7 +621,7 @@ if (!$tipo_cambio) {
                                 <span>Envío:</span>
                                 <span class="text-success">Gratis</span>
                             </div>
-                            <hr>
+                            <hr style="border-color: rgba(139, 125, 90, 0.3);">
                             <div class="d-flex justify-content-between mb-3">
                                 <div>
                                     <strong>Total:</strong>
@@ -505,10 +632,10 @@ if (!$tipo_cambio) {
                                     <div class="summary-usd" id="total-usd">USD 0.00</div>
                                 </div>
                             </div>
-                            <button class="btn btn-success-bloom w-100 mb-3" id="checkout-btn" disabled>
+                            <button class="btn btn-bloom w-100 mb-3" id="checkout-btn" disabled style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
                                 <i class="fab fa-whatsapp me-2"></i>Completar Pedido por WhatsApp
                             </button>
-                            <a href="catalogo.php" class="btn btn-outline-primary-bloom w-100">
+                            <a href="catalogo.php" class="btn btn-outline-bloom w-100">
                                 <i class="fas fa-arrow-left me-2"></i>Seguir Comprando
                             </a>
                         </div>
@@ -516,7 +643,7 @@ if (!$tipo_cambio) {
                 </div>
                 
                 <!-- Información de contacto -->
-                <div class="contact-card mt-4">
+                <div class="contact-card bloom-card mt-4">
                     <div class="card-body">
                         <h6 class="mb-3"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
                         <p class="small mb-3">
@@ -524,7 +651,7 @@ if (!$tipo_cambio) {
                             <i class="fas fa-phone me-1"></i>+595981934464<br>
                             <i class="fas fa-clock me-1"></i><?php echo $horario_empresa; ?>
                         </p>
-                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-success-bloom btn-sm w-100">
+                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-bloom btn-sm w-100" style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
                             <i class="fab fa-whatsapp me-1"></i>Contactar por WhatsApp
                         </a>
                     </div>
@@ -559,7 +686,7 @@ if (!$tipo_cambio) {
                         <small class="text-muted">Ej: 0972366265, 0985123456</small>
                     </div>
                     
-                    <div class="alert alert-info">
+                    <div class="alert" style="background: rgba(184, 168, 109, 0.1); border: 1px solid rgba(184, 168, 109, 0.3); color: var(--text-light);">
                         <small>
                             <i class="fas fa-info-circle me-1"></i>
                             Te contactaremos por WhatsApp para confirmar disponibilidad y coordinar el pago.
@@ -567,8 +694,8 @@ if (!$tipo_cambio) {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-primary-bloom" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-success-bloom" id="modal-confirm-btn">
+                    <button type="button" class="btn btn-outline-bloom" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-bloom" id="modal-confirm-btn" style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
                         <i class="fab fa-whatsapp me-2"></i>Enviar Pedido
                     </button>
                 </div>
@@ -663,8 +790,8 @@ if (!$tipo_cambio) {
                     <div class="col-3 col-md-2">
                         ${item.image ? 
                             `<img src="../uploads/products/${item.image}" class="product-thumb" alt="${item.name}">` :
-                            `<div class="product-thumb bg-light d-flex align-items-center justify-content-center">
-                                <i class="fas fa-gem text-muted"></i>
+                            `<div class="product-thumb bg-dark d-flex align-items-center justify-content-center">
+                                <i class="fas fa-spa text-accent"></i>
                             </div>`
                         }
                     </div>
@@ -711,6 +838,7 @@ if (!$tipo_cambio) {
     function updateCartCount() {
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         document.getElementById('cart-count').textContent = totalItems;
+        document.getElementById('cart-count-desktop').textContent = totalItems;
     }
     
     function updateClearCartButton() {
@@ -970,6 +1098,16 @@ if (!$tipo_cambio) {
                 e.target.value = 1;
                 updateQuantity(index, 1);
             }
+        }
+    });
+    
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
         }
     });
     

@@ -131,81 +131,132 @@ if (!empty($categoria_id)) {
     <title>Catálogo Completo - <?php echo $titulo_sistema; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="css/styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #e74c3c;
-            --accent-color: #3498db;
-            --text-dark: #2c3e50;
-            --text-light: #7f8c8d;
-            --bg-light: #f8f9fa;
-            --border-color: #e0e0e0;
+            --primary: #0a0a0a;
+            --secondary: #8b7d5a;
+            --accent: #b8a86d;
+            --light: #f8f9fa;
+            --dark: #1a1a1a;
+            --success: #9caf88;
+            --text-light: #e8e6e3;
+            --text-muted: #a5a5a5;
+            --gold-light: #d4c19c;
+            --gold-dark: #8b7d5a;
         }
         
         body {
-            font-family: 'Arial', sans-serif;
-            background: white;
-            color: var(--text-dark);
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--primary);
+            color: var(--text-light);
+            padding-top: 76px;
+            overflow-x: hidden;
+        }
+        
+        .title-font {
+            font-family: 'Playfair Display', serif;
         }
         
         /* Navbar estilo */
-        .navbar-bloom {
-            background: white;
-            border-bottom: 2px solid var(--border-color);
-            padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        .navbar {
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            z-index: 1030;
         }
         
-        .navbar-brand-bloom {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary-color) !important;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98) !important;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
         
-        .nav-link-bloom {
-            color: var(--text-dark) !important;
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin: 0 15px;
-            padding: 8px 0 !important;
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--accent) !important;
+        }
+        
+        .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
             position: relative;
+            margin: 0 5px;
+            padding: 8px 15px !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
         
-        .nav-link-bloom:hover,
-        .nav-link-bloom.active {
-            color: var(--primary-color) !important;
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(184, 168, 109, 0.1);
+            color: var(--accent) !important;
         }
         
-        .nav-link-bloom.active::after {
+        .nav-link::after {
             content: '';
             position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
+            bottom: 0;
+            left: 15px;
+            right: 15px;
             height: 2px;
-            background: var(--primary-color);
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
         
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            transform: scaleX(1);
+        }
+        
+        /* Dropdown styles */
+        .dropdown-menu {
+            background: var(--dark) !important;
+            border: 1px solid rgba(139, 125, 90, 0.2) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .dropdown-item {
+            color: var(--text-light) !important;
+            padding: 10px 15px !important;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(184, 168, 109, 0.1) !important;
+            color: var(--accent) !important;
+        }
+        
+        /* Search Container */
         .search-container {
             position: relative;
             margin-right: 20px;
         }
         
         .search-box-bloom {
-            border: 2px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(139, 125, 90, 0.3);
             border-radius: 25px;
             padding: 10px 45px 10px 20px;
             font-size: 0.9rem;
             width: 300px;
             transition: all 0.3s;
+            color: var(--text-light);
         }
         
         .search-box-bloom:focus {
-            border-color: var(--accent-color);
-            box-shadow: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.25rem rgba(184, 168, 109, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+        }
+        
+        .search-box-bloom::placeholder {
+            color: rgba(255, 255, 255, 0.6);
         }
         
         .search-icon-bloom {
@@ -213,71 +264,115 @@ if (!empty($categoria_id)) {
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-light);
+            color: var(--accent);
             background: none;
             border: none;
         }
         
-        .cart-icon-bloom {
-            color: var(--primary-color);
+        .cart-icon-bloom, .shop-icon-bloom {
+            color: var(--accent);
             font-size: 1.4rem;
+            transition: all 0.3s ease;
+        }
+        
+        .cart-icon-bloom:hover, .shop-icon-bloom:hover {
+            color: var(--text-light);
+            transform: scale(1.1);
+        }
+        
+        /* Card Style */
+        .bloom-card {
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            border: 1px solid rgba(139, 125, 90, 0.1);
             position: relative;
         }
         
-        .shop-icon-bloom {
-            color: var(--primary-color);
-            font-size: 1.4rem;
-            margin-right: 20px;
-        }
-        
-        /* Categorías badges */
-        .categorias-badge {
-            margin: 2px;
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 12px;
-        }
-        
-        .categorias-container {
-            min-height: 40px;
-            margin-bottom: 8px;
-        }
-        
-        /* Cart Badge */
-        .cart-badge-bloom {
+        .bloom-card::before {
+            content: '';
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--secondary-color);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .bloom-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
+            border-color: rgba(184, 168, 109, 0.3);
+        }
+        
+        .bloom-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        /* Buttons */
+        .btn-bloom {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(184, 168, 109, 0.3);
+        }
+        
+        .btn-bloom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.4);
+            color: var(--primary);
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+        }
+        
+        .btn-outline-bloom {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-bloom:hover {
+            background: var(--accent);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.3);
         }
         
         /* Page Header */
         .page-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 0;
+            background: linear-gradient(135deg, rgba(10,10,10,0.9), rgba(26,26,26,0.8)), 
+                        url('https://images.unsplash.com/photo-1547887537-6158d64c35b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-light);
+            padding: 80px 0;
             margin-bottom: 40px;
             text-align: center;
         }
         
         .page-title {
-            font-size: 2.5rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--text-light);
         }
         
         .page-subtitle {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             opacity: 0.9;
+            color: var(--text-light);
         }
         
         /* Filter Sidebar */
@@ -287,16 +382,16 @@ if (!empty($categoria_id)) {
         }
         
         .filter-card {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border: 1px solid rgba(139, 125, 90, 0.1);
+            border-radius: 12px;
             overflow: hidden;
             margin-bottom: 20px;
-            background: white;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
         }
         
         .filter-card .card-header {
-            background: var(--primary-color);
-            color: white;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
             border: none;
             padding: 15px 20px;
             font-weight: 600;
@@ -309,7 +404,7 @@ if (!empty($categoria_id)) {
         }
         
         .filter-list li {
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
         }
         
         .filter-list li:last-child {
@@ -319,29 +414,29 @@ if (!empty($categoria_id)) {
         .filter-list a {
             display: block;
             padding: 12px 20px;
-            color: var(--text-dark);
+            color: var(--text-light);
             text-decoration: none;
             transition: all 0.3s;
         }
         
         .filter-list a:hover,
         .filter-list a.active {
-            background: var(--bg-light);
-            color: var(--primary-color);
+            background: rgba(184, 168, 109, 0.1);
+            color: var(--accent);
         }
         
         .filter-list a.active {
             font-weight: 600;
-            border-left: 3px solid var(--primary-color);
+            border-left: 3px solid var(--accent);
         }
         
         /* Product Cards */
         .product-card-bloom {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border: 1px solid rgba(139, 125, 90, 0.1);
+            border-radius: 12px;
             overflow: hidden;
             margin-bottom: 25px;
-            background: white;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
             transition: all 0.3s ease;
             height: 100%;
             display: flex;
@@ -349,15 +444,16 @@ if (!empty($categoria_id)) {
         }
         
         .product-card-bloom:hover {
+            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: rgba(184, 168, 109, 0.3);
         }
         
         .product-image-bloom {
-            height: 200px;
+            height: 250px;
             object-fit: cover;
             width: 100%;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
         }
         
         .product-info-bloom {
@@ -371,12 +467,12 @@ if (!empty($categoria_id)) {
             font-weight: 600;
             font-size: 1.1rem;
             margin-bottom: 8px;
-            color: var(--text-dark);
+            color: var(--text-light);
             min-height: 40px;
         }
         
         .product-description-bloom {
-            color: var(--text-light);
+            color: var(--text-muted);
             font-size: 0.85rem;
             margin-bottom: 10px;
             line-height: 1.4;
@@ -384,24 +480,17 @@ if (!empty($categoria_id)) {
             min-height: 40px;
         }
         
-        .product-meta-bloom {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-bottom: 15px;
-        }
-        
         .product-price-bloom {
             font-size: 1.3rem;
             font-weight: 700;
-            color: var(--secondary-color);
-            margin-bottom: 5px;
+            color: var(--accent);
+            margin-bottom: 15px;
         }
         
-        .product-price-usd {
+        .price-usd {
             font-size: 0.9rem;
-            color: var(--accent-color);
-            font-weight: 600;
-            margin-bottom: 15px;
+            color: var(--text-muted);
+            font-weight: 500;
         }
         
         .product-actions-bloom {
@@ -409,11 +498,11 @@ if (!empty($categoria_id)) {
         }
         
         .btn-add-cart-bloom {
-            background: var(--primary-color);
-            color: white;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
             border: none;
-            border-radius: 6px;
-            padding: 10px 15px;
+            border-radius: 8px;
+            padding: 12px 15px;
             font-size: 0.9rem;
             font-weight: 600;
             width: 100%;
@@ -426,36 +515,174 @@ if (!empty($categoria_id)) {
         }
         
         .btn-add-cart-bloom:hover {
-            background: #1a252f;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            transform: translateY(-2px);
         }
         
         .btn-details-bloom {
-            color: var(--accent-color);
+            color: var(--accent);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
             text-align: center;
             display: block;
             padding: 8px;
+            transition: all 0.3s ease;
         }
         
         .btn-details-bloom:hover {
-            color: var(--primary-color);
+            color: var(--text-light);
         }
         
-        .btn-outline-primary-bloom {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            background: transparent;
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-weight: 600;
+        /* Categorías badges */
+        .categorias-badge {
+            margin: 2px;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(184, 168, 109, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(184, 168, 109, 0.3);
+        }
+        
+        .categorias-container {
+            min-height: 40px;
+            margin-bottom: 8px;
+        }
+        
+        /* Section Titles */
+        .section-title-bloom {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        .section-subtitle-bloom {
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+        
+        .section-divider {
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            margin-bottom: 3rem;
+        }
+        
+        /* Contact Card */
+        .contact-card {
+            border: 1px solid rgba(139, 125, 90, 0.1);
+            border-radius: 12px;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+        }
+        
+        .contact-card .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* Footer */
+        .footer-bloom {
+            background: var(--dark);
+            color: var(--text-light);
+            padding: 60px 0 20px;
+            border-top: 3px solid var(--accent);
+        }
+        
+        .footer-title-bloom {
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+        
+        .footer-links-bloom a {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links-bloom a:hover {
+            color: var(--accent);
+        }
+        
+        /* WhatsApp Float */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
             transition: all 0.3s;
         }
         
-        .btn-outline-primary-bloom:hover {
-            background: var(--primary-color);
-            color: white;
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+        
+        /* Cart Badge */
+        .cart-badge-bloom {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        /* Mobile Styles */
+        .mobile-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mobile-search-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 1.2rem;
+            padding: 5px;
+        }
+        
+        /* Modal Styles */
+        .search-modal-bloom .modal-content {
+            background: var(--dark);
+            border: 1px solid rgba(139, 125, 90, 0.2);
+            border-radius: 16px;
+            color: var(--text-light);
+        }
+        
+        .search-modal-bloom .modal-header {
+            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            padding: 20px;
+        }
+        
+        .search-modal-bloom .modal-body {
+            padding: 20px;
         }
         
         /* Stock Badges */
@@ -469,60 +696,21 @@ if (!empty($categoria_id)) {
             font-weight: 600;
         }
         
-        /* Contact Card */
-        .contact-card {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: white;
-        }
-        
-        .contact-card .card-body {
-            padding: 20px;
-            text-align: center;
-        }
-        
-        /* Footer */
-        .footer-bloom {
-            background: var(--primary-color);
-            color: white;
-            padding: 40px 0 20px;
-            border-top: 3px solid var(--secondary-color);
-        }
-        
-        .footer-title-bloom {
-            font-weight: 700;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-        }
-        
-        .footer-links-bloom a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 8px;
-            transition: color 0.3s;
-            font-size: 0.9rem;
-        }
-        
-        .footer-links-bloom a:hover {
-            color: white;
-        }
-        
-        /* Mobile Responsive */
+        /* Responsive */
         @media (max-width: 768px) {
-            .navbar-brand-bloom {
-                font-size: 1.6rem;
+            .navbar-brand {
+                font-size: 1.5rem;
             }
             
             .search-box-bloom {
                 width: 250px;
             }
             
-            .page-title {
+            .section-title-bloom {
                 font-size: 2rem;
             }
             
-            .nav-link-bloom {
+            .nav-link {
                 margin: 0 8px;
                 font-size: 0.9rem;
             }
@@ -532,14 +720,22 @@ if (!empty($categoria_id)) {
                 min-height: auto;
             }
             
-            .filter-sidebar {
-                position: static;
-                margin-bottom: 30px;
+            .mobile-icons {
+                gap: 10px;
             }
             
             .categorias-badge {
                 font-size: 0.65rem;
                 padding: 3px 6px;
+            }
+            
+            .filter-sidebar {
+                position: static;
+                margin-bottom: 30px;
+            }
+            
+            .page-title {
+                font-size: 2.2rem;
             }
         }
         
@@ -552,36 +748,45 @@ if (!empty($categoria_id)) {
             .search-box-bloom {
                 width: 100%;
             }
+            
+            .section-title-bloom {
+                font-size: 1.8rem;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- WhatsApp Float -->
+    <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-bloom sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar">
         <div class="container">
-            <a class="navbar-brand navbar-brand-bloom" href="index.php">
-                <?php echo $titulo_sistema; ?>
+            <a class="navbar-brand" href="index.php">
+                <i class="fas fa-spa me-2"></i><?php echo $titulo_sistema; ?>
             </a>
             
             <!-- Iconos para mobile -->
             <div class="mobile-icons d-lg-none">
-                <!-- Botón de búsqueda -->
                 <button class="mobile-search-btn" type="button" data-bs-toggle="modal" data-bs-target="#searchModal">
                     <i class="fas fa-search"></i>
                 </button>
                 
-                <!-- Icono de tienda -->
                 <a href="catalogo.php" class="text-decoration-none">
                     <i class="fas fa-store shop-icon-bloom"></i>
                 </a>
                 
-                <!-- Carrito -->
                 <a href="carrito.php" class="text-decoration-none position-relative">
                     <i class="fas fa-shopping-bag cart-icon-bloom"></i>
                     <span class="cart-badge-bloom" id="cart-count">0</span>
                 </a>
                 
-                <!-- Botón hamburguesa -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -591,23 +796,35 @@ if (!empty($categoria_id)) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link nav-link-bloom" href="index.php">INICIO</a>
+                        <a class="nav-link" href="index.php">INICIO</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            CATEGORÍAS
+                        </a>
+                        <ul class="dropdown-menu">
+                            <?php foreach ($categorias as $cat): ?>
+                            <li>
+                                <a class="dropdown-item" href="catalogo.php?categoria_id=<?php echo $cat['id']; ?>">
+                                    <?php echo $cat['nombre']; ?>
+                                </a>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-bloom active" href="catalogo.php">CATÁLOGO</a>
+                        <a class="nav-link active" href="catalogo.php">CATÁLOGO</a>
                     </li>
                 </ul>
                 
                 <!-- Elementos para desktop -->
                 <div class="d-none d-lg-flex align-items-center">
-                    <!-- Icono de tienda -->
                     <div class="navbar-nav me-3">
                         <a class="nav-link" href="catalogo.php">
                             <i class="fas fa-store shop-icon-bloom"></i>
                         </a>
                     </div>
                     
-                    <!-- Buscador -->
                     <div class="search-container">
                         <form method="GET" action="catalogo.php" class="position-relative">
                             <input class="form-control search-box-bloom" type="search" name="search" placeholder="Buscar productos..." 
@@ -618,7 +835,6 @@ if (!empty($categoria_id)) {
                         </form>
                     </div>
                     
-                    <!-- Carrito -->
                     <div class="navbar-nav">
                         <a class="nav-link position-relative" href="carrito.php">
                             <i class="fas fa-shopping-bag cart-icon-bloom"></i>
@@ -631,19 +847,19 @@ if (!empty($categoria_id)) {
     </nav>
 
     <!-- Modal de búsqueda para mobile -->
-    <div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade search-modal-bloom" id="searchModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Buscar productos</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form method="GET" action="catalogo.php">
                         <div class="input-group">
                             <input type="search" name="search" class="form-control" placeholder="Buscar productos..." 
                                    value="<?php echo htmlspecialchars($search); ?>">
-                            <button class="btn btn-primary" type="submit">
+                            <button class="btn btn-bloom" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
@@ -667,7 +883,7 @@ if (!empty($categoria_id)) {
             <div class="col-md-3">
                 <div class="filter-sidebar">
                     <!-- Filtro por Categoría -->
-                    <div class="filter-card">
+                    <div class="filter-card bloom-card">
                         <div class="card-header">
                             <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filtrar por Categoría</h6>
                         </div>
@@ -691,7 +907,7 @@ if (!empty($categoria_id)) {
                     </div>
                     
                     <!-- Ordenar -->
-                    <div class="filter-card">
+                    <div class="filter-card bloom-card">
                         <div class="card-header">
                             <h6 class="mb-0"><i class="fas fa-sort me-2"></i>Ordenar por</h6>
                         </div>
@@ -731,7 +947,7 @@ if (!empty($categoria_id)) {
                     </div>
 
                     <!-- Información de contacto -->
-                    <div class="contact-card mt-4">
+                    <div class="contact-card bloom-card mt-4">
                         <div class="card-body">
                             <h6 class="mb-3"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
                             <p class="small mb-3">
@@ -743,7 +959,6 @@ if (!empty($categoria_id)) {
                             <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-success btn-sm w-100">
                                 <i class="fab fa-whatsapp me-1"></i>WhatsApp
                             </a>
-                            
                         </div>
                     </div>
                 </div>
@@ -769,7 +984,7 @@ if (!empty($categoria_id)) {
                     </div>
                     
                     <?php if (!empty($search) || !empty($categoria_id)): ?>
-                    <a href="catalogo.php" class="btn btn-outline-primary-bloom">
+                    <a href="catalogo.php" class="btn btn-outline-bloom">
                         <i class="fas fa-times me-1"></i>Limpiar filtros
                     </a>
                     <?php endif; ?>
@@ -779,16 +994,18 @@ if (!empty($categoria_id)) {
                 <div class="row">
                     <?php if (empty($productos)): ?>
                     <div class="col-12 text-center py-5">
-                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted mb-3">No se encontraron productos</h4>
-                        <p class="text-muted mb-4">Intenta con otros términos de búsqueda o categorías</p>
-                        <div class="d-flex gap-2 justify-content-center flex-wrap">
-                            <a href="catalogo.php" class="btn btn-primary-bloom">
-                                <i class="fas fa-th-large me-1"></i>Ver Todo el Catálogo
-                            </a>
-                            <a href="index.php" class="btn btn-outline-primary-bloom">
-                                <i class="fas fa-home me-1"></i>Volver al Inicio
-                            </a>
+                        <div class="bloom-card p-5">
+                            <i class="fas fa-search fa-3x text-accent mb-3"></i>
+                            <h4 class="text-muted mb-3">No se encontraron productos</h4>
+                            <p class="text-muted mb-4">Intenta con otros términos de búsqueda o categorías</p>
+                            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                <a href="catalogo.php" class="btn btn-bloom">
+                                    <i class="fas fa-th-large me-1"></i>Ver Todo el Catálogo
+                                </a>
+                                <a href="index.php" class="btn btn-outline-bloom">
+                                    <i class="fas fa-home me-1"></i>Volver al Inicio
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <?php else: ?>
@@ -797,14 +1014,14 @@ if (!empty($categoria_id)) {
                         $precio_usd = $producto['precio_publico'] / $tipo_cambio['venta'];
                     ?>
                     <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="product-card-bloom">
+                        <div class="product-card-bloom bloom-card">
                             <div class="position-relative">
                                 <?php if (!empty($producto['imagen'])): ?>
                                 <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
                                      class="product-image-bloom" alt="<?php echo $producto['nombre']; ?>">
                                 <?php else: ?>
-                                <div class="product-image-bloom bg-light d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-gem fa-2x text-muted"></i>
+                                <div class="product-image-bloom bg-dark d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-spa fa-3x text-accent"></i>
                                 </div>
                                 <?php endif; ?>
                                 
@@ -828,7 +1045,7 @@ if (!empty($categoria_id)) {
                                         <?php 
                                         $categorias_array = explode(', ', $producto['categorias_nombres']);
                                         foreach (array_slice($categorias_array, 0, 2) as $categoria): ?>
-                                            <span class="badge bg-primary categorias-badge"><?php echo $categoria; ?></span>
+                                            <span class="badge categorias-badge"><?php echo $categoria; ?></span>
                                         <?php endforeach; ?>
                                         <?php if (count($categorias_array) > 2): ?>
                                             <span class="badge bg-secondary categorias-badge">+<?php echo count($categorias_array) - 2; ?> más</span>
@@ -839,10 +1056,11 @@ if (!empty($categoria_id)) {
                                 </div>
                                 
                                 <div class="product-price-bloom">
-                                    GS. <?php echo number_format($producto['precio_publico'], 0, ',', '.'); ?>
-                                </div>
-                                <div class="product-price-usd">
-                                    <i class="fas fa-dollar-sign me-1"></i>USD <?php echo number_format($precio_usd, 2, '.', ','); ?>
+                                    <?php 
+                                    $precios = formatPrecioDual($producto['precio_publico']);
+                                    ?>
+                                    <div class="fw-bold"><?php echo $precios['gs']; ?></div>
+                                    <div class="price-usd"><?php echo $precios['usd']; ?></div>
                                 </div>
                                 
                                 <div class="product-actions-bloom">
@@ -860,7 +1078,7 @@ if (!empty($categoria_id)) {
                                     </a>
                                     <?php else: ?>
                                     <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
-                                       target="_blank" class="btn btn-outline-primary-bloom w-100 mb-2">
+                                       target="_blank" class="btn btn-outline-bloom w-100 mb-2">
                                         <i class="fab fa-whatsapp me-1"></i>Consultar Stock
                                     </a>
                                     <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn-details-bloom">
@@ -879,8 +1097,8 @@ if (!empty($categoria_id)) {
                 <?php if (count($productos) > 12): ?>
                 <div class="row mt-4">
                     <div class="col-12 text-center">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
+                        <div class="alert bloom-card p-3" style="background: rgba(184, 168, 109, 0.1); border: 1px solid rgba(184, 168, 109, 0.3);">
+                            <i class="fas fa-info-circle me-2 text-accent"></i>
                             Mostrando <?php echo count($productos); ?> productos. Usa los filtros para encontrar lo que buscas.
                         </div>
                     </div>
@@ -893,32 +1111,62 @@ if (!empty($categoria_id)) {
     <!-- Footer -->
     <footer class="footer-bloom">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="footer-title-bloom"><?php echo $titulo_sistema; ?></h5>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales.</p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="footer-title-bloom">CONTACTO</h5>
-                    <div class="footer-links-bloom">
-                        <p><i class="fas fa-phone me-2"></i><?php echo $telefono_empresa; ?></p>
-                        <p><i class="fas fa-phone me-2"></i>+595981934464</p>
-
-                        <p><i class="fas fa-envelope me-2"></i><?php echo $email_empresa; ?></p>
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <i class="fas fa-spa fs-2 me-2" style="color: var(--accent);"></i>
+                        <h3 class="title-font h4 mb-0"><?php echo $titulo_sistema; ?></h3>
+                    </div>
+                    <p class="mb-4"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales. Descubre la esencia de la elegancia en cada fragancia.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="footer-title-bloom">ENLACES RÁPIDOS</h5>
-                    <div class="footer-links-bloom">
-                        <a href="index.php">Inicio</a>
-                        <a href="catalogo.php">Catálogo</a>
-                        <a href="carrito.php">Carrito</a>
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-title-bloom">Enlaces</h5>
+                    <ul class="list-unstyled footer-links-bloom">
+                        <li><a href="index.php">Inicio</a></li>
+                        <li><a href="catalogo.php">Catálogo</a></li>
+                        <li><a href="carrito.php">Carrito</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-title-bloom">Contacto</h5>
+                    <ul class="list-unstyled footer-links-bloom">
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-phone me-2 mt-1" style="color: var(--accent);"></i>
+                            <span><?php echo $telefono_empresa; ?></span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-envelope me-2 mt-1" style="color: var(--accent);"></i>
+                            <span><?php echo $email_empresa; ?></span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-map-marker-alt me-2 mt-1" style="color: var(--accent);"></i>
+                            <span>CDE - Paraguay</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h5 class="footer-title-bloom">Newsletter</h5>
+                    <p class="mb-3">Suscríbete para recibir novedades y ofertas exclusivas.</p>
+                    <div class="d-flex">
+                        <input type="email" class="form-control me-2" placeholder="Tu correo" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139,125,90,0.3); color: white;">
+                        <button class="btn btn-bloom">Enviar</button>
                     </div>
                 </div>
             </div>
-            <hr style="border-color: rgba(255,255,255,0.2);">
+            <hr class="my-5" style="border-color: rgba(255,255,255,0.1);">
             <div class="text-center">
-                <small style="color: rgba(255,255,255,0.7);">&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados, <a href="https://www.facebook.com/gustavogabriel.velazquez1/">Desarrollador</a>.</small>
+                <p>&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1/" style="color: var(--accent);">Desarrollador</a></p>
             </div>
         </div>
     </footer>
@@ -960,26 +1208,60 @@ if (!empty($categoria_id)) {
             localStorage.setItem('bloom_cart', JSON.stringify(cart));
             updateCartCount();
             
-            // Mostrar notificación simple
-            const toast = document.createElement('div');
-            toast.className = 'position-fixed top-0 end-0 p-3';
-            toast.style.zIndex = '9999';
-            toast.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>¡Éxito!</strong> ${productName} agregado al carrito.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            // Mostrar notificación
+            showToast('¡Producto agregado!', `${productName} se agregó al carrito`, 'success');
+        });
+        
+        // Función para mostrar notificaciones
+        function showToast(title, message, type = 'info') {
+            // Crear toast dinámico
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'warning'} border-0 position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <strong>${title}</strong><br>${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
                 </div>
             `;
-            document.body.appendChild(toast);
             
-            // Auto-remover después de 3 segundos
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
+            $('body').append(toastHtml);
+            const toast = new bootstrap.Toast($('.toast').last()[0]);
+            toast.show();
+            
+            // Remover después de cerrar
+            $('.toast').last().on('hidden.bs.toast', function () {
+                $(this).remove();
+            });
+        }
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
         });
         
         // Inicializar contador del carrito
         updateCartCount();
+        
+        // Smooth scroll para enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>

@@ -172,8 +172,9 @@ if ($action == 'list') {
         
         // Aplicar filtros
         if (!empty($search)) {
-            $query .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.codigo LIKE ?)";
+            $query .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.codigo LIKE ? OR c.nombre LIKE ?)";
             $searchTerm = "%$search%";
+            $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
@@ -328,6 +329,72 @@ if ($action == 'create') {
             color: white;
             margin-right: 4px;
         }
+        
+        /* Estilos compactos para tabla de productos */
+        .compact-table {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+        
+        .compact-table th {
+            padding: 8px 6px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 0.8rem;
+        }
+        
+        .compact-table td {
+            padding: 6px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .compact-table .btn-sm {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.75rem;
+        }
+        
+        .product-row:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .codigo-col {
+            width: 100px;
+            font-weight: 600;
+        }
+        
+        .nombre-col {
+            min-width: 200px;
+        }
+        
+        .categorias-col {
+            min-width: 150px;
+        }
+        
+        .precio-col {
+            width: 120px;
+            text-align: right;
+        }
+        
+        .stock-col {
+            width: 100px;
+            text-align: center;
+        }
+        
+        .estado-col {
+            width: 90px;
+            text-align: center;
+        }
+        
+        .acciones-col {
+            width: 90px;
+            text-align: center;
+        }
+        
+        .imagen-col {
+            width: 70px;
+        }
     </style>
 </head>
 <body>
@@ -436,7 +503,7 @@ if ($action == 'create') {
                                 <div class="col-md-4">
                                     <label for="search" class="form-label">Buscar</label>
                                     <input type="text" class="form-control" id="search" name="search" 
-                                           value="<?php echo $search; ?>" placeholder="Nombre, descripción o código...">
+                                           value="<?php echo $search; ?>" placeholder="Nombre, descripción, código o categoría...">
                                 </div>
                                 
                                 <div class="col-md-3">
@@ -470,22 +537,22 @@ if ($action == 'create') {
                         </div>
                     </div>
 
-                    <!-- Tabla de productos -->
+                    <!-- Tabla de productos - VERSIÓN COMPACTA -->
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-striped table-hover">
+                                <table class="table table-striped table-hover compact-table">
                                     <thead>
                                         <tr>
-                                            <th>Imagen</th>
-                                            <th>Código</th>
-                                            <th>Nombre</th>
-                                            <th>Categorías</th>
-                                            <th>Precio Público</th>
-                                            <th>Precio Real</th>
-                                            <th>Stock</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
+                                            <th class="imagen-col">Imagen</th>
+                                            <th class="codigo-col">Código</th>
+                                            <th class="nombre-col">Nombre</th>
+                                            <th class="categorias-col">Categorías</th>
+                                            <th class="precio-col">P. Público</th>
+                                            <th class="precio-col">P. Real</th>
+                                            <th class="stock-col">Stock</th>
+                                            <th class="estado-col">Estado</th>
+                                            <th class="acciones-col">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -498,8 +565,8 @@ if ($action == 'create') {
                                         </tr>
                                         <?php else: ?>
                                         <?php foreach ($productos as $prod): ?>
-                                        <tr>
-                                            <td>
+                                        <tr class="product-row">
+                                            <td class="imagen-col">
                                                 <?php if (!empty($prod['imagen'])): ?>
                                                 <img src="../uploads/products/<?php echo $prod['imagen']; ?>" 
                                                      alt="<?php echo $prod['nombre']; ?>" class="product-image">
@@ -509,14 +576,14 @@ if ($action == 'create') {
                                                 </div>
                                                 <?php endif; ?>
                                             </td>
-                                            <td>
-                                                <strong><?php echo $prod['codigo']; ?></strong>
+                                            <td class="codigo-col">
+                                                <strong class="text-primary"><?php echo $prod['codigo']; ?></strong>
                                             </td>
-                                            <td>
+                                            <td class="nombre-col">
                                                 <div class="fw-bold"><?php echo $prod['nombre']; ?></div>
                                                 <small class="text-muted"><?php echo substr($prod['descripcion'], 0, 50); ?>...</small>
                                             </td>
-                                            <td>
+                                            <td class="categorias-col">
                                                 <?php if (!empty($prod['categorias_nombres'])): ?>
                                                     <?php 
                                                     $categorias_array = explode(', ', $prod['categorias_nombres']);
@@ -527,7 +594,7 @@ if ($action == 'create') {
                                                     <span class="badge bg-secondary categorias-badge">Sin categorías</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td>
+                                            <td class="precio-col">
                                                 <?php 
                                                 $precios_publico = formatPrecioDual($prod['precio_publico']);
                                                 ?>
@@ -535,7 +602,7 @@ if ($action == 'create') {
                                                 <br>
                                                 <small class="price-usd"><?php echo $precios_publico['usd']; ?></small>
                                             </td>
-                                            <td>
+                                            <td class="precio-col">
                                                 <?php 
                                                 $precios_real = formatPrecioDual($prod['precio_real']);
                                                 ?>
@@ -552,17 +619,17 @@ if ($action == 'create') {
                                                     (<?php echo number_format($margen, 1); ?>%)
                                                 </small>
                                             </td>
-                                            <td>
+                                            <td class="stock-col">
                                                 <span class="badge bg-<?php echo $prod['stock'] > 10 ? 'success' : ($prod['stock'] > 0 ? 'warning' : 'danger'); ?>">
-                                                    <?php echo $prod['stock']; ?> unidades
+                                                    <?php echo $prod['stock']; ?>
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td class="estado-col">
                                                 <span class="badge bg-<?php echo $prod['activo'] ? 'success' : 'secondary'; ?>">
                                                     <?php echo $prod['activo'] ? 'Activo' : 'Inactivo'; ?>
                                                 </span>
                                             </td>
-                                            <td class="table-actions">
+                                            <td class="acciones-col table-actions">
                                                 <a href="?action=edit&id=<?php echo $prod['id']; ?>" class="btn btn-sm btn-warning" title="Editar">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
