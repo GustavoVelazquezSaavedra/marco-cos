@@ -156,15 +156,15 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
     <style>
         :root {
             --primary: #0a0a0a;
-            --secondary: #8b7d5a;
-            --accent: #b8a86d;
+            --secondary: #c8c8c8;
+            --accent: #e8e8e8;
             --light: #f8f9fa;
             --dark: #1a1a1a;
-            --success: #9caf88;
+            --success: #afafaf;
             --text-light: #e8e6e3;
             --text-muted: #a5a5a5;
-            --gold-light: #d4c19c;
-            --gold-dark: #8b7d5a;
+            --gold-light: #f0f0f0;
+            --gold-dark: #d0d0d0;
         }
         
         body {
@@ -184,7 +184,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             background: rgba(10, 10, 10, 0.95) !important;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.2);
             z-index: 1030;
         }
         
@@ -212,7 +212,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         
         .nav-link:hover,
         .nav-link.active {
-            background: rgba(184, 168, 109, 0.1);
+            background: rgba(232, 232, 232, 0.1);
             color: var(--accent) !important;
         }
         
@@ -236,7 +236,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         /* Dropdown styles */
         .dropdown-menu {
             background: var(--dark) !important;
-            border: 1px solid rgba(139, 125, 90, 0.2) !important;
+            border: 1px solid rgba(200, 200, 200, 0.2) !important;
             border-radius: 8px !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         }
@@ -248,7 +248,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         }
         
         .dropdown-item:hover {
-            background: rgba(184, 168, 109, 0.1) !important;
+            background: rgba(232, 232, 232, 0.1) !important;
             color: var(--accent) !important;
         }
         
@@ -260,7 +260,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         
         .search-box-bloom {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(139, 125, 90, 0.3);
+            border: 1px solid rgba(200, 200, 200, 0.3);
             border-radius: 25px;
             padding: 10px 45px 10px 20px;
             font-size: 0.9rem;
@@ -271,7 +271,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         
         .search-box-bloom:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 0.25rem rgba(184, 168, 109, 0.25);
+            box-shadow: 0 0 0 0.25rem rgba(232, 232, 232, 0.25);
             background: rgba(255, 255, 255, 0.08);
             color: var(--text-light);
         }
@@ -308,7 +308,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             position: relative;
         }
         
@@ -326,8 +326,8 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         
         .bloom-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
-            border-color: rgba(184, 168, 109, 0.3);
+            box-shadow: 0 15px 35px rgba(232, 232, 232, 0.15);
+            border-color: rgba(232, 232, 232, 0.3);
         }
         
         .bloom-card:hover::before {
@@ -343,12 +343,12 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 600;
             padding: 12px 30px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 4px 12px rgba(232, 232, 232, 0.3);
         }
         
         .btn-bloom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.4);
+            box-shadow: 0 6px 20px rgba(232, 232, 232, 0.4);
             color: var(--primary);
             background: linear-gradient(135deg, var(--secondary), var(--accent));
         }
@@ -367,10 +367,14 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             background: var(--accent);
             color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 6px 20px rgba(232, 232, 232, 0.3);
         }
         
-        /* Slider Styles - Controles discretos */
+        /* ==================== */
+        /* ESTILOS DE IMÁGENES MEJORADOS */
+        /* ==================== */
+        
+        /* Slider Styles - IMÁGENES COMPLETAS */
         .slider-section {
             background: var(--primary);
             padding: 0;
@@ -383,7 +387,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         }
         
         .carousel-item {
-            height: 500px;
+            height: 600px; /* Altura fija para el slider */
             transition: transform 0.6s ease-in-out;
         }
         
@@ -394,7 +398,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             width: 100%;
             height: 100%;
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
         }
         
@@ -425,74 +429,15 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             padding: 8px 20px;
             border-radius: 50px;
             font-size: 0.8rem;
-            box-shadow: 0 4px 12px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 4px 12px rgba(232, 232, 232, 0.3);
             margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
-        /* Controles del slider discretos */
-        .carousel-control-prev,
-        .carousel-control-next {
-            width: 40px;
-            height: 40px;
-            background: rgba(184, 168, 109, 0.1);
-            border-radius: 50%;
-            top: 50%;
-            transform: translateY(-50%);
-            margin: 0 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(184, 168, 109, 0.2);
-            transition: all 0.3s ease;
-            opacity: 0.7;
-        }
-        
-        .carousel-control-prev:hover,
-        .carousel-control-next:hover {
-            background: rgba(184, 168, 109, 0.3);
-            opacity: 1;
-            transform: translateY(-50%) scale(1.1);
-        }
-        
-        .carousel-control-prev {
-            left: 10px;
-        }
-        
-        .carousel-control-next {
-            right: 10px;
-        }
-        
-        .carousel-control-prev-icon,
-        .carousel-control-next-icon {
-            width: 20px;
-            height: 20px;
-            filter: brightness(0) invert(1);
-        }
-        
-        /* Indicadores discretos */
-        .carousel-indicators {
-            bottom: 20px;
-            margin: 0;
-        }
-        
-        .carousel-indicators button {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin: 0 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border: none;
-            transition: all 0.3s ease;
-        }
-        
-        .carousel-indicators button.active {
-            background: var(--accent);
-            transform: scale(1.2);
-        }
-        
-        /* Product Cards */
+        /* Product Cards - IMÁGENES UNIFORMES */
         .product-card-bloom {
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 25px;
@@ -504,16 +449,32 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         }
         
         .product-card-bloom:hover {
-            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
+            box-shadow: 0 15px 35px rgba(232, 232, 232, 0.15);
             transform: translateY(-5px);
-            border-color: rgba(184, 168, 109, 0.3);
+            border-color: rgba(232, 232, 232, 0.3);
+        }
+        
+        .product-image-container {
+            height: 300px; /* Altura fija para imágenes de productos */
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .product-image-bloom {
-            height: 250px;
-            object-fit: cover;
             width: 100%;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+            height: 100%;
+            object-fit: contain; /* Muestra toda la imagen sin recortar */
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card-bloom:hover .product-image-bloom {
+            transform: scale(1.05);
         }
         
         .product-info-bloom {
@@ -594,15 +555,80 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             color: var(--text-light);
         }
         
+        /* Categories Section - IMÁGENES UNIFORMES */
+        .categories-section-bloom {
+            background: var(--dark);
+            padding: 80px 0;
+            border-top: 1px solid rgba(200, 200, 200, 0.1);
+        }
+        
+        .category-card-bloom {
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            border: 1px solid rgba(200, 200, 200, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .category-card-bloom:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+        
+        .category-image-container {
+            height: 250px; /* Altura fija para imágenes de categorías */
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background: var(--dark);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .category-image-bloom {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Muestra toda la imagen sin recortar */
+            padding: 15px;
+            transition: transform 0.3s ease;
+        }
+        
+        .category-card-bloom:hover .category-image-bloom {
+            transform: scale(1.05);
+        }
+        
+        .category-title-bloom {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .category-description-bloom {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        
         /* Categorías badges */
         .categorias-badge {
             margin: 2px;
             font-size: 0.7rem;
             padding: 4px 8px;
             border-radius: 12px;
-            background: rgba(184, 168, 109, 0.15);
+            background: rgba(232, 232, 232, 0.15);
             color: var(--accent);
-            border: 1px solid rgba(184, 168, 109, 0.3);
+            border: 1px solid rgba(232, 232, 232, 0.3);
         }
         
         .categorias-container {
@@ -634,49 +660,63 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             margin: 0 auto 3rem;
         }
         
-        /* Categories Section - NUEVO ESTILO */
-        .categories-section-bloom {
-            background: var(--dark);
-            padding: 80px 0;
-            border-top: 1px solid rgba(139, 125, 90, 0.1);
+        /* Controles del slider discretos */
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 40px;
+            height: 40px;
+            background: rgba(232, 232, 232, 0.1);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin: 0 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(232, 232, 232, 0.2);
+            transition: all 0.3s ease;
+            opacity: 0.7;
         }
         
-        .category-card-bloom {
-            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
-            border: 1px solid rgba(139, 125, 90, 0.1);
-            border-radius: 12px;
-            padding: 30px 25px;
-            text-align: center;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            height: 100%;
+        .carousel-control-prev:hover,
+        .carousel-control-next:hover {
+            background: rgba(232, 232, 232, 0.3);
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
         }
         
-        .category-card-bloom:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px);
+        .carousel-control-prev {
+            left: 10px;
         }
         
-        .category-image-bloom {
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            width: 100%;
+        .carousel-control-next {
+            right: 10px;
         }
         
-        .category-title-bloom {
-            font-weight: 600;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: var(--accent);
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1);
         }
         
-        .category-description-bloom {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
+        /* Indicadores discretos */
+        .carousel-indicators {
+            bottom: 20px;
+            margin: 0;
+        }
+        
+        .carousel-indicators button {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin: 0 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .carousel-indicators button.active {
+            background: var(--accent);
+            transform: scale(1.2);
         }
         
         /* Footer */
@@ -766,13 +806,13 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         /* Modal Styles */
         .search-modal-bloom .modal-content {
             background: var(--dark);
-            border: 1px solid rgba(139, 125, 90, 0.2);
+            border: 1px solid rgba(200, 200, 200, 0.2);
             border-radius: 16px;
             color: var(--text-light);
         }
         
         .search-modal-bloom .modal-header {
-            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.2);
             padding: 20px;
         }
         
@@ -780,7 +820,10 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
             padding: 20px;
         }
         
-        /* Responsive */
+        /* ==================== */
+        /* RESPONSIVE MEJORADO */
+        /* ==================== */
+        
         @media (max-width: 768px) {
             .navbar-brand {
                 font-size: 1.5rem;
@@ -813,12 +856,22 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                 padding: 3px 6px;
             }
             
+            /* SLIDER EN MOBILE */
             .carousel-item {
-                height: 450px;
+                height: 500px !important;
             }
             
             .slider-content {
                 padding: 0 1rem;
+                text-align: center;
+            }
+            
+            .display-4 {
+                font-size: 2rem !important;
+            }
+            
+            .lead {
+                font-size: 1rem !important;
             }
             
             .carousel-control-prev,
@@ -826,6 +879,24 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                 width: 35px;
                 height: 35px;
                 margin: 0 5px;
+            }
+            
+            /* IMÁGENES DE PRODUCTOS EN MOBILE */
+            .product-image-container {
+                height: 250px !important;
+            }
+            
+            .product-image-bloom {
+                padding: 15px;
+            }
+            
+            /* IMÁGENES DE CATEGORÍAS EN MOBILE */
+            .category-image-container {
+                height: 200px !important;
+            }
+            
+            .category-image-bloom {
+                padding: 10px;
             }
         }
         
@@ -843,13 +914,42 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                 font-size: 1.8rem;
             }
             
+            /* SLIDER EN MÓVILES PEQUEÑOS */
             .carousel-item {
-                height: 400px;
+                height: 400px !important;
             }
             
             .carousel-control-prev,
             .carousel-control-next {
                 display: none;
+            }
+            
+            .slider-content .row {
+                margin: 0;
+            }
+            
+            .slider-content .col-lg-8 {
+                padding: 0;
+            }
+            
+            /* BOTONES EN MOBILE PEQUEÑO */
+            .btn-bloom, .btn-outline-bloom {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .d-flex.gap-3 {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            /* IMÁGENES EN MÓVILES PEQUEÑOS */
+            .product-image-container {
+                height: 220px !important;
+            }
+            
+            .category-image-container {
+                height: 180px !important;
             }
         }
     </style>
@@ -1113,14 +1213,12 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                     <?php foreach ($productos_destacados as $producto): ?>
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="product-card-bloom bloom-card">
-                            <div class="position-relative">
+                            <div class="product-image-container">
                                 <?php if (!empty($producto['imagen'])): ?>
                                 <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
                                      class="product-image-bloom" alt="<?php echo $producto['nombre']; ?>">
                                 <?php else: ?>
-                                <div class="product-image-bloom bg-dark d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-spa fa-3x text-accent"></i>
-                                </div>
+                                <i class="fas fa-spa fa-4x text-accent"></i>
                                 <?php endif; ?>
                             </div>
                             
@@ -1221,14 +1319,12 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                     <?php foreach ($productos as $producto): ?>
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="product-card-bloom bloom-card">
-                            <div class="position-relative">
+                            <div class="product-image-container">
                                 <?php if (!empty($producto['imagen'])): ?>
                                 <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
                                      class="product-image-bloom" alt="<?php echo $producto['nombre']; ?>">
                                 <?php else: ?>
-                                <div class="product-image-bloom bg-dark d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-spa fa-3x text-accent"></i>
-                                </div>
+                                <i class="fas fa-spa fa-4x text-accent"></i>
                                 <?php endif; ?>
                             </div>
                             
@@ -1293,7 +1389,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </section>
 
-    <!-- Categorías ORGANIZADAS - SECCIÓN CORREGIDA -->
+    <!-- Categorías ORGANIZADAS -->
     <section class="categories-section-bloom">
         <div class="container">
             <h2 class="section-title-bloom">Nuestras Categorías</h2>
@@ -1309,14 +1405,14 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                 <?php foreach ($categoriasOrganizadas['masculino'] as $categoria): ?>
                 <div class="col-md-4 col-sm-6 mb-4">
                     <div class="category-card-bloom bloom-card">
-                        <?php if (!empty($categoria['imagen_aleatoria'])): ?>
-                        <img src="../uploads/products/<?php echo $categoria['imagen_aleatoria']; ?>" 
-                             class="category-image-bloom" alt="<?php echo $categoria['nombre']; ?>">
-                        <?php else: ?>
-                        <div class="category-image-bloom bg-dark d-flex align-items-center justify-content-center">
-                            <i class="fas fa-mars fa-3x text-accent"></i>
+                        <div class="category-image-container">
+                            <?php if (!empty($categoria['imagen_aleatoria'])): ?>
+                            <img src="../uploads/products/<?php echo $categoria['imagen_aleatoria']; ?>" 
+                                 class="category-image-bloom" alt="<?php echo $categoria['nombre']; ?>">
+                            <?php else: ?>
+                            <i class="fas fa-mars fa-4x text-accent"></i>
+                            <?php endif; ?>
                         </div>
-                        <?php endif; ?>
                         <h4 class="category-title-bloom"><?php echo $categoria['nombre']; ?></h4>
                         <p class="category-description-bloom">
                             <?php echo !empty($categoria['descripcion']) ? $categoria['descripcion'] : 'Descubre nuestra exclusiva colección de perfumes masculinos'; ?>
@@ -1339,14 +1435,14 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                 <?php foreach ($categoriasOrganizadas['femenino'] as $categoria): ?>
                 <div class="col-md-4 col-sm-6 mb-4">
                     <div class="category-card-bloom bloom-card">
-                        <?php if (!empty($categoria['imagen_aleatoria'])): ?>
-                        <img src="../uploads/products/<?php echo $categoria['imagen_aleatoria']; ?>" 
-                             class="category-image-bloom" alt="<?php echo $categoria['nombre']; ?>">
-                        <?php else: ?>
-                        <div class="category-image-bloom bg-dark d-flex align-items-center justify-content-center">
-                            <i class="fas fa-venus fa-3x text-accent"></i>
+                        <div class="category-image-container">
+                            <?php if (!empty($categoria['imagen_aleatoria'])): ?>
+                            <img src="../uploads/products/<?php echo $categoria['imagen_aleatoria']; ?>" 
+                                 class="category-image-bloom" alt="<?php echo $categoria['nombre']; ?>">
+                            <?php else: ?>
+                            <i class="fas fa-venus fa-4x text-accent"></i>
+                            <?php endif; ?>
                         </div>
-                        <?php endif; ?>
                         <h4 class="category-title-bloom"><?php echo $categoria['nombre']; ?></h4>
                         <p class="category-description-bloom">
                             <?php echo !empty($categoria['descripcion']) ? $categoria['descripcion'] : 'Fragancias femeninas que realzan tu belleza interior'; ?>
@@ -1369,14 +1465,14 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                 <?php foreach ($categoriasOrganizadas['arabe'] as $categoria): ?>
                 <div class="col-md-4 col-sm-6 mb-4">
                     <div class="category-card-bloom bloom-card">
-                        <?php if (!empty($categoria['imagen_aleatoria'])): ?>
-                        <img src="../uploads/products/<?php echo $categoria['imagen_aleatoria']; ?>" 
-                             class="category-image-bloom" alt="<?php echo $categoria['nombre']; ?>">
-                        <?php else: ?>
-                        <div class="category-image-bloom bg-dark d-flex align-items-center justify-content-center">
-                            <i class="fas fa-gem fa-3x text-accent"></i>
+                        <div class="category-image-container">
+                            <?php if (!empty($categoria['imagen_aleatoria'])): ?>
+                            <img src="../uploads/products/<?php echo $categoria['imagen_aleatoria']; ?>" 
+                                 class="category-image-bloom" alt="<?php echo $categoria['nombre']; ?>">
+                            <?php else: ?>
+                            <i class="fas fa-gem fa-4x text-accent"></i>
+                            <?php endif; ?>
                         </div>
-                        <?php endif; ?>
                         <h4 class="category-title-bloom"><?php echo $categoria['nombre']; ?></h4>
                         <p class="category-description-bloom">
                             <?php echo !empty($categoria['descripcion']) ? $categoria['descripcion'] : 'Fragancias árabes de lujo con esencias exóticas'; ?>
@@ -1399,14 +1495,14 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                 <?php foreach ($categoriasOrganizadas['marcas'] as $categoria): ?>
                 <div class="col-md-3 col-sm-6 mb-4">
                     <div class="category-card-bloom bloom-card">
-                        <?php if (!empty($categoria['imagen_aleatoria'])): ?>
-                        <img src="../uploads/products/<?php echo $categoria['imagen_aleatoria']; ?>" 
-                             class="category-image-bloom" alt="<?php echo $categoria['nombre']; ?>">
-                        <?php else: ?>
-                        <div class="category-image-bloom bg-dark d-flex align-items-center justify-content-center">
-                            <i class="fas fa-crown fa-3x text-accent"></i>
+                        <div class="category-image-container">
+                            <?php if (!empty($categoria['imagen_aleatoria'])): ?>
+                            <img src="../uploads/products/<?php echo $categoria['imagen_aleatoria']; ?>" 
+                                 class="category-image-bloom" alt="<?php echo $categoria['nombre']; ?>">
+                            <?php else: ?>
+                            <i class="fas fa-crown fa-4x text-accent"></i>
+                            <?php endif; ?>
                         </div>
-                        <?php endif; ?>
                         <h4 class="category-title-bloom"><?php echo $categoria['nombre']; ?></h4>
                         <a href="?categoria_id=<?php echo $categoria['id']; ?>" class="btn btn-outline-bloom btn-sm">
                             Ver Productos
@@ -1470,7 +1566,7 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                     <h5 class="footer-title-bloom">Newsletter</h5>
                     <p class="mb-3">Suscríbete para recibir novedades y ofertas exclusivas.</p>
                     <div class="d-flex">
-                        <input type="email" class="form-control me-2" placeholder="Tu correo" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139,125,90,0.3); color: white;">
+                        <input type="email" class="form-control me-2" placeholder="Tu correo" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(200,200,200,0.3); color: white;">
                         <button class="btn btn-bloom">Enviar</button>
                     </div>
                 </div>

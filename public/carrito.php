@@ -68,15 +68,15 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
     <style>
         :root {
             --primary: #0a0a0a;
-            --secondary: #8b7d5a;
-            --accent: #b8a86d;
+            --secondary: #c8c8c8;
+            --accent: #e8e8e8;
             --light: #f8f9fa;
             --dark: #1a1a1a;
-            --success: #9caf88;
+            --success: #afafaf;
             --text-light: #e8e6e3;
             --text-muted: #a5a5a5;
-            --gold-light: #d4c19c;
-            --gold-dark: #8b7d5a;
+            --gold-light: #f0f0f0;
+            --gold-dark: #d0d0d0;
         }
         
         body {
@@ -96,7 +96,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             background: rgba(10, 10, 10, 0.95) !important;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.2);
             z-index: 1030;
         }
         
@@ -124,7 +124,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         .nav-link:hover,
         .nav-link.active {
-            background: rgba(184, 168, 109, 0.1);
+            background: rgba(232, 232, 232, 0.1);
             color: var(--accent) !important;
         }
         
@@ -179,7 +179,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             font-size: 3rem;
             font-weight: 700;
             margin-bottom: 15px;
-            color: var(--text-light);
+            color: var(--accent);
         }
         
         .page-subtitle {
@@ -195,7 +195,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             position: relative;
         }
         
@@ -213,8 +213,8 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         .bloom-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
-            border-color: rgba(184, 168, 109, 0.3);
+            box-shadow: 0 15px 35px rgba(232, 232, 232, 0.15);
+            border-color: rgba(232, 232, 232, 0.3);
         }
         
         .bloom-card:hover::before {
@@ -230,12 +230,12 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 600;
             padding: 12px 30px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 4px 12px rgba(232, 232, 232, 0.3);
         }
         
         .btn-bloom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.4);
+            box-shadow: 0 6px 20px rgba(232, 232, 232, 0.4);
             color: var(--primary);
             background: linear-gradient(135deg, var(--secondary), var(--accent));
         }
@@ -254,7 +254,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             background: var(--accent);
             color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 6px 20px rgba(232, 232, 232, 0.3);
         }
         
         .btn-danger-bloom {
@@ -272,11 +272,33 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             transform: translateY(-1px);
         }
         
-        /* Cart Items */
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            color: white;
+            background: linear-gradient(135deg, #128C7E, #25D366);
+        }
+        
+        /* ==================== */
+        /* ESTILOS DE IMÁGENES MEJORADOS */
+        /* ==================== */
+        
+        /* Cart Items - IMÁGENES UNIFORMES */
         .cart-item {
             transition: all 0.3s ease;
             padding: 20px 0;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.1);
         }
         
         .cart-item:last-child {
@@ -291,12 +313,28 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             overflow: hidden;
         }
         
-        .product-thumb {
+        .product-thumb-container {
             width: 80px;
             height: 80px;
-            object-fit: cover;
             border-radius: 8px;
-            border: 1px solid rgba(139, 125, 90, 0.2);
+            border: 1px solid rgba(200, 200, 200, 0.2);
+            overflow: hidden;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Muestra toda la imagen sin recortar */
+            padding: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .cart-item:hover .product-thumb {
+            transform: scale(1.05);
         }
         
         .product-title {
@@ -319,7 +357,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         .quantity-input {
             width: 60px;
             text-align: center;
-            border: 1px solid rgba(139, 125, 90, 0.3);
+            border: 1px solid rgba(200, 200, 200, 0.3);
             border-radius: 6px;
             padding: 5px;
             background: rgba(255, 255, 255, 0.05);
@@ -332,14 +370,14 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(139, 125, 90, 0.3);
+            border: 1px solid rgba(200, 200, 200, 0.3);
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-light);
             transition: all 0.3s ease;
         }
         
         .btn-quantity:hover {
-            background: rgba(184, 168, 109, 0.2);
+            background: rgba(232, 232, 232, 0.2);
             border-color: var(--accent);
         }
         
@@ -378,7 +416,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         /* Contact Card */
         .contact-card {
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             border-radius: 12px;
             background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
         }
@@ -390,16 +428,17 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         /* Exchange Rate Info */
         .exchange-info {
-            background: linear-gradient(135deg, rgba(184, 168, 109, 0.2), rgba(139, 125, 90, 0.1));
+            background: linear-gradient(135deg, rgba(232, 232, 232, 0.2), rgba(200, 200, 200, 0.1));
             color: var(--text-light);
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 20px;
-            border: 1px solid rgba(139, 125, 90, 0.2);
+            border: 1px solid rgba(200, 200, 200, 0.2);
         }
         
         .exchange-info small {
             opacity: 0.9;
+            color: var(--text-light);
         }
         
         /* Summary USD */
@@ -409,10 +448,19 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 500;
         }
         
+        /* Text Colors Fix */
+        .text-success {
+            color: #25D366 !important;
+        }
+        
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
         /* Modal */
         .modal-content {
             background: var(--dark);
-            border: 1px solid rgba(139, 125, 90, 0.2);
+            border: 1px solid rgba(200, 200, 200, 0.2);
             border-radius: 16px;
             color: var(--text-light);
         }
@@ -430,7 +478,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         .form-control {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(139, 125, 90, 0.3);
+            border: 1px solid rgba(200, 200, 200, 0.3);
             border-radius: 8px;
             color: var(--text-light);
             padding: 10px 15px;
@@ -439,11 +487,44 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         .form-control:focus {
             background: rgba(255, 255, 255, 0.08);
             border-color: var(--accent);
-            box-shadow: 0 0 0 0.25rem rgba(184, 168, 109, 0.25);
+            box-shadow: 0 0 0 0.25rem rgba(232, 232, 232, 0.25);
             color: var(--text-light);
         }
         
-        /* Responsive */
+        .form-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        /* WhatsApp Float */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+            color: white;
+        }
+        
+        /* ==================== */
+        /* RESPONSIVE MEJORADO */
+        /* ==================== */
+        
         @media (max-width: 768px) {
             .navbar-brand {
                 font-size: 1.5rem;
@@ -453,13 +534,28 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                 font-size: 2.2rem;
             }
             
-            .product-thumb {
+            .product-thumb-container {
                 width: 60px;
                 height: 60px;
             }
             
+            .product-thumb {
+                padding: 5px;
+            }
+            
             .cart-item {
                 padding: 15px 0;
+            }
+            
+            .btn-bloom, .btn-outline-bloom, .btn-whatsapp {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .mobile-icons {
+                display: flex;
+                align-items: center;
+                gap: 15px;
             }
         }
         
@@ -468,8 +564,35 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                 font-size: 1.8rem;
             }
             
-            .btn-bloom, .btn-outline-bloom {
-                padding: 10px 20px;
+            .product-thumb-container {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .product-title {
+                font-size: 0.9rem;
+            }
+            
+            .product-price, .product-price-usd {
+                font-size: 0.8rem;
+            }
+            
+            .quantity-input {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .btn-quantity {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+            
+            .exchange-info {
+                padding: 15px;
+            }
+            
+            .exchange-info strong {
                 font-size: 0.9rem;
             }
         }
@@ -477,7 +600,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <!-- WhatsApp Float -->
-    <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="whatsapp-float" target="_blank" style="position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); z-index: 1000; transition: all 0.3s;">
+    <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -498,6 +621,10 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                     <i class="fas fa-shopping-bag" style="color: var(--accent); font-size: 1.2rem;"></i>
                     <span class="cart-badge-bloom" id="cart-count">0</span>
                 </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             </div>
             
             <!-- Contenido del menú -->
@@ -611,28 +738,28 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card-body">
                         <div id="order-summary">
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Subtotal:</span>
+                                <span style="color: var(--text-light);">Subtotal:</span>
                                 <div class="text-end">
-                                    <div id="subtotal">GS. 0</div>
+                                    <div id="subtotal" style="color: var(--accent); font-weight: 600;">GS. 0</div>
                                     <div class="summary-usd" id="subtotal-usd">USD 0.00</div>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Envío:</span>
+                                <span style="color: var(--text-light);">Envío:</span>
                                 <span class="text-success">Gratis</span>
                             </div>
-                            <hr style="border-color: rgba(139, 125, 90, 0.3);">
+                            <hr style="border-color: rgba(200, 200, 200, 0.3);">
                             <div class="d-flex justify-content-between mb-3">
                                 <div>
-                                    <strong>Total:</strong>
+                                    <strong style="color: var(--text-light);">Total:</strong>
                                     <div class="summary-usd" id="total-usd-label">USD 0.00</div>
                                 </div>
                                 <div class="text-end">
-                                    <strong id="total" class="text-success">GS. 0</strong>
+                                    <strong id="total" class="text-success" style="font-size: 1.2rem;">GS. 0</strong>
                                     <div class="summary-usd" id="total-usd">USD 0.00</div>
                                 </div>
                             </div>
-                            <button class="btn btn-bloom w-100 mb-3" id="checkout-btn" disabled style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
+                            <button class="btn btn-whatsapp w-100 mb-3" id="checkout-btn" disabled>
                                 <i class="fab fa-whatsapp me-2"></i>Completar Pedido por WhatsApp
                             </button>
                             <a href="catalogo.php" class="btn btn-outline-bloom w-100">
@@ -645,13 +772,13 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                 <!-- Información de contacto -->
                 <div class="contact-card bloom-card mt-4">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
-                        <p class="small mb-3">
+                        <h6 class="mb-3" style="color: var(--accent);"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
+                        <p class="small mb-3" style="color: var(--text-light);">
                             <i class="fas fa-phone me-1"></i><?php echo $telefono_empresa; ?><br>
                             <i class="fas fa-phone me-1"></i>+595981934464<br>
                             <i class="fas fa-clock me-1"></i><?php echo $horario_empresa; ?>
                         </p>
-                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-bloom btn-sm w-100" style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
+                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-whatsapp btn-sm w-100">
                             <i class="fab fa-whatsapp me-1"></i>Contactar por WhatsApp
                         </a>
                     </div>
@@ -686,7 +813,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                         <small class="text-muted">Ej: 0972366265, 0985123456</small>
                     </div>
                     
-                    <div class="alert" style="background: rgba(184, 168, 109, 0.1); border: 1px solid rgba(184, 168, 109, 0.3); color: var(--text-light);">
+                    <div class="alert" style="background: rgba(232, 232, 232, 0.1); border: 1px solid rgba(232, 232, 232, 0.3); color: var(--text-light);">
                         <small>
                             <i class="fas fa-info-circle me-1"></i>
                             Te contactaremos por WhatsApp para confirmar disponibilidad y coordinar el pago.
@@ -695,7 +822,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-bloom" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-bloom" id="modal-confirm-btn" style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
+                    <button type="button" class="btn btn-whatsapp" id="modal-confirm-btn">
                         <i class="fab fa-whatsapp me-2"></i>Enviar Pedido
                     </button>
                 </div>
@@ -788,12 +915,12 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             html += `
                 <div class="cart-item row align-items-center" id="cart-item-${index}">
                     <div class="col-3 col-md-2">
-                        ${item.image ? 
-                            `<img src="../uploads/products/${item.image}" class="product-thumb" alt="${item.name}">` :
-                            `<div class="product-thumb bg-dark d-flex align-items-center justify-content-center">
-                                <i class="fas fa-spa text-accent"></i>
-                            </div>`
-                        }
+                        <div class="product-thumb-container">
+                            ${item.image ? 
+                                `<img src="../uploads/products/${item.image}" class="product-thumb" alt="${item.name}">` :
+                                `<i class="fas fa-spa text-accent"></i>`
+                            }
+                        </div>
                     </div>
                     <div class="col-5 col-md-4">
                         <h6 class="product-title mb-1">${item.name}</h6>

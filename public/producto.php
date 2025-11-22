@@ -103,15 +103,16 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
     <style>
         :root {
             --primary: #0a0a0a;
-            --secondary: #8b7d5a;
-            --accent: #b8a86d;
+            --secondary: #c8c8c8;
+            --accent: #e8e8e8;
             --light: #f8f9fa;
             --dark: #1a1a1a;
-            --success: #9caf88;
-            --text-light: #e8e6e3;
-            --text-muted: #a5a5a5;
-            --gold-light: #d4c19c;
-            --gold-dark: #8b7d5a;
+            --success: #afafaf;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --text-dark: #e8e6e3;
+            --gold-light: #f0f0f0;
+            --gold-dark: #d0d0d0;
         }
         
         body {
@@ -131,7 +132,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             background: rgba(10, 10, 10, 0.95) !important;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.2);
             z-index: 1030;
         }
         
@@ -159,7 +160,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         .nav-link:hover,
         .nav-link.active {
-            background: rgba(184, 168, 109, 0.1);
+            background: rgba(232, 232, 232, 0.1);
             color: var(--accent) !important;
         }
         
@@ -183,7 +184,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         /* Dropdown styles */
         .dropdown-menu {
             background: var(--dark) !important;
-            border: 1px solid rgba(139, 125, 90, 0.2) !important;
+            border: 1px solid rgba(200, 200, 200, 0.2) !important;
             border-radius: 8px !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         }
@@ -195,7 +196,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         }
         
         .dropdown-item:hover {
-            background: rgba(184, 168, 109, 0.1) !important;
+            background: rgba(232, 232, 232, 0.1) !important;
             color: var(--accent) !important;
         }
         
@@ -233,7 +234,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             font-size: 3rem;
             font-weight: 700;
             margin-bottom: 15px;
-            color: var(--text-light);
+            color: var(--accent);
         }
         
         .page-subtitle {
@@ -249,7 +250,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             position: relative;
         }
         
@@ -267,8 +268,8 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         .bloom-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
-            border-color: rgba(184, 168, 109, 0.3);
+            box-shadow: 0 15px 35px rgba(232, 232, 232, 0.15);
+            border-color: rgba(232, 232, 232, 0.3);
         }
         
         .bloom-card:hover::before {
@@ -284,12 +285,12 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 600;
             padding: 12px 30px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 4px 12px rgba(232, 232, 232, 0.3);
         }
         
         .btn-bloom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.4);
+            box-shadow: 0 6px 20px rgba(232, 232, 232, 0.4);
             color: var(--primary);
             background: linear-gradient(135deg, var(--secondary), var(--accent));
         }
@@ -308,36 +309,82 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             background: var(--accent);
             color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 6px 20px rgba(232, 232, 232, 0.3);
         }
         
-        /* Product Gallery */
-        .product-image {
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            color: white;
+            background: linear-gradient(135deg, #128C7E, #25D366);
+        }
+        
+        /* ==================== */
+        /* ESTILOS DE IMÁGENES MEJORADOS */
+        /* ==================== */
+        
+        /* Product Gallery - IMÁGENES UNIFORMES */
+        .product-image-container {
+            height: 500px; /* Altura fija para imagen principal */
             width: 100%;
-            max-height: 500px;
-            object-fit: cover;
+            overflow: hidden;
+            position: relative;
+            background: var(--dark);
             border-radius: 12px;
-            border: 1px solid rgba(139, 125, 90, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .product-image-bloom {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Muestra toda la imagen sin recortar */
+            padding: 30px;
+            transition: transform 0.3s ease;
         }
         
         .product-gallery {
             margin-top: 15px;
         }
         
-        .gallery-thumb {
+        .gallery-thumb-container {
             width: 80px;
             height: 80px;
-            object-fit: cover;
             border-radius: 8px;
-            cursor: pointer;
+            overflow: hidden;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 2px solid transparent;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         
-        .gallery-thumb:hover,
-        .gallery-thumb.active {
+        .gallery-thumb-container:hover,
+        .gallery-thumb-container.active {
             border-color: var(--accent);
             transform: scale(1.05);
+        }
+        
+        .gallery-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
         }
         
         /* Product Details */
@@ -368,7 +415,8 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         .product-features li {
             padding: 10px 0;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.1);
+            color: var(--text-light);
         }
         
         .product-features li:last-child {
@@ -387,9 +435,9 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             font-size: 0.7rem;
             padding: 4px 8px;
             border-radius: 12px;
-            background: rgba(184, 168, 109, 0.15);
+            background: rgba(232, 232, 232, 0.15);
             color: var(--accent);
-            border: 1px solid rgba(184, 168, 109, 0.3);
+            border: 1px solid rgba(232, 232, 232, 0.3);
         }
         
         .breadcrumb-category {
@@ -405,7 +453,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         .breadcrumb-bloom {
             background: rgba(26, 26, 26, 0.8);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.1);
         }
         
         .breadcrumb-bloom .breadcrumb-item a {
@@ -426,7 +474,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         .quantity-input {
             width: 80px;
             text-align: center;
-            border: 1px solid rgba(139, 125, 90, 0.3);
+            border: 1px solid rgba(200, 200, 200, 0.3);
             border-radius: 8px;
             padding: 10px;
             background: rgba(255, 255, 255, 0.05);
@@ -436,13 +484,14 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         
         .quantity-input:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 0.25rem rgba(184, 168, 109, 0.25);
+            box-shadow: 0 0 0 0.25rem rgba(232, 232, 232, 0.25);
             background: rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
         }
         
-        /* Related Products */
+        /* Related Products - IMÁGENES UNIFORMES */
         .related-product-card {
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 25px;
@@ -454,16 +503,32 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         }
         
         .related-product-card:hover {
-            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
+            box-shadow: 0 15px 35px rgba(232, 232, 232, 0.15);
             transform: translateY(-5px);
-            border-color: rgba(184, 168, 109, 0.3);
+            border-color: rgba(232, 232, 232, 0.3);
+        }
+        
+        .related-product-image-container {
+            height: 200px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .related-product-image {
-            height: 200px;
-            object-fit: cover;
             width: 100%;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+            height: 100%;
+            object-fit: contain;
+            padding: 15px;
+            transition: transform 0.3s ease;
+        }
+        
+        .related-product-card:hover .related-product-image {
+            transform: scale(1.05);
         }
         
         /* WhatsApp Float */
@@ -488,6 +553,21 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         .whatsapp-float:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        
+        .toast-success {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
         }
         
         /* Footer */
@@ -518,22 +598,51 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             color: var(--accent);
         }
         
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1050;
+        /* Text Colors Fix */
+        .text-muted {
+            color: var(--text-muted) !important;
         }
         
-        .toast-success {
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            color: var(--primary);
-            border: none;
+        .text-light {
+            color: var(--text-light) !important;
+        }
+        
+        .text-dark {
+            color: var(--text-dark) !important;
+        }
+        
+        /* Form Controls */
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 200, 200, 0.3);
             border-radius: 8px;
+            color: var(--text-light);
+            padding: 10px 15px;
         }
         
-        /* Responsive */
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.25rem rgba(232, 232, 232, 0.25);
+            color: var(--text-light);
+        }
+        
+        .form-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        /* Mobile Styles */
+        .mobile-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* ==================== */
+        /* RESPONSIVE MEJORADO */
+        /* ==================== */
+        
         @media (max-width: 768px) {
             .navbar-brand {
                 font-size: 1.5rem;
@@ -547,9 +656,31 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                 font-size: 2rem;
             }
             
-            .gallery-thumb {
+            .gallery-thumb-container {
                 width: 60px;
                 height: 60px;
+            }
+            
+            /* IMÁGENES EN MOBILE */
+            .product-image-container {
+                height: 400px !important;
+            }
+            
+            .product-image-bloom {
+                padding: 20px;
+            }
+            
+            .related-product-image-container {
+                height: 180px !important;
+            }
+            
+            .related-product-image {
+                padding: 10px;
+            }
+            
+            .btn-bloom, .btn-outline-bloom, .btn-whatsapp {
+                padding: 10px 20px;
+                font-size: 0.9rem;
             }
         }
         
@@ -558,13 +689,26 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                 font-size: 1.8rem;
             }
             
-            .btn-bloom, .btn-outline-bloom {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-            
             .product-price-bloom {
                 font-size: 1.8rem;
+            }
+            
+            /* IMÁGENES EN MÓVILES PEQUEÑOS */
+            .product-image-container {
+                height: 350px !important;
+            }
+            
+            .product-image-bloom {
+                padding: 15px;
+            }
+            
+            .related-product-image-container {
+                height: 160px !important;
+            }
+            
+            .gallery-thumb-container {
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
@@ -675,16 +819,14 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             <!-- Galería de Imágenes -->
             <div class="col-md-6 mb-5">
                 <div class="bloom-card p-4">
-                    <div class="product-gallery-main">
+                    <div class="product-image-container">
                         <?php if (!empty($producto['imagen'])): ?>
                         <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                             alt="<?php echo $producto['nombre']; ?>" 
-                             class="product-image" 
+                             class="product-image-bloom" 
+                             alt="<?php echo $producto['nombre']; ?>"
                              id="main-product-image">
                         <?php else: ?>
-                        <div class="product-image bg-dark d-flex align-items-center justify-content-center">
-                            <i class="fas fa-spa fa-5x text-accent"></i>
-                        </div>
+                        <i class="fas fa-spa fa-5x text-accent"></i>
                         <?php endif; ?>
                     </div>
                     
@@ -693,10 +835,11 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                         <div class="row g-2 justify-content-center">
                             <?php if (!empty($producto['imagen'])): ?>
                             <div class="col-auto">
-                                <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                                     alt="<?php echo $producto['nombre']; ?>" 
-                                     class="gallery-thumb active"
-                                     onclick="changeMainImage(this.src)">
+                                <div class="gallery-thumb-container active" onclick="changeMainImage('../uploads/products/<?php echo $producto['imagen']; ?>')">
+                                    <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
+                                         class="gallery-thumb" 
+                                         alt="<?php echo $producto['nombre']; ?>">
+                                </div>
                             </div>
                             <?php endif; ?>
                             <!-- Aquí puedes agregar más imágenes si tienes una galería -->
@@ -724,7 +867,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         
                         <!-- Nombre del producto -->
-                        <h1 class="h2 title-font mb-4"><?php echo $producto['nombre']; ?></h1>
+                        <h1 class="h2 title-font mb-4 text-light"><?php echo $producto['nombre']; ?></h1>
                         
                         <!-- Precio -->
                         <div class="mb-4">
@@ -740,12 +883,12 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                         <!-- Stock -->
                         <div class="mb-4">
                             <?php if ($producto['stock'] > 0): ?>
-                            <span class="badge stock-badge" style="background: linear-gradient(135deg, var(--success), #7a9a63);">
+                            <span class="badge stock-badge" style="background: linear-gradient(135deg, var(--success), #8a8a8a); color: var(--primary);">
                                 <i class="fas fa-check me-1"></i>
                                 <?php echo $producto['stock']; ?> disponibles en stock
                             </span>
                             <?php else: ?>
-                            <span class="badge stock-badge bg-danger">
+                            <span class="badge stock-badge bg-danger text-white">
                                 <i class="fas fa-times me-1"></i>
                                 Agotado
                             </span>
@@ -754,13 +897,13 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                         
                         <!-- Descripción -->
                         <div class="mb-4">
-                            <h5 class="mb-3" style="color: var(--accent);">Descripción</h5>
+                            <h5 class="mb-3 text-accent">Descripción</h5>
                             <p class="text-muted"><?php echo nl2br($producto['descripcion']); ?></p>
                         </div>
                         
                         <!-- Características -->
                         <div class="mb-4">
-                            <h5 class="mb-3" style="color: var(--accent);">Características</h5>
+                            <h5 class="mb-3 text-accent">Características</h5>
                             <ul class="product-features">
                                 <li>
                                     <i class="fas fa-tags feature-icon"></i>
@@ -791,7 +934,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                             <?php if ($producto['stock'] > 0): ?>
                             <div class="row g-3 align-items-center mb-4">
                                 <div class="col-auto">
-                                    <label for="quantity" class="form-label"><strong>Cantidad:</strong></label>
+                                    <label for="quantity" class="form-label"><strong class="text-light">Cantidad:</strong></label>
                                 </div>
                                 <div class="col-auto">
                                     <input type="number" id="quantity" class="form-control quantity-input" 
@@ -814,10 +957,10 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                             <?php else: ?>
                             <div class="alert bloom-card mb-4" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.3);">
                                 <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
-                                Este producto está temporalmente agotado. Contáctanos para más información.
+                                <span class="text-light">Este producto está temporalmente agotado. Contáctanos para más información.</span>
                             </div>
                             <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
-                               target="_blank" class="btn btn-bloom w-100" style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
+                               target="_blank" class="btn btn-whatsapp w-100">
                                 <i class="fab fa-whatsapp me-2"></i>Consultar por WhatsApp
                             </a>
                             <?php endif; ?>
@@ -829,26 +972,25 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- Productos Relacionados -->
         <?php if (!empty($productos_relacionados)): ?>
-        <div class="row mt-5 pt-5 border-top" style="border-color: rgba(139, 125, 90, 0.1) !important;">
+        <div class="row mt-5 pt-5 border-top" style="border-color: rgba(200, 200, 200, 0.1) !important;">
             <div class="col-12">
-                <h3 class="title-font mb-4" style="color: var(--accent);">Productos Relacionados</h3>
+                <h3 class="title-font mb-4 text-accent">Productos Relacionados</h3>
                 <div class="row">
                     <?php foreach ($productos_relacionados as $relacionado): ?>
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="related-product-card bloom-card">
-                            <div class="position-relative">
+                            <div class="related-product-image-container">
                                 <?php if (!empty($relacionado['imagen'])): ?>
                                 <img src="../uploads/products/<?php echo $relacionado['imagen']; ?>" 
-                                     class="related-product-image" alt="<?php echo $relacionado['nombre']; ?>">
+                                     class="related-product-image" 
+                                     alt="<?php echo $relacionado['nombre']; ?>">
                                 <?php else: ?>
-                                <div class="related-product-image bg-dark d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-spa fa-3x text-accent"></i>
-                                </div>
+                                <i class="fas fa-spa fa-3x text-accent"></i>
                                 <?php endif; ?>
                             </div>
                             
                             <div class="p-3 d-flex flex-column flex-grow-1">
-                                <h6 class="product-title-bloom mb-2"><?php echo $relacionado['nombre']; ?></h6>
+                                <h6 class="mb-2 text-light" style="font-weight: 600; min-height: 40px;"><?php echo $relacionado['nombre']; ?></h6>
                                 
                                 <!-- Categorías del producto relacionado -->
                                 <?php if (!empty($relacionado['categorias_nombres'])): ?>
@@ -864,16 +1006,16 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <?php endif; ?>
                                 
-                                <p class="product-description-bloom flex-grow-1">
+                                <p class="text-muted flex-grow-1" style="font-size: 0.85rem; line-height: 1.4; min-height: 40px;">
                                     <?php echo substr($relacionado['descripcion'], 0, 80); ?>...
                                 </p>
                                 <div class="mt-auto">
-                                    <div class="product-price-bloom mb-2" style="font-size: 1.1rem;">
+                                    <div class="mb-2" style="font-size: 1.1rem; font-weight: 700; color: var(--accent);">
                                         <?php 
                                         $precios_rel = formatPrecioDual($relacionado['precio_publico']);
                                         ?>
                                         <div class="fw-bold"><?php echo $precios_rel['gs']; ?></div>
-                                        <div class="price-usd"><?php echo $precios_rel['usd']; ?></div>
+                                        <div style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;"><?php echo $precios_rel['usd']; ?></div>
                                     </div>
                                     <div class="d-grid">
                                         <a href="producto.php?id=<?php echo $relacionado['id']; ?>" 
@@ -899,9 +1041,9 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-lg-4">
                     <div class="d-flex align-items-center mb-4">
                         <i class="fas fa-spa fs-2 me-2" style="color: var(--accent);"></i>
-                        <h3 class="title-font h4 mb-0"><?php echo $titulo_sistema; ?></h3>
+                        <h3 class="title-font h4 mb-0 text-light"><?php echo $titulo_sistema; ?></h3>
                     </div>
-                    <p class="mb-4"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales. Descubre la esencia de la elegancia en cada fragancia.</p>
+                    <p class="mb-4 text-light"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales. Descubre la esencia de la elegancia en cada fragancia.</p>
                     <div class="d-flex gap-3">
                         <a href="#" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
                             <i class="fab fa-facebook-f"></i>
@@ -927,34 +1069,34 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                     <ul class="list-unstyled footer-links-bloom">
                         <li class="mb-3 d-flex align-items-start">
                             <i class="fas fa-phone me-2 mt-1" style="color: var(--accent);"></i>
-                            <span><?php echo $telefono_empresa; ?></span>
+                            <span class="text-light"><?php echo $telefono_empresa; ?></span>
                         </li>
                         <li class="mb-3 d-flex align-items-start">
                             <i class="fas fa-phone me-2 mt-1" style="color: var(--accent);"></i>
-                            <span>+595981934464</span>
+                            <span class="text-light">+595981934464</span>
                         </li>
                         <li class="mb-3 d-flex align-items-start">
                             <i class="fas fa-envelope me-2 mt-1" style="color: var(--accent);"></i>
-                            <span><?php echo $email_empresa; ?></span>
+                            <span class="text-light"><?php echo $email_empresa; ?></span>
                         </li>
                         <li class="mb-3 d-flex align-items-start">
                             <i class="fas fa-map-marker-alt me-2 mt-1" style="color: var(--accent);"></i>
-                            <span>CDE - Paraguay</span>
+                            <span class="text-light">CDE - Paraguay</span>
                         </li>
                     </ul>
                 </div>
                 <div class="col-lg-3">
                     <h5 class="footer-title-bloom">Newsletter</h5>
-                    <p class="mb-3">Suscríbete para recibir novedades y ofertas exclusivas.</p>
+                    <p class="mb-3 text-light">Suscríbete para recibir novedades y ofertas exclusivas.</p>
                     <div class="d-flex">
-                        <input type="email" class="form-control me-2" placeholder="Tu correo" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139,125,90,0.3); color: white;">
+                        <input type="email" class="form-control me-2" placeholder="Tu correo">
                         <button class="btn btn-bloom">Enviar</button>
                     </div>
                 </div>
             </div>
             <hr class="my-5" style="border-color: rgba(255,255,255,0.1);">
             <div class="text-center">
-                <p>&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1/" style="color: var(--accent);">Desarrollador</a></p>
+                <p class="text-light">&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1/" style="color: var(--accent);">Desarrollador</a></p>
             </div>
         </div>
     </footer>
@@ -1003,8 +1145,8 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         // Cambiar imagen principal en la galería
         function changeMainImage(src) {
             $('#main-product-image').attr('src', src);
-            $('.gallery-thumb').removeClass('active');
-            $(event.target).addClass('active');
+            $('.gallery-thumb-container').removeClass('active');
+            $(event.target).closest('.gallery-thumb-container').addClass('active');
         }
         
         // Agregar al carrito desde la página de detalles

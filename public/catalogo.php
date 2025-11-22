@@ -135,15 +135,15 @@ if (!empty($categoria_id)) {
     <style>
         :root {
             --primary: #0a0a0a;
-            --secondary: #8b7d5a;
-            --accent: #b8a86d;
+            --secondary: #c8c8c8;
+            --accent: #e8e8e8;
             --light: #f8f9fa;
             --dark: #1a1a1a;
-            --success: #9caf88;
+            --success: #afafaf;
             --text-light: #e8e6e3;
             --text-muted: #a5a5a5;
-            --gold-light: #d4c19c;
-            --gold-dark: #8b7d5a;
+            --gold-light: #f0f0f0;
+            --gold-dark: #d0d0d0;
         }
         
         body {
@@ -163,7 +163,7 @@ if (!empty($categoria_id)) {
             background: rgba(10, 10, 10, 0.95) !important;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.2);
             z-index: 1030;
         }
         
@@ -191,7 +191,7 @@ if (!empty($categoria_id)) {
         
         .nav-link:hover,
         .nav-link.active {
-            background: rgba(184, 168, 109, 0.1);
+            background: rgba(232, 232, 232, 0.1);
             color: var(--accent) !important;
         }
         
@@ -215,7 +215,7 @@ if (!empty($categoria_id)) {
         /* Dropdown styles */
         .dropdown-menu {
             background: var(--dark) !important;
-            border: 1px solid rgba(139, 125, 90, 0.2) !important;
+            border: 1px solid rgba(200, 200, 200, 0.2) !important;
             border-radius: 8px !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         }
@@ -227,7 +227,7 @@ if (!empty($categoria_id)) {
         }
         
         .dropdown-item:hover {
-            background: rgba(184, 168, 109, 0.1) !important;
+            background: rgba(232, 232, 232, 0.1) !important;
             color: var(--accent) !important;
         }
         
@@ -239,7 +239,7 @@ if (!empty($categoria_id)) {
         
         .search-box-bloom {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(139, 125, 90, 0.3);
+            border: 1px solid rgba(200, 200, 200, 0.3);
             border-radius: 25px;
             padding: 10px 45px 10px 20px;
             font-size: 0.9rem;
@@ -250,7 +250,7 @@ if (!empty($categoria_id)) {
         
         .search-box-bloom:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 0.25rem rgba(184, 168, 109, 0.25);
+            box-shadow: 0 0 0 0.25rem rgba(232, 232, 232, 0.25);
             background: rgba(255, 255, 255, 0.08);
             color: var(--text-light);
         }
@@ -287,7 +287,7 @@ if (!empty($categoria_id)) {
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             position: relative;
         }
         
@@ -305,8 +305,8 @@ if (!empty($categoria_id)) {
         
         .bloom-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
-            border-color: rgba(184, 168, 109, 0.3);
+            box-shadow: 0 15px 35px rgba(232, 232, 232, 0.15);
+            border-color: rgba(232, 232, 232, 0.3);
         }
         
         .bloom-card:hover::before {
@@ -322,12 +322,12 @@ if (!empty($categoria_id)) {
             font-weight: 600;
             padding: 12px 30px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 4px 12px rgba(232, 232, 232, 0.3);
         }
         
         .btn-bloom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.4);
+            box-shadow: 0 6px 20px rgba(232, 232, 232, 0.4);
             color: var(--primary);
             background: linear-gradient(135deg, var(--secondary), var(--accent));
         }
@@ -346,7 +346,25 @@ if (!empty($categoria_id)) {
             background: var(--accent);
             color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 168, 109, 0.3);
+            box-shadow: 0 6px 20px rgba(232, 232, 232, 0.3);
+        }
+        
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            color: white;
+            background: linear-gradient(135deg, #128C7E, #25D366);
         }
         
         /* Page Header */
@@ -366,7 +384,7 @@ if (!empty($categoria_id)) {
             font-size: 3rem;
             font-weight: 700;
             margin-bottom: 15px;
-            color: var(--text-light);
+            color: var(--accent);
         }
         
         .page-subtitle {
@@ -382,7 +400,7 @@ if (!empty($categoria_id)) {
         }
         
         .filter-card {
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 20px;
@@ -404,7 +422,7 @@ if (!empty($categoria_id)) {
         }
         
         .filter-list li {
-            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.1);
         }
         
         .filter-list li:last-child {
@@ -421,7 +439,7 @@ if (!empty($categoria_id)) {
         
         .filter-list a:hover,
         .filter-list a.active {
-            background: rgba(184, 168, 109, 0.1);
+            background: rgba(232, 232, 232, 0.1);
             color: var(--accent);
         }
         
@@ -430,9 +448,13 @@ if (!empty($categoria_id)) {
             border-left: 3px solid var(--accent);
         }
         
-        /* Product Cards */
+        /* ==================== */
+        /* ESTILOS DE IMÁGENES MEJORADOS */
+        /* ==================== */
+        
+        /* Product Cards - IMÁGENES UNIFORMES */
         .product-card-bloom {
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 25px;
@@ -444,16 +466,32 @@ if (!empty($categoria_id)) {
         }
         
         .product-card-bloom:hover {
-            box-shadow: 0 15px 35px rgba(184, 168, 109, 0.15);
+            box-shadow: 0 15px 35px rgba(232, 232, 232, 0.15);
             transform: translateY(-5px);
-            border-color: rgba(184, 168, 109, 0.3);
+            border-color: rgba(232, 232, 232, 0.3);
+        }
+        
+        .product-image-container {
+            height: 300px; /* Altura fija para imágenes de productos */
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .product-image-bloom {
-            height: 250px;
-            object-fit: cover;
             width: 100%;
-            border-bottom: 1px solid rgba(139, 125, 90, 0.1);
+            height: 100%;
+            object-fit: contain; /* Muestra toda la imagen sin recortar */
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card-bloom:hover .product-image-bloom {
+            transform: scale(1.05);
         }
         
         .product-info-bloom {
@@ -540,9 +578,9 @@ if (!empty($categoria_id)) {
             font-size: 0.7rem;
             padding: 4px 8px;
             border-radius: 12px;
-            background: rgba(184, 168, 109, 0.15);
+            background: rgba(232, 232, 232, 0.15);
             color: var(--accent);
-            border: 1px solid rgba(184, 168, 109, 0.3);
+            border: 1px solid rgba(232, 232, 232, 0.3);
         }
         
         .categorias-container {
@@ -574,7 +612,7 @@ if (!empty($categoria_id)) {
         
         /* Contact Card */
         .contact-card {
-            border: 1px solid rgba(139, 125, 90, 0.1);
+            border: 1px solid rgba(200, 200, 200, 0.1);
             border-radius: 12px;
             background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
         }
@@ -653,6 +691,27 @@ if (!empty($categoria_id)) {
             font-weight: bold;
         }
         
+        /* Stock Badges */
+        .stock-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+        
+        /* Text Colors Fix */
+        .text-success {
+            color: #25D366 !important;
+        }
+        
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
         /* Mobile Styles */
         .mobile-icons {
             display: flex;
@@ -671,13 +730,13 @@ if (!empty($categoria_id)) {
         /* Modal Styles */
         .search-modal-bloom .modal-content {
             background: var(--dark);
-            border: 1px solid rgba(139, 125, 90, 0.2);
+            border: 1px solid rgba(200, 200, 200, 0.2);
             border-radius: 16px;
             color: var(--text-light);
         }
         
         .search-modal-bloom .modal-header {
-            border-bottom: 1px solid rgba(139, 125, 90, 0.2);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.2);
             padding: 20px;
         }
         
@@ -685,18 +744,10 @@ if (!empty($categoria_id)) {
             padding: 20px;
         }
         
-        /* Stock Badges */
-        .stock-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
+        /* ==================== */
+        /* RESPONSIVE MEJORADO */
+        /* ==================== */
         
-        /* Responsive */
         @media (max-width: 768px) {
             .navbar-brand {
                 font-size: 1.5rem;
@@ -737,6 +788,20 @@ if (!empty($categoria_id)) {
             .page-title {
                 font-size: 2.2rem;
             }
+            
+            /* IMÁGENES EN MOBILE */
+            .product-image-container {
+                height: 250px !important;
+            }
+            
+            .product-image-bloom {
+                padding: 15px;
+            }
+            
+            .btn-bloom, .btn-outline-bloom, .btn-whatsapp {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
         }
         
         @media (max-width: 576px) {
@@ -755,6 +820,15 @@ if (!empty($categoria_id)) {
             
             .page-title {
                 font-size: 1.8rem;
+            }
+            
+            /* IMÁGENES EN MÓVILES PEQUEÑOS */
+            .product-image-container {
+                height: 220px !important;
+            }
+            
+            .product-image-bloom {
+                padding: 10px;
             }
         }
     </style>
@@ -949,14 +1023,14 @@ if (!empty($categoria_id)) {
                     <!-- Información de contacto -->
                     <div class="contact-card bloom-card mt-4">
                         <div class="card-body">
-                            <h6 class="mb-3"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
-                            <p class="small mb-3">
+                            <h6 class="mb-3" style="color: var(--accent);"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
+                            <p class="small mb-3" style="color: var(--text-light);">
                                 <i class="fas fa-phone me-1"></i><?php echo $telefono_empresa; ?>
                             </p>
-                            <p class="small mb-3">
+                            <p class="small mb-3" style="color: var(--text-light);">
                                 <i class="fas fa-phone me-1"></i>+595981934464
                             </p>
-                            <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-success btn-sm w-100">
+                            <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" target="_blank" class="btn btn-whatsapp btn-sm w-100">
                                 <i class="fab fa-whatsapp me-1"></i>WhatsApp
                             </a>
                         </div>
@@ -969,7 +1043,7 @@ if (!empty($categoria_id)) {
                 <!-- Header del catálogo -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h2 class="mb-1">
+                        <h2 class="mb-1" style="color: var(--text-light);">
                             <?php if (!empty($search)): ?>
                                 <i class="fas fa-search me-2"></i>Resultados para "<?php echo htmlspecialchars($search); ?>"
                             <?php elseif (!empty($categoria_id)): ?>
@@ -1016,21 +1090,21 @@ if (!empty($categoria_id)) {
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="product-card-bloom bloom-card">
                             <div class="position-relative">
-                                <?php if (!empty($producto['imagen'])): ?>
-                                <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
-                                     class="product-image-bloom" alt="<?php echo $producto['nombre']; ?>">
-                                <?php else: ?>
-                                <div class="product-image-bloom bg-dark d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-spa fa-3x text-accent"></i>
+                                <div class="product-image-container">
+                                    <?php if (!empty($producto['imagen'])): ?>
+                                    <img src="../uploads/products/<?php echo $producto['imagen']; ?>" 
+                                         class="product-image-bloom" alt="<?php echo $producto['nombre']; ?>">
+                                    <?php else: ?>
+                                    <i class="fas fa-spa fa-4x text-accent"></i>
+                                    <?php endif; ?>
+                                    
+                                    <!-- Badge de stock -->
+                                    <?php if ($producto['stock'] == 0): ?>
+                                    <span class="stock-badge bg-danger text-white">Agotado</span>
+                                    <?php elseif ($producto['stock'] < 10): ?>
+                                    <span class="stock-badge bg-warning text-dark">Últimas unidades</span>
+                                    <?php endif; ?>
                                 </div>
-                                <?php endif; ?>
-                                
-                                <!-- Badge de stock -->
-                                <?php if ($producto['stock'] == 0): ?>
-                                <span class="stock-badge bg-danger text-white">Agotado</span>
-                                <?php elseif ($producto['stock'] < 10): ?>
-                                <span class="stock-badge bg-warning text-dark">Últimas unidades</span>
-                                <?php endif; ?>
                             </div>
                             
                             <div class="product-info-bloom">
@@ -1078,7 +1152,7 @@ if (!empty($categoria_id)) {
                                     </a>
                                     <?php else: ?>
                                     <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>?text=Hola, me interesa el producto <?php echo urlencode($producto['nombre']); ?> (<?php echo $producto['codigo']; ?>) que está agotado. ¿Cuándo tendrán stock?" 
-                                       target="_blank" class="btn btn-outline-bloom w-100 mb-2">
+                                       target="_blank" class="btn btn-whatsapp w-100 mb-2">
                                         <i class="fab fa-whatsapp me-1"></i>Consultar Stock
                                     </a>
                                     <a href="producto.php?id=<?php echo $producto['id']; ?>" class="btn-details-bloom">
@@ -1097,7 +1171,7 @@ if (!empty($categoria_id)) {
                 <?php if (count($productos) > 12): ?>
                 <div class="row mt-4">
                     <div class="col-12 text-center">
-                        <div class="alert bloom-card p-3" style="background: rgba(184, 168, 109, 0.1); border: 1px solid rgba(184, 168, 109, 0.3);">
+                        <div class="alert bloom-card p-3" style="background: rgba(232, 232, 232, 0.1); border: 1px solid rgba(232, 232, 232, 0.3); color: var(--text-light);">
                             <i class="fas fa-info-circle me-2 text-accent"></i>
                             Mostrando <?php echo count($productos); ?> productos. Usa los filtros para encontrar lo que buscas.
                         </div>
@@ -1117,7 +1191,7 @@ if (!empty($categoria_id)) {
                         <i class="fas fa-spa fs-2 me-2" style="color: var(--accent);"></i>
                         <h3 class="title-font h4 mb-0"><?php echo $titulo_sistema; ?></h3>
                     </div>
-                    <p class="mb-4"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales. Descubre la esencia de la elegancia en cada fragancia.</p>
+                    <p class="mb-4" style="color: var(--text-light);"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales. Descubre la esencia de la elegancia en cada fragancia.</p>
                     <div class="d-flex gap-3">
                         <a href="#" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
                             <i class="fab fa-facebook-f"></i>
@@ -1143,30 +1217,30 @@ if (!empty($categoria_id)) {
                     <ul class="list-unstyled footer-links-bloom">
                         <li class="mb-3 d-flex align-items-start">
                             <i class="fas fa-phone me-2 mt-1" style="color: var(--accent);"></i>
-                            <span><?php echo $telefono_empresa; ?></span>
+                            <span style="color: var(--text-light);"><?php echo $telefono_empresa; ?></span>
                         </li>
                         <li class="mb-3 d-flex align-items-start">
                             <i class="fas fa-envelope me-2 mt-1" style="color: var(--accent);"></i>
-                            <span><?php echo $email_empresa; ?></span>
+                            <span style="color: var(--text-light);"><?php echo $email_empresa; ?></span>
                         </li>
                         <li class="mb-3 d-flex align-items-start">
                             <i class="fas fa-map-marker-alt me-2 mt-1" style="color: var(--accent);"></i>
-                            <span>CDE - Paraguay</span>
+                            <span style="color: var(--text-light);">CDE - Paraguay</span>
                         </li>
                     </ul>
                 </div>
                 <div class="col-lg-3">
                     <h5 class="footer-title-bloom">Newsletter</h5>
-                    <p class="mb-3">Suscríbete para recibir novedades y ofertas exclusivas.</p>
+                    <p class="mb-3" style="color: var(--text-light);">Suscríbete para recibir novedades y ofertas exclusivas.</p>
                     <div class="d-flex">
-                        <input type="email" class="form-control me-2" placeholder="Tu correo" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139,125,90,0.3); color: white;">
+                        <input type="email" class="form-control me-2" placeholder="Tu correo" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(200,200,200,0.3); color: white;">
                         <button class="btn btn-bloom">Enviar</button>
                     </div>
                 </div>
             </div>
             <hr class="my-5" style="border-color: rgba(255,255,255,0.1);">
             <div class="text-center">
-                <p>&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1/" style="color: var(--accent);">Desarrollador</a></p>
+                <p style="color: var(--text-light);">&copy; 2025 <?php echo $titulo_sistema; ?>. Todos los derechos reservados. <a href="https://www.facebook.com/gustavogabriel.velazquez1/" style="color: var(--accent);">Desarrollador</a></p>
             </div>
         </div>
     </footer>
