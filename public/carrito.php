@@ -522,6 +522,66 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         }
         
         /* ==================== */
+        /* ESTILOS MEJORADOS PARA RESUMEN DEL PEDIDO */
+        /* ==================== */
+        
+        .order-summary-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(200, 200, 200, 0.1);
+            margin-bottom: 8px;
+        }
+        
+        .order-summary-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .order-summary-total {
+            background: rgba(232, 232, 232, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(232, 232, 232, 0.1);
+        }
+        
+        .summary-label {
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        .summary-value {
+            font-weight: 600;
+            color: var(--accent);
+            text-align: right;
+        }
+        
+        .summary-usd-value {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 2px;
+        }
+        
+        .total-amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .total-usd-amount {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(232, 232, 232, 0.3), transparent);
+            margin: 20px 0;
+        }
+        
+        /* ==================== */
         /* RESPONSIVE MEJORADO */
         /* ==================== */
         
@@ -556,6 +616,10 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                 display: flex;
                 align-items: center;
                 gap: 15px;
+            }
+            
+            .order-summary-item {
+                padding: 10px 0;
             }
         }
         
@@ -593,6 +657,14 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             }
             
             .exchange-info strong {
+                font-size: 0.9rem;
+            }
+            
+            .total-amount {
+                font-size: 1.1rem;
+            }
+            
+            .total-usd-amount {
                 font-size: 0.9rem;
             }
         }
@@ -731,34 +803,43 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             </div>
             
             <div class="col-md-4">
-                <div class="bloom-card sticky-top" style="top: 100px;">
+                <!-- Resumen del Pedido -->
+                <div class="bloom-card mb-4">
                     <div class="card-header" style="background: linear-gradient(135deg, var(--accent), var(--secondary)); color: var(--primary); border: none; padding: 15px 20px; font-weight: 600;">
                         <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Resumen del Pedido</h5>
                     </div>
                     <div class="card-body">
                         <div id="order-summary">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span style="color: var(--text-light);">Subtotal:</span>
-                                <div class="text-end">
-                                    <div id="subtotal" style="color: var(--accent); font-weight: 600;">GS. 0</div>
-                                    <div class="summary-usd" id="subtotal-usd">USD 0.00</div>
+                            <div class="order-summary-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="summary-label">Subtotal:</span>
+                                    <div class="text-end">
+                                        <div class="summary-value" id="subtotal">GS. 0</div>
+                                        <div class="summary-usd-value" id="subtotal-usd">USD 0.00</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span style="color: var(--text-light);">Envío:</span>
-                                <span class="text-success">Gratis</span>
-                            </div>
-                            <hr style="border-color: rgba(200, 200, 200, 0.3);">
-                            <div class="d-flex justify-content-between mb-3">
-                                <div>
-                                    <strong style="color: var(--text-light);">Total:</strong>
-                                    <div class="summary-usd" id="total-usd-label">USD 0.00</div>
-                                </div>
-                                <div class="text-end">
-                                    <strong id="total" class="text-success" style="font-size: 1.2rem;">GS. 0</strong>
-                                    <div class="summary-usd" id="total-usd">USD 0.00</div>
+                            
+                            <div class="order-summary-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="summary-label">Envío:</span>
+                                    <span class="text-success fw-bold">Gratis</span>
                                 </div>
                             </div>
+                            
+                            <div class="section-divider"></div>
+                            
+                            <div class="order-summary-total">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong class="summary-label">Total:</strong>
+                                    <div class="text-end">
+                                        <div class="total-amount" id="total">GS. 0</div>
+                                        <div class="total-usd-amount" id="total-usd">USD 0.00</div>
+                                    </div>
+                                </div>
+                                <div class="summary-usd-value text-center" id="total-usd-label">Total en USD: 0.00</div>
+                            </div>
+                            
                             <button class="btn btn-whatsapp w-100 mb-3" id="checkout-btn" disabled>
                                 <i class="fab fa-whatsapp me-2"></i>Completar Pedido por WhatsApp
                             </button>
@@ -769,8 +850,8 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
                 
-                <!-- Información de contacto -->
-                <div class="contact-card bloom-card mt-4">
+                <!-- Información de contacto SEPARADA -->
+                <div class="contact-card bloom-card">
                     <div class="card-body">
                         <h6 class="mb-3" style="color: var(--accent);"><i class="fas fa-headset me-2"></i>¿Necesitas ayuda?</h6>
                         <p class="small mb-3" style="color: var(--text-light);">
@@ -897,7 +978,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById('subtotal-usd').textContent = formatearPrecioUSD(0);
             document.getElementById('total').textContent = 'GS. 0';
             document.getElementById('total-usd').textContent = formatearPrecioUSD(0);
-            document.getElementById('total-usd-label').textContent = formatearPrecioUSD(0);
+            document.getElementById('total-usd-label').textContent = 'Total en USD: 0.00';
             return;
         }
         
@@ -959,7 +1040,7 @@ $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById('subtotal-usd').textContent = formatearPrecioUSD(subtotalUSD);
         document.getElementById('total').textContent = 'GS. ' + subtotal.toLocaleString();
         document.getElementById('total-usd').textContent = formatearPrecioUSD(totalUSD);
-        document.getElementById('total-usd-label').textContent = formatearPrecioUSD(totalUSD);
+        document.getElementById('total-usd-label').textContent = 'Total en USD: ' + totalUSD.toFixed(2);
     }
     
     function updateCartCount() {

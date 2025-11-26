@@ -73,10 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'create') {
         if (empty($productos) || !is_array($productos)) {
             $error = "Debe agregar al menos un producto al presupuesto";
         } else {
+            // CORRECCIÓN: Convertir precios de productos según la moneda seleccionada
+            if ($moneda == 'usd') {
+                $productos = convertirProductosADolares($productos, $tipo_cambio['venta']);
+            }
+            
             $query = "INSERT INTO presupuestos (cliente_nombre, cliente_telefono, cliente_documento, productos, total, notas, moneda, aplicar_iva, tipo_descuento, descuento_general) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $db->prepare($query);
             
-            if ($stmt->execute([$cliente_nombre, $cliente_telefono, $cliente_documento, $productos_json, $total, $notas, $moneda, $aplicar_iva, $tipo_descuento, $descuento_general])) {
+            if ($stmt->execute([$cliente_nombre, $cliente_telefono, $cliente_documento, json_encode($productos), $total, $notas, $moneda, $aplicar_iva, $tipo_descuento, $descuento_general])) {
                 $presupuesto_id = $db->lastInsertId();
                 $success = "Presupuesto creado exitosamente (ID: #$presupuesto_id)";
                 $action = 'list';
@@ -114,10 +119,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'edit' && $id) {
         if (empty($productos) || !is_array($productos)) {
             $error = "Debe agregar al menos un producto al presupuesto";
         } else {
+            // CORRECCIÓN: Convertir precios de productos según la moneda seleccionada
+            if ($moneda == 'usd') {
+                $productos = convertirProductosADolares($productos, $tipo_cambio['venta']);
+            }
+            
             $query = "UPDATE presupuestos SET cliente_nombre = ?, cliente_telefono = ?, cliente_documento = ?, productos = ?, total = ?, notas = ?, moneda = ?, aplicar_iva = ?, tipo_descuento = ?, descuento_general = ?, fecha_actualizacion = NOW() WHERE id = ?";
             $stmt = $db->prepare($query);
             
-            if ($stmt->execute([$cliente_nombre, $cliente_telefono, $cliente_documento, $productos_json, $total, $notas, $moneda, $aplicar_iva, $tipo_descuento, $descuento_general, $id])) {
+            if ($stmt->execute([$cliente_nombre, $cliente_telefono, $cliente_documento, json_encode($productos), $total, $notas, $moneda, $aplicar_iva, $tipo_descuento, $descuento_general, $id])) {
                 $success = "Presupuesto actualizado exitosamente";
                 $action = 'view';
             } else {
@@ -199,6 +209,11 @@ if (($action == 'view' || $action == 'edit' || $action == 'cambiar_estado') && $
     } else {
         // Decodificar productos del presupuesto
         $productos_presupuesto = json_decode($presupuesto['productos'], true);
+        
+        // CORRECCIÓN: Si el presupuesto está en dólares, convertir los precios para mostrar
+        if ($presupuesto['moneda'] == 'usd') {
+            $productos_presupuesto = convertirProductosAGuaranies($productos_presupuesto, $tipo_cambio['venta']);
+        }
     }
 }
 
@@ -218,6 +233,28 @@ function formatearTelefono($telefono) {
     }
     
     return $telefono;
+}
+
+// CORRECCIÓN: Función para convertir productos a dólares
+function convertirProductosADolares($productos, $tipo_cambio) {
+    foreach ($productos as &$producto) {
+        if (isset($producto['price'])) {
+            $producto['price'] = $producto['price'] / $tipo_cambio;
+        }
+        // Guardar el precio original en guaraníes
+        $producto['price_original_gs'] = $producto['price'] * $tipo_cambio;
+    }
+    return $productos;
+}
+
+// CORRECCIÓN: Función para convertir productos a guaraníes para mostrar
+function convertirProductosAGuaranies($productos, $tipo_cambio) {
+    foreach ($productos as &$producto) {
+        if (isset($producto['price'])) {
+            $producto['price'] = $producto['price'] * $tipo_cambio;
+        }
+    }
+    return $productos;
 }
 
 // Función para convertir presupuesto a pedido
