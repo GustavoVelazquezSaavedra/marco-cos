@@ -8,7 +8,7 @@ $db = $database->getConnection();
 // Obtener información de la empresa desde la base de datos
 $titulo_sistema = "BLOOM"; // Valor por defecto
 $subtitulo_sistema = "Perfumes"; // Valor por defecto
-$telefono_empresa = "+595972366265"; // Valor por defecto
+$telefono_empresa = "+595976588694"; // Valor por defecto
 $email_empresa = "info@bloom.com"; // Valor por defecto
 
 // Intentar obtener de la base de datos si hay conexión
@@ -36,6 +36,12 @@ try {
 
 // Obtener tipo de cambio actual (ya está en functions.php)
 $tipo_cambio = getTipoCambioActual();
+
+// Obtener redes sociales activas
+$queryRedes = "SELECT * FROM redes_sociales WHERE activo = 1 ORDER BY orden";
+$stmtRedes = $db->prepare($queryRedes);
+$stmtRedes->execute();
+$redes_sociales = $stmtRedes->fetchAll(PDO::FETCH_ASSOC);
 
 // Obtener categorías principales organizadas con imagen aleatoria
 $queryCategorias = "SELECT c.*, 
@@ -821,6 +827,53 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
         }
         
         /* ==================== */
+        /* CORRECCIONES ESPECÍFICAS */
+        /* ==================== */
+        
+        /* Corrección para el menú móvil */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: rgba(10, 10, 10, 0.98);
+                padding: 20px;
+                border-radius: 0 0 12px 12px;
+                margin-top: 10px;
+                border: 1px solid rgba(200, 200, 200, 0.2);
+            }
+            
+            .nav-link {
+                margin: 5px 0;
+                text-align: center;
+            }
+        }
+        
+        /* Corrección para el slider en desktop */
+        @media (min-width: 992px) {
+            .slider-background {
+                background-size: cover !important;
+                background-position: center center !important;
+            }
+            
+            .carousel-item {
+                height: 700px !important; /* Aumenta la altura en desktop */
+            }
+        }
+        
+        /* Corrección de los íconos ovalados - REDES SOCIALES CIRCULARES */
+        .btn-outline-bloom.btn-sm.rounded-circle {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50% !important;
+            padding: 0;
+        }
+        
+        .btn-outline-bloom.btn-sm.rounded-circle i {
+            font-size: 1rem;
+        }
+        
+        /* ==================== */
         /* RESPONSIVE MEJORADO */
         /* ==================== */
         
@@ -1526,15 +1579,11 @@ $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <p class="mb-4"><?php echo $subtitulo_sistema; ?> de la más alta calidad para momentos especiales. Descubre la esencia de la elegancia en cada fragancia.</p>
                     <div class="d-flex gap-3">
-                        <a href="#" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
-                            <i class="fab fa-facebook-f"></i>
+                        <?php foreach ($redes_sociales as $red): ?>
+                        <a href="<?php echo $red['url']; ?>" class="btn btn-outline-bloom btn-sm rounded-circle p-2" target="_blank">
+                            <i class="<?php echo $red['icono']; ?>"></i>
                         </a>
-                        <a href="#" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="https://wa.me/<?php echo str_replace('+', '', $telefono_empresa); ?>" class="btn btn-outline-bloom btn-sm rounded-circle p-2">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">

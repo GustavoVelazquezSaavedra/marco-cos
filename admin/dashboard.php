@@ -128,6 +128,9 @@ $isAdmin = ($_SESSION['user_role'] == 'admin');
                     <a href="slider.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-images"></i> Slider Principal
                     </a>
+                    <a href="redes_sociales.php" class="list-group-item list-group-item-action">
+                        <i class="fas fa-share-alt"></i> Redes Sociales
+                    </a>
                     <?php if ($isAdmin): ?>
                     <a href="usuarios.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-users"></i> Usuarios

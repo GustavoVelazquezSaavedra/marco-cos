@@ -27,5 +27,8 @@
         <a href="usuarios.php" class="list-group-item list-group-item-action active">
             <i class="fas fa-users"></i> Usuarios
         </a>
+        <a href="redes_sociales.php" class="list-group-item list-group-item-action">
+            <i class="fas fa-share-alt"></i> Redes Sociales
+        </a>
     </div>
 </div>

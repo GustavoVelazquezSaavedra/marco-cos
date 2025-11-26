@@ -104,4 +104,15 @@ function uploadImage($file, $folder = "products") {
         return ["success" => false, "message" => "Error al subir la imagen."];
     }
 }
+
+/**
+ * Obtener redes sociales activas
+ */
+function getRedesSociales() {
+    global $db;
+    $query = "SELECT * FROM redes_sociales WHERE activo = 1 ORDER BY orden";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
