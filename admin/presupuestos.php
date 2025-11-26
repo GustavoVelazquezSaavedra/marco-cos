@@ -210,9 +210,17 @@ if (($action == 'view' || $action == 'edit' || $action == 'cambiar_estado') && $
         // Decodificar productos del presupuesto
         $productos_presupuesto = json_decode($presupuesto['productos'], true);
         
-        // CORRECCIÓN: Si el presupuesto está en dólares, convertir los precios para mostrar
+        // CORRECCIÓN: Si el presupuesto está en dólares, mostrar los precios en dólares
         if ($presupuesto['moneda'] == 'usd') {
-            $productos_presupuesto = convertirProductosAGuaranies($productos_presupuesto, $tipo_cambio['venta']);
+            foreach ($productos_presupuesto as &$producto) {
+                if (isset($producto['price'])) {
+                    // Si ya está en dólares, mantenerlo así
+                    if (!isset($producto['price_original_gs'])) {
+                        // Si no tiene precio original, significa que está en guaraníes
+                        $producto['price'] = $producto['price'] / $tipo_cambio['venta'];
+                    }
+                }
+            }
         }
     }
 }
@@ -235,23 +243,14 @@ function formatearTelefono($telefono) {
     return $telefono;
 }
 
-// CORRECCIÓN: Función para convertir productos a dólares
+// CORRECCIÓN: Función para convertir productos a dólares (SOLO para guardar)
 function convertirProductosADolares($productos, $tipo_cambio) {
     foreach ($productos as &$producto) {
         if (isset($producto['price'])) {
+            // Guardar el precio original en guaraníes
+            $producto['price_original_gs'] = $producto['price'];
+            // Convertir a dólares
             $producto['price'] = $producto['price'] / $tipo_cambio;
-        }
-        // Guardar el precio original en guaraníes
-        $producto['price_original_gs'] = $producto['price'] * $tipo_cambio;
-    }
-    return $productos;
-}
-
-// CORRECCIÓN: Función para convertir productos a guaraníes para mostrar
-function convertirProductosAGuaranies($productos, $tipo_cambio) {
-    foreach ($productos as &$producto) {
-        if (isset($producto['price'])) {
-            $producto['price'] = $producto['price'] * $tipo_cambio;
         }
     }
     return $productos;
@@ -348,29 +347,31 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         .descuento-badge { background-color: #6f42c1; }
         .moneda-badge { background-color: #fd7e14; }
         
-        /* Estilos compactos para tabla de productos */
+        /* Estilos compactos para tabla de productos - MÁS COMPACTO */
         .compact-table {
-            font-size: 0.85rem;
+            font-size: 0.80rem;
             margin-bottom: 0;
         }
         
         .compact-table th {
-            padding: 8px 6px;
+            padding: 6px 4px;
             background-color: #f8f9fa;
             font-weight: 600;
             border-bottom: 2px solid #dee2e6;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
         
         .compact-table td {
-            padding: 6px;
+            padding: 4px;
             vertical-align: middle;
             border-bottom: 1px solid #eee;
+            white-space: nowrap;
         }
         
         .compact-table .btn-sm {
-            padding: 0.2rem 0.4rem;
-            font-size: 0.75rem;
+            padding: 0.15rem 0.3rem;
+            font-size: 0.70rem;
         }
         
         .producto-row:hover {
@@ -383,10 +384,12 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         }
         
         .cantidad-input {
-            width: 70px;
+            width: 60px;
             text-align: center;
-            padding: 0.2rem 0.4rem;
-            font-size: 0.85rem;
+            padding: 0.15rem 0.3rem;
+            font-size: 0.80rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
         }
         
         .subtotal-col {
@@ -395,28 +398,50 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         }
         
         .acciones-col {
-            width: 80px;
+            width: 60px;
             text-align: center;
         }
         
         .codigo-col {
-            width: 100px;
+            width: 90px;
             font-weight: 600;
+            font-size: 0.75rem;
         }
         
         .cantidad-col {
-            width: 80px;
+            width: 70px;
             text-align: center;
         }
         
+        .producto-col {
+            min-width: 200px;
+            white-space: normal !important;
+        }
+        
         .precio-col {
-            width: 120px;
+            width: 100px;
             text-align: right;
         }
         
         .subtotal-col {
-            width: 120px;
+            width: 100px;
             text-align: right;
+        }
+        
+        /* Estilo para cuando no hay productos */
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: #6c757d;
+        }
+        
+        /* Totales compactos */
+        .totales-compactos {
+            font-size: 0.85rem;
+        }
+        
+        .totales-compactos .card-body {
+            padding: 0.75rem;
         }
     </style>
 </head>
@@ -582,11 +607,16 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                     
                                     <div class="mb-2">
                                         <small><strong>Total:</strong> 
-                                            <?php if ($pre['moneda'] == 'usd'): ?>
-                                                $ <?php echo number_format($pre['total'], 2, '.', ','); ?>
-                                            <?php else: ?>
-                                                Gs. <?php echo number_format($pre['total'], 0, ',', '.'); ?>
-                                            <?php endif; ?>
+                                            <?php 
+                                                $total_mostrar = $pre['total'];
+                                                if ($pre['moneda'] == 'usd') {
+                                                    // Convertir de guaraníes a dólares para mostrar
+                                                    $total_mostrar = $pre['total'] / $tipo_cambio['venta'];
+                                                    echo '$ ' . number_format($total_mostrar, 2, '.', ',');
+                                                } else {
+                                                    echo 'Gs. ' . number_format($total_mostrar, 0, ',', '.');
+                                                }
+                                                ?>
                                         </small>
                                         <?php if ($pre['aplicar_iva'] == 'si'): ?>
                                         <span class="badge iva-badge ms-1">IVA 10%</span>
@@ -620,8 +650,14 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                             <i class="fas fa-file-pdf"></i> PDF
                                         </a>
                                         <?php if (!empty($pre['cliente_telefono'])): ?>
-                                        <a href="https://wa.me/<?php echo $pre['cliente_telefono']; ?>?text=Hola <?php echo urlencode($pre['cliente_nombre']); ?>, te enviamos el presupuesto #<?php echo $pre['id']; ?> de BLOOM - Perfumes y cosmeticos. Total: <?php echo $pre['moneda'] == 'usd' ? '$' : 'Gs.'; ?> <?php echo number_format($pre['total'], $pre['moneda'] == 'usd' ? 2 : 0, ',', '.'); ?>" 
-                                           target="_blank" class="btn btn-sm btn-outline-success">
+                                        <?php
+                                        $total_whatsapp = $pre['total'];
+                                        if ($pre['moneda'] == 'usd') {
+                                            $total_whatsapp = $pre['total'] / $tipo_cambio['venta'];
+                                        }
+                                        ?>
+                                        <a href="https://wa.me/<?php echo $pre['cliente_telefono']; ?>?text=Hola <?php echo urlencode($pre['cliente_nombre']); ?>, te enviamos el presupuesto #<?php echo $pre['id']; ?> de BLOOM - Perfumes y cosmeticos. Total: <?php echo $pre['moneda'] == 'usd' ? '$' : 'Gs.'; ?> <?php echo number_format($total_whatsapp, $pre['moneda'] == 'usd' ? 2 : 0, ',', '.'); ?>" 
+                                        target="_blank" class="btn btn-sm btn-outline-success">
                                             <i class="fab fa-whatsapp"></i> WhatsApp
                                         </a>
                                         <?php endif; ?>
@@ -781,14 +817,14 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                         <h5 class="card-title mb-0">Productos del Presupuesto</h5>
                                         <span class="badge bg-primary" id="contador-productos">0 productos</span>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body p-0">
                                         <div class="table-responsive">
                                             <table class="table table-striped compact-table">
                                                 <thead>
                                                     <tr>
                                                         <th class="codigo-col">Código</th>
                                                         <th class="cantidad-col">Cant</th>
-                                                        <th>Producto</th>
+                                                        <th class="producto-col">Producto</th>
                                                         <th class="precio-col">P.Unit</th>
                                                         <th class="subtotal-col">Subtotal</th>
                                                         <th class="acciones-col">Acciones</th>
@@ -804,20 +840,20 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                             </table>
                                         </div>
                                         
-                                        <!-- Totales -->
-                                        <div class="row mt-4">
+                                        <!-- Totales compactos -->
+                                        <div class="row mt-3 p-3 totales-compactos">
                                             <div class="col-md-6">
                                                 <div class="card bg-light">
-                                                    <div class="card-body p-3">
-                                                        <h6 class="card-title mb-2">Subtotal</h6>
+                                                    <div class="card-body p-2">
+                                                        <h6 class="card-title mb-1">Subtotal</h6>
                                                         <h5 class="text-primary mb-0" id="subtotal-display">Gs. 0</h5>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="card bg-success text-white">
-                                                    <div class="card-body p-3">
-                                                        <h6 class="card-title mb-2">Total</h6>
+                                                    <div class="card-body p-2">
+                                                        <h6 class="card-title mb-1">Total</h6>
                                                         <h4 class="mb-1" id="total-display">Gs. 0</h4>
                                                         <small id="total-usd-display" class="opacity-75">$ 0.00</small>
                                                     </div>
@@ -829,7 +865,7 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                         <input type="hidden" name="productos_json" id="productos_json" value="<?php echo $is_edit ? htmlspecialchars($presupuesto['productos']) : '[]'; ?>">
                                         <input type="hidden" name="total" id="total" value="<?php echo $is_edit ? $presupuesto['total'] : '0'; ?>">
                                         
-                                        <div class="d-flex gap-2 mt-4">
+                                        <div class="d-flex gap-2 mt-3 p-3 border-top">
                                             <button type="submit" class="btn btn-success" id="btn-guardar" <?php echo $is_edit ? '' : 'disabled'; ?>>
                                                 <i class="fas fa-save"></i> <?php echo $is_edit ? 'Actualizar' : 'Guardar'; ?> Presupuesto
                                             </button>
@@ -884,7 +920,7 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                                                 <tr>
                                                     <th class="codigo-col">Código</th>
                                                     <th class="cantidad-col">Cant</th>
-                                                    <th>Producto</th>
+                                                    <th class="producto-col">Producto</th>
                                                     <th class="precio-col">P.Unit</th>
                                                     <th class="subtotal-col">Subtotal</th>
                                                 </tr>
@@ -1202,6 +1238,15 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
 
         // Cargar productos existentes si estamos editando
         if (productosPresupuesto.length > 0) {
+            // Si estamos editando un presupuesto en dólares, convertir los precios para mostrar
+            if (monedaActual === 'usd') {
+                productosPresupuesto.forEach(producto => {
+                    if (producto.price_original_gs) {
+                        // Si tiene precio original en GS, convertir a USD para mostrar
+                        producto.price = producto.price_original_gs / tipoCambio;
+                    }
+                });
+            }
             actualizarListaProductos();
             calcularTotales();
         }
@@ -1234,6 +1279,21 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         // Eventos para moneda e IVA
         $('input[name="moneda"]').change(function() {
             monedaActual = $(this).val();
+            // Actualizar precios según la moneda seleccionada
+            productosPresupuesto.forEach(producto => {
+                if (monedaActual === 'usd') {
+                    // Convertir a dólares
+                    if (!producto.price_original_gs) {
+                        producto.price_original_gs = producto.price;
+                    }
+                    producto.price = producto.price_original_gs / tipoCambio;
+                } else {
+                    // Convertir a guaraníes
+                    if (producto.price_original_gs) {
+                        producto.price = producto.price_original_gs;
+                    }
+                }
+            });
             actualizarListaProductos();
             calcularTotales();
         });
@@ -1279,7 +1339,7 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         if (productoExistente) {
             productoExistente.quantity += cantidad;
         } else {
-            productosPresupuesto.push({
+            const nuevoProducto = {
                 id: productoData.id,
                 name: productoData.nombre,
                 price: parseFloat(productoData.precio_publico),
@@ -1287,7 +1347,17 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                 codigo: productoData.codigo,
                 stock: productoData.stock,
                 categoria: productoData.categoria_nombre
-            });
+            };
+            
+            // Guardar precio original en guaraníes
+            nuevoProducto.price_original_gs = parseFloat(productoData.precio_publico);
+            
+            // Si la moneda actual es USD, convertir el precio
+            if (monedaActual === 'usd') {
+                nuevoProducto.price = nuevoProducto.price_original_gs / tipoCambio;
+            }
+            
+            productosPresupuesto.push(nuevoProducto);
         }
         
         actualizarListaProductos();
@@ -1311,22 +1381,16 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         
         let html = '';
         productosPresupuesto.forEach((producto, index) => {
-            // Convertir precio según moneda actual
-            let precioMostrar = producto.price;
-            let subtotalMostrar = producto.price * producto.quantity;
+            // Calcular subtotal
+            const subtotal = producto.price * producto.quantity;
             
-            if (monedaActual === 'usd') {
-                precioMostrar = producto.price / tipoCambio;
-                subtotalMostrar = (producto.price * producto.quantity) / tipoCambio;
-            }
-            
-            // Formatear precios
-            const precioFormateado = precioMostrar.toLocaleString(monedaActual === 'usd' ? 'en-US' : 'es-PY', {
+            // Formatear precios según moneda
+            const precioFormateado = producto.price.toLocaleString(monedaActual === 'usd' ? 'en-US' : 'es-PY', {
                 minimumFractionDigits: monedaActual === 'usd' ? 2 : 0,
                 maximumFractionDigits: monedaActual === 'usd' ? 2 : 0
             });
             
-            const subtotalFormateado = subtotalMostrar.toLocaleString(monedaActual === 'usd' ? 'en-US' : 'es-PY', {
+            const subtotalFormateado = subtotal.toLocaleString(monedaActual === 'usd' ? 'en-US' : 'es-PY', {
                 minimumFractionDigits: monedaActual === 'usd' ? 2 : 0,
                 maximumFractionDigits: monedaActual === 'usd' ? 2 : 0
             });
@@ -1337,9 +1401,11 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
                         <strong class="text-primary">${producto.codigo}</strong>
                     </td>
                     <td class="cantidad-col">
-                        <strong>${producto.quantity}</strong>
+                        <input type="number" class="form-control cantidad-input" 
+                               value="${producto.quantity}" min="1" 
+                               onchange="actualizarCantidad(${index}, this.value)">
                     </td>
-                    <td>
+                    <td class="producto-col">
                         <div class="fw-bold">${producto.name}</div>
                         ${producto.categoria ? '<small class="text-muted">' + producto.categoria + '</small>' : ''}
                     </td>
@@ -1362,27 +1428,70 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         contador.textContent = productosPresupuesto.length + ' producto' + (productosPresupuesto.length !== 1 ? 's' : '');
     }
 
+    // Función para actualizar cantidad de producto
+    function actualizarCantidad(index, nuevaCantidad) {
+        const cantidad = parseInt(nuevaCantidad);
+        if (cantidad < 1) {
+            alert('La cantidad debe ser mayor a 0');
+            // Restaurar valor anterior
+            actualizarListaProductos();
+            return;
+        }
+        
+        // Verificar stock
+        if (cantidad > productosPresupuesto[index].stock) {
+            alert('No hay suficiente stock. Stock disponible: ' + productosPresupuesto[index].stock);
+            // Restaurar valor anterior
+            actualizarListaProductos();
+            return;
+        }
+        
+        productosPresupuesto[index].quantity = cantidad;
+        calcularTotales();
+        // Actualizar solo la fila específica para mejor rendimiento
+        actualizarFilaProducto(index);
+    }
+
+    // Función para actualizar solo una fila de producto
+    function actualizarFilaProducto(index) {
+        const producto = productosPresupuesto[index];
+        const subtotal = producto.price * producto.quantity;
+        
+        const precioFormateado = producto.price.toLocaleString(monedaActual === 'usd' ? 'en-US' : 'es-PY', {
+            minimumFractionDigits: monedaActual === 'usd' ? 2 : 0,
+            maximumFractionDigits: monedaActual === 'usd' ? 2 : 0
+        });
+        
+        const subtotalFormateado = subtotal.toLocaleString(monedaActual === 'usd' ? 'en-US' : 'es-PY', {
+            minimumFractionDigits: monedaActual === 'usd' ? 2 : 0,
+            maximumFractionDigits: monedaActual === 'usd' ? 2 : 0
+        });
+        
+        const fila = document.querySelector(`#lista-productos tr:nth-child(${index + 1})`);
+        if (fila) {
+            fila.querySelector('.cantidad-col input').value = producto.quantity;
+            fila.querySelector('.precio-col').innerHTML = `${monedaActual === 'usd' ? '$' : 'Gs.'} ${precioFormateado}`;
+            fila.querySelector('.subtotal-col').innerHTML = `<strong class="text-success">${monedaActual === 'usd' ? '$' : 'Gs.'} ${subtotalFormateado}</strong>`;
+        }
+    }
+
     // Función para eliminar producto del presupuesto
     function eliminarProducto(index) {
-        productosPresupuesto.splice(index, 1);
-        actualizarListaProductos();
-        calcularTotales();
+        if (confirm('¿Está seguro de eliminar este producto del presupuesto?')) {
+            productosPresupuesto.splice(index, 1);
+            actualizarListaProductos();
+            calcularTotales();
+        }
     }
 
     // Función para calcular totales
     function calcularTotales() {
-        let subtotalGs = 0;
+        let subtotal = 0;
         
-        // Calcular subtotal en guaraníes (siempre)
+        // Calcular subtotal
         productosPresupuesto.forEach(producto => {
-            subtotalGs += producto.price * producto.quantity;
+            subtotal += producto.price * producto.quantity;
         });
-        
-        // Convertir a dólares si es necesario
-        let subtotal = subtotalGs;
-        if (monedaActual === 'usd') {
-            subtotal = subtotalGs / tipoCambio;
-        }
         
         // Calcular IVA
         let iva = 0;
@@ -1415,7 +1524,7 @@ function convertirPresupuestoAPedido($presupuesto_id, $db) {
         }
         
         // Actualizar campos hidden del formulario
-        // IMPORTANTE: Guardar el total en guaraníes en la base de datos
+        // IMPORTANTE: Siempre guardar el total en guaraníes en la base de datos
         let totalGs = total;
         if (monedaActual === 'usd') {
             totalGs = total * tipoCambio;
